@@ -1,4 +1,4 @@
-package fmsconta;
+package fmsconta.control;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
