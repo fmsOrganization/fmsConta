@@ -1,10 +1,10 @@
-package fmsconta;
+package fmsconta.control;
 import java.awt.*;
 
 import javax.swing.*;
 
-import view.PantallaPrincipal;
-import view.Presentacion;
+import fmsconta.view.PantallaPrincipal;
+import fmsconta.view.Presentacion;
 
 public class Fmsconta1 extends JFrame {
 
@@ -19,6 +19,7 @@ public class Fmsconta1 extends JFrame {
 		final String version="fmsConta 2.0 Beta";
 		String nameUser;
 		String passUser;
+		 
 		
 		// CONFIGURACION ASPECTO DE PANELES PLATAFORMA MEZCLA JAVA
 		try {

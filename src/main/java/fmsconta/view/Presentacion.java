@@ -1,4 +1,4 @@
-package view;
+package fmsconta.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -91,7 +91,6 @@ public class Presentacion extends JFrame implements ActionListener{
 	
 
 
-	@Override
 	public void actionPerformed(ActionEvent e) {
 		// 
 		

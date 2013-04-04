@@ -1,4 +1,4 @@
-package view;
+package fmsconta.view;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -22,7 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import fmsconta.ContaDAO;
+import fmsconta.control.ContaDAO;
 
 
 
@@ -282,7 +282,6 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 
 	} //fin del builder
 
-	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		Object source=e.getSource();

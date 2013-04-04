@@ -1,4 +1,4 @@
-package view;
+package fmsconta.view;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -23,7 +23,7 @@ import javax.swing.ScrollPaneLayout;
 import javax.swing.border.Border;
 import javax.swing.table.AbstractTableModel;
 
-import view.ContUsuario.CreaTabla;
+import fmsconta.view.ContUsuario.CreaTabla;
 
 public class ContEmpresa extends JFrame implements ActionListener{
 	
@@ -154,39 +154,11 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		
 	} //fin del builder
 	
-	
-	/* ********************************************************************
-	 * el accionPerformed lee los botones pulsados
-	 * cada uno de los botones fabrica y muestra un jdialog independiente
-	 * con la accion correspondiente realizada
-	 ******************************************************************* */
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		
-		Object source=e.getSource();
-		
-		if (source==imprimir) {
-			
-			// abre una pantalla para imprimir en un JDialog
-			
-			JDialog listado=new JDialog(ventanaListado,"Listado de datos de Empresa",false);
-			listado.setSize(900,600);
-			listado.setLocationRelativeTo(rootPane);
-			listado.setResizable(true);
-			listado.setBackground(colorBlanco);
 
-			listado.getContentPane().setBackground(colorBlanco);
-			tablaDatos.setBackground(colorBlanco);
-			panelUsu.setBackground(colorBlanco);
-			listado.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-			
-			listado.add(panelUsu);
-			listado.setVisible(true);
-			
-		}
+	
+
 		
-	} // fin del actionPerformed
+	
 	
 	
 	/* ****************************************************************
@@ -577,25 +549,55 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		};
 
 		
-		@Override
 		public int getRowCount() {
 			// TODO Auto-generated method stub
 			return info.length;
 		}
 
-		@Override
 		public int getColumnCount() {
 			// TODO Auto-generated method stub
 			return nombreColum.length;
 		}
 
-		@Override
 		public Object getValueAt(int rowIndex, int nombreColum) {
 			// TODO Auto-generated method stub
 			return info[rowIndex][nombreColum];
 		}
 
 	}  // FIN DE CREATABLA
+
+	
+	/* ********************************************************************
+	 * el accionPerformed lee los botones pulsados
+	 * cada uno de los botones fabrica y muestra un jdialog independiente
+	 * con la accion correspondiente realizada
+	 ******************************************************************* */
+
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+	Object source=e.getSource();
+		
+		if (source==imprimir) {
+			
+			// abre una pantalla para imprimir en un JDialog
+			
+			JDialog listado=new JDialog(ventanaListado,"Listado de datos de Empresa",false);
+			listado.setSize(900,600);
+			listado.setLocationRelativeTo(rootPane);
+			listado.setResizable(true);
+			listado.setBackground(colorBlanco);
+
+			listado.getContentPane().setBackground(colorBlanco);
+			tablaDatos.setBackground(colorBlanco);
+			panelUsu.setBackground(colorBlanco);
+			listado.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+			
+			listado.add(panelUsu);
+			listado.setVisible(true);
+			
+		}
+		
+	} // fin del actionPerformed
 	
 	
 

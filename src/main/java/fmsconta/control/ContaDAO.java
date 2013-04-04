@@ -1,4 +1,4 @@
-package fmsconta;
+package fmsconta.control;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -43,7 +43,7 @@ public class ContaDAO {
 			*/
         
         try {
-        	conexionDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/db393934124","root", "0600105314");
+        	conexionDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/db393934124","root", "150653");
         } catch (SQLException ex) {
             System.out.println("Error conectando a la base de datos");
             Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
