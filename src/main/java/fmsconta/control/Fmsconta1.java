@@ -1,10 +1,8 @@
-package fmsconta;
+package fmsconta.control;
 import java.awt.*;
 
 import javax.swing.*;
-
-import view.PantallaPrincipal;
-import view.Presentacion;
+import fmsconta.view.*;
 
 public class Fmsconta1 extends JFrame {
 

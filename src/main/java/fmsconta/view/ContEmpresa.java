@@ -1,4 +1,4 @@
-package view;
+package fmsconta.view;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -23,7 +23,7 @@ import javax.swing.ScrollPaneLayout;
 import javax.swing.border.Border;
 import javax.swing.table.AbstractTableModel;
 
-import view.ContUsuario.CreaTabla;
+import fmsconta.view.ContUsuario.CreaTabla;
 
 public class ContEmpresa extends JFrame implements ActionListener{
 	
@@ -161,7 +161,6 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	 * con la accion correspondiente realizada
 	 ******************************************************************* */
 	
-	@Override
 	public void actionPerformed(ActionEvent e) {
 		
 		Object source=e.getSource();
@@ -577,19 +576,16 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		};
 
 		
-		@Override
 		public int getRowCount() {
 			// TODO Auto-generated method stub
 			return info.length;
 		}
 
-		@Override
 		public int getColumnCount() {
 			// TODO Auto-generated method stub
 			return nombreColum.length;
 		}
 
-		@Override
 		public Object getValueAt(int rowIndex, int nombreColum) {
 			// TODO Auto-generated method stub
 			return info[rowIndex][nombreColum];

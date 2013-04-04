@@ -1,4 +1,4 @@
-package view;
+package fmsconta.view;
 
 import java.awt.Component;
 
@@ -15,7 +15,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.JOptionPane;
 
-import fmsconta.ContaDAO;
+import fmsconta.control.ContaDAO;
+
 
 public class Identificacion extends JFrame implements ActionListener{
 	
@@ -108,7 +109,6 @@ public class Identificacion extends JFrame implements ActionListener{
 	}  // fin del metodo addcomponentes
 
 	
-	@Override
 	public void actionPerformed (ActionEvent e) {
 		// leemos los eventos
 		Object source=e.getSource();

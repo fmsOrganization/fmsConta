@@ -1,4 +1,4 @@
-package view;
+package fmsconta.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -24,7 +24,7 @@ public class Presentacion extends JFrame implements ActionListener{
 	private Image abc;	
 	private JPanel south;
 	
-	private String pathImageFiles="src/pictures/";
+	private String pathImageFiles="src/main/java/fmsconta/pictures/";
 	private JButton botonSalir;
 	private Color colorfondo=new Color(220,220,220);
 
@@ -91,7 +91,6 @@ public class Presentacion extends JFrame implements ActionListener{
 	
 
 
-	@Override
 	public void actionPerformed(ActionEvent e) {
 		// 
 		
