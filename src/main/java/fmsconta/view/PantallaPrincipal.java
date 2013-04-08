@@ -30,66 +30,101 @@ import fmsconta.control.ContaDAO;
 
 public class PantallaPrincipal extends JFrame implements ActionListener {
 	
+	// panel principal y variables diversas
 	private JDialog pantallaMain;
 	private Color colorfondo=new Color(220,220,220);
-	private String pathImageFiles="src/pictures/";
-	private String datosUser[]=new String[15];
-	private String datosEmpr[]=new String[12];
+	// path de los jpg
+	private String pathImageFiles="src/main/java/fmsconta/pictures/";
 	
+	// panel superior title y sus componentes 
 	private JPanel panelIco;
 	private FlowLayout horizontal0;
 	private Image abc;
 	private JLabel iconoPortada;
-	
+	// panel datos informativos y sus componentes
 	private JPanel panelTitle;
 	private GridLayout horizontal1;
 	private Font fuente;
 	private JLabel nombreEmpresa;
 	private JLabel nombreUsuario;
-	
+	// panel de los combos y sus componentes
 	private JPanel panelCombos;
 	private BoxLayout horizontal2;
-	
+	// panel de la izquierda y sus componentes
 	private JPanel panelIzq;
 	private BoxLayout vertical;
 	private BotonesPanelIzq botonesFijos;
 	private Dimension dimens;
-	
+	// panel central y sus componentes
 	private JPanel panelCen;
 	private JPanel panelAuxCen;
 	private BoxLayout horizontal6;
 	private Font fuente2;
 	private JLabel fotoFondo;
-	
+	// panel de abajo y sus componentes
 	private JPanel panelInf;
 	private BoxLayout horizontal3;
 	private String textoLeyenda;
 	private JLabel leyenda;
 	
-	private String company;
-	private String year;
-	private String userConta;
-	private String passConta;
+	// matrices de retorno de DDBB
+	private String datosUser[]=new String[15];
+	private String datosEmpr[]=new String[12];
+	// variables de id y DDBB
+	private String company="";			// nombre de la compañia (info pantalla)
+	private String year="";				// año de operaciones (info pantalla)
+	private String nameUser="";			// nombre del usuario (info pantalla)
+	private String keyUser="";			// key del user para DDBB
+	private String keyEmpr="";			// key de la empresa para DDBB
+	private boolean isManager=false;	// es manager (true) o usuario (false)
 	
-	public PantallaPrincipal (JFrame mainWindow, String titulo, String nameUser, String passUser){
+	
+	
+	/* *****************************************************************************
+	 *  Este metodo builder muestra la pantalla principal
+	 *  Asimismo lee en la DDBB los datos del usuario y los datos de la empresa
+	 *  actual en la que esta trabajando.
+	 *  Deja informacion del keyUser y keyEmpr (keys de sus respectivos ficheros)
+	 *  Recibe un Frame principal, el titulo de la pantalla,
+	 *  el nombre y el password
+	 ******************************************************************************** */
+	
+	public PantallaPrincipal (JFrame mainWindow, String titulo, String loginUser, String passUser){
 		
-		// *** buscamos los datos del user en la base de datos
-
-			userConta=nameUser;
-			passConta=passUser;
+			
 			
 			// instanciamos el pool de conexiones ContaDAO
 			ContaDAO newUserConta=new ContaDAO();
 
-			// leemos los datos del usuario
-			datosUser=newUserConta.idUserDB(userConta, passConta);
+			// leemos los datos del usuario segun identificacion
+			datosUser=newUserConta.idUserDB(loginUser, passUser);
 			
+			// si no recibimos un null es que la lectura es correcta
+			// los datos vienen filtrados desde identificacion
+			// por lo que el error seria de lectura
 			if (datosUser!=null) {
+				// lee datos de la empresa seleccionada
 				datosEmpr=newUserConta.idEmpDB(datosUser[10]);
-				userConta=datosUser[2];
-				company=datosEmpr[2];
-				year=datosUser[11];
-			} else System.err.println("Error, no existe el user");
+				if (datosEmpr==null) {
+					// si no existe empresa creada PROVISIONALMENTE se sale
+					System.err.println("Error, no existe la empresa");
+					JOptionPane.showMessageDialog(null, "No existe empresa creada");
+					System.exit(0);
+				} else {
+					this.nameUser=datosUser[2];	// nombre del user (info)
+					company=datosEmpr[2];	// compañia de trabajo (info)
+					year=datosUser[11];		// año de trabajo (info)
+					keyUser=datosUser[1]; 	// key del user
+					keyEmpr=datosEmpr[1]; 	// key de la empresa
+					if (datosEmpr[11].equals(datosUser[1])) isManager=true;	//si es el manager true
+				}
+
+			} else {
+				// si se produce un error leyendo el usuario finaliza la app
+				System.err.println("Error, no existe el user");
+				JOptionPane.showMessageDialog(null, "Error leyendo el usuario, no puede continuar");
+				System.exit(0);
+			}
 			
 		// ***********************************************
 		// ***********************************************
@@ -136,7 +171,7 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 		horizontal1=new GridLayout(1,2,10,5);
 		panelTitle.setLayout(horizontal1);
 		nombreEmpresa=new JLabel(company+" - "+year,SwingConstants.CENTER);
-		nombreUsuario=new JLabel("usuario: "+userConta,SwingConstants.CENTER);
+		nombreUsuario=new JLabel("usuario: "+nameUser,SwingConstants.CENTER);
 			// CREAMOS LOS COLORES DE FONDO Y DE LOS TIPOS DE LETRA
 		panelTitle.setBackground(colorfondo);
 		panelTitle.setForeground(colorfondo);
@@ -268,7 +303,6 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 		pantallaMain.pack();
 		pantallaMain.setVisible(true);	
 
-	
 
 		// CREAMOS LOS LISTENER DE LOS BOTONES
 		
@@ -279,9 +313,14 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 		botonesFijos.copseg.addActionListener(this);
 		botonesFijos.salida.addActionListener(this);
 
-	
-
 	} //fin del builder
+	
+	
+	
+	/* ***************************************************************
+	 * El metodo controla todos los eventos de la aplicacion principal
+	 * NO CONTROLA los eventos de las distintas pantallas mostradas
+	***************************************************************** */
 
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
@@ -301,13 +340,17 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 			panelCen.setVisible(true);
 		}
 		
+		// si pulsa el boton de empresa
 		if (source == botonesFijos.empresa) {
+			// borramos el panel central
 			panelCen.setVisible(false);	
 			panelCen.remove(panelAuxCen);
 			panelCen.validate();
+			// creamos un nuevo panel central
 			panelAuxCen=new JPanel();
 			panelAuxCen.setBackground(colorfondo);
-			ContEmpresa hola=new ContEmpresa(datosEmpr,"Florencio Muñoz",panelCen.getHeight());
+			// invocamos y mostramos el nuevo panel central
+			ContEmpresa hola=new ContEmpresa(datosEmpr,keyEmpr,nameUser,isManager,datosUser[6],keyUser);
 			panelAuxCen.add(hola.retorna());
 			panelCen.add(panelAuxCen);
 			panelCen.setVisible(true);

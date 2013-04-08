@@ -38,6 +38,14 @@ public class Presentacion extends JFrame implements ActionListener{
 		//builder
 	}
 		
+	
+	
+	/*
+	 * Este constructor es un inicializador de pantalla soporte
+	 * para colocar sobre ella el JDialog de identificacion
+	 * Recibe un JFrame principal y el titulo de la ventana 
+	 */
+	
 	public Presentacion (JFrame initWindow,String titulo) {
 		
 		// 		INICIALIZACION DE LA VENTANA PRINCIPAL
@@ -79,10 +87,10 @@ public class Presentacion extends JFrame implements ActionListener{
 		nwUser=new Identificacion(pantallagen);
 		nwUser.setVisible(true);
 		
-		// mostramos el nombre del usuario identificado
+		// recogemos el nombre y pass del usuario identificado
 		userConta=nwUser.getUser();
 		userPass=nwUser.getPassword();
-		
+
 		// implementamos el boton salida
 		botonSalir.setActionCommand("Salida");
 		botonSalir.addActionListener(this);
@@ -134,4 +142,5 @@ public class Presentacion extends JFrame implements ActionListener{
 	public void setUserPass(String userPass) {
 		this.userPass = userPass;
 	}
+	
 }

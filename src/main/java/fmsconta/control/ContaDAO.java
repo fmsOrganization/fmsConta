@@ -143,7 +143,6 @@ public class ContaDAO {
     		}
     		
     	} catch (SQLException ex) {
-    		System.err.println("Error en los malditos string keyUser");
     		// si hay algun error cerramos la conexion y return null
     		try {
 				con.close();
@@ -341,5 +340,90 @@ public class ContaDAO {
     
     } // fin de idEmpDB ***********************************
     
+    
+    
+    /* **********************************************************************************
+     * este metodo sirve para grabar en la DDBB los datos de la empresa
+     * 
+     * Recibe el key de empresa en formato String,un String[] con los datos
+     * y un muy importante String oper ("INSERT" o "UPDATE") segun corresponda
+     * Devuelve un true o false si hay errores 
+     ********************************************************************************** */
+    
+    
+    public boolean grabaEmpDB (String keyEmp, String datosEmp[], String oper) {
+           
+    	// crea una conexion
+    	Connection con=ConnectDB();
+    	
+    	Statement st=null;
+    	try {
+    		st = con.createStatement();
+    	} catch (SQLException ex) {
+    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		return false;
+    	}
+    	
+    	// recoge los valores a grabar o actualizar
+      //  int id=(int)Integer.parseInt(datosEmp[0]); realmente es un autoincrement
+        String key=datosEmp[1];
+    	String nom=datosEmp[2];
+    	String dir=datosEmp[3];
+    	String loc=datosEmp[4];
+    	String pro=datosEmp[5];
+    	String cpo=datosEmp[6];
+    	String cif=datosEmp[7];
+    	String ini=datosEmp[8];
+    	String fin=datosEmp[9];
+    	int act=(int)Integer.parseInt(datosEmp[10]);
+    	String man=datosEmp[11];
+    	
+    	int rs=0; 
+    	try {   
+    		if (oper.equals("UPDATE")) {
+    			rs = st.executeUpdate("UPDATE c_empresas SET keyempresa='"+key+"', " +
+    				"nombre='"+nom+"', direccion='"+dir+"', localidad='"+loc+"', provincia='"+pro+"'," +
+    				" codpostal='"+cpo+"', cif='"+cif+"', fechainicio='"+ini+"',fechafin='"+fin+"'," +
+    						" activa='"+act+"',keymanager='"+man+"' WHERE keyempresa='"+keyEmp+"' LIMIT 1");
+    		} else if (oper.equals("INSERT")) {
+    			rs = st.executeUpdate("INSERT c_empresas SET keyempresa='"+key+"', " +
+        				"nombre='"+nom+"', direccion='"+dir+"', localidad='"+loc+"', provincia='"+pro+"'," +
+        				" codpostal='"+cpo+"', cif='"+cif+"', fechainicio='"+ini+"',fechafin='"+fin+"'," +
+        						" activa='"+act+"',keymanager='"+man+"'");
+    		} else System.err.println("No se recibió orden de Update o Insert. Operación no efectuada ");
+    			
+    	} catch (SQLException ex) {
+    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		return false;
+    	} 
+       
+
+    	// si todo ha ido bien
+    	// cerramos la conexion y retornamos el String[]
+    	try {
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+    	
+    	return true;
+    
+    } // fin de grabaEmpDB ***********************************
     
 }

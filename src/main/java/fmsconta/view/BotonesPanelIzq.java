@@ -19,7 +19,7 @@ public class BotonesPanelIzq extends JFrame{
 	protected JButton copseg;
 	protected JButton salida;
 	
-	private String pathImageFiles="src/pictures/";
+	private String pathImageFiles="src/main/java/fmsconta/pictures/";
 	private Image abc;
 
 	
