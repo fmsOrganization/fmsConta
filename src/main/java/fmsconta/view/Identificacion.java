@@ -38,6 +38,12 @@ public class Identificacion extends JFrame implements ActionListener{
 	}
 	
 	
+	/* ****************************************************
+	 * Este metodo constructor es un JDialog modal
+	 * Suministra la clasica ventana de usuario y contraseña
+	 * Recibe como argumento el JFrame principal
+	 ****************************************************** */
+	
 	public Identificacion (JDialog mainWindow) {
 		
 		// PREPARACION DE LA VENTANA
@@ -61,7 +67,9 @@ public class Identificacion extends JFrame implements ActionListener{
 		entrar= new JButton("Entrar");
 		salir= new JButton("Salir");
 		userName=new JTextField(15);
+		userName.setToolTipText("Longitud entre 3 y 10 caracteres");
 		userPass=new JPasswordField(15);
+		userPass.setToolTipText("Longitud entre 3 y 10 caracteres");
 		
 		// añadimos los componentes
 		Component comp;
@@ -90,6 +98,14 @@ public class Identificacion extends JFrame implements ActionListener{
 	} // fin del builder identificacion
 	
 	
+	
+	/* *************************************************************************
+	 * Este metodo es un metodo complementario de ayuda a la confeccion
+	 * del gridbaglayout, ahorrando mucha linea y tal 
+	 * Recibe un componente y los parametros del gridbaglayout
+	 * Devuelve el componente con el setcontraints ya hecho
+	 *************************************************************************** */
+	
 	public Component addComponentes (Component componente, int gridx, int gridy, int gridwidth, 
 			int gridheight, int weightx, int weighty, int fill, int anchor) {
 		
@@ -109,36 +125,97 @@ public class Identificacion extends JFrame implements ActionListener{
 	}  // fin del metodo addcomponentes
 
 	
+	
+	/* ******************************************************************
+	 * Este metodo implementa la accion de los botones entrar y salir
+	 * de la ventana de identificacion
+	 * Recibe el evento y lo controla. Llama al metodo idCorrect para
+	 * controlar el usuario y/o contraseña validos
+	 ********************************************************************/
+	
 	public void actionPerformed (ActionEvent e) {
 		// leemos los eventos
 		Object source=e.getSource();
 		
-		// control sobre los botones
+		// ******************control sobre los botones
+		
 		if (source==salir) {
 			// si pulsa salir
 			System.exit(0);
 		}
 		
 		if (source==entrar) {
-			// si pulsa entrar
-			if (!(userName.getText().equals("") || userName.getText().equals(null))) {
-				// introducido un user y un pass 
-				// verifica si coincide user y pass
-				// y cierra la ventana
-				if (idCorrect()) {
+			// comprueba la idoneidad del login/pass introducido
+			if (idCorrect()){
+				// comprueba la existencia del login/pass
+				if (idExist()) {
 					idUser.setVisible(false);
 				} else {
-					// no es correcto y se muestra un mensaje
-					JOptionPane.showMessageDialog(null, "Usuario o contraseña no válidos");
+					// no existe y se muestra un mensaje
+					JOptionPane.showMessageDialog(null, "Ese usuario o contraseña no existe");
 				}
-				
+			} else {
+				// no es correcto y se muestra un mensaje
+				JOptionPane.showMessageDialog(null, "El usuario o contraseña es de longitud inadecuado");
 			}
 		}		
 
 	}  // fin del actionPerformed
 
 	
+	
+	/* *******************************************************************
+	 * Este metodo comprueba en si el login y password suministrado
+	 * cumple los requisitos basicos que son:
+	 * campo no vacio, y longitud min 3 y max 10
+	 * No recibe ningun argumento y retorna un true/false si cumple o no
+	 ******************************************************************** */
+	
 	public boolean idCorrect() {
+		
+		String login=userName.getText();
+		char passw[]=new char[10];
+		passw=userPass.getPassword();
+		
+		// verifica si hay userName relleno
+		if ((login.equals("") || login.equals(null))) {
+			JOptionPane.showMessageDialog(null, "Usuario no rellenado");
+			return false;
+		}
+		
+		//  verifica si userName mide entre 3 y 10
+		if ((login.length()<3 || login.length()>10)) {
+			JOptionPane.showMessageDialog(null, "Longitud de usuario inadecuada");
+			return false;
+		}		
+		
+		// verifica si hay userPass relleno
+		if ((passw.equals("") || passw.equals(null))) {
+			JOptionPane.showMessageDialog(null, "Contraseña no rellenada");
+			return false;
+		}		
+		
+		// verifica si userPass mide entre 3 y 10
+		if ((passw.length<3 || passw.length>10)) {
+			JOptionPane.showMessageDialog(null, "Longitud de contraseña inadecuada");
+			return false;
+		}
+		
+		passw=null;
+		// llegado aqui es que cumple los requisitos
+		return true;
+		
+	} // fin del metodo idCorrect
+
+	
+	
+	/* *******************************************************************
+	 * Este metodo comprueba en la DDBB si existe el usuario identificado
+	 * por el login y password introducido
+	 * No recibe ningun argumento y retorna un true/false si existe o no
+	 ******************************************************************** */
+	
+	public boolean idExist() {
 		
 		// se comprueba en DB si existe un user y password concreto
 		// y devuelve true o false segun 
@@ -152,18 +229,26 @@ public class Identificacion extends JFrame implements ActionListener{
 		usExist=newUserConta.idExist(getUser(),getPassword());
 		
 		return usExist;
-	}
-	
 		
-	public String getUser() {
+	} // fin del metodo idExist
+	
+	
+	
+	// get del user
+		
+	protected String getUser() {
 		// retorna el usuario
 		return userName.getText();
-	}
+	} 
 
-	public String getPassword() {
+	// get del password
+	
+	protected String getPassword() {
 		// retorna la password
 		char tuPass[]=new char[10];
 		tuPass=userPass.getPassword();
-		return String.valueOf(tuPass);
-	}
+		String pass=String.valueOf(tuPass);
+		tuPass=null;
+		return pass;
+	} 
 }

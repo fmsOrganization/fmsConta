@@ -5,15 +5,19 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -24,6 +28,7 @@ import javax.swing.border.Border;
 import javax.swing.table.AbstractTableModel;
 
 import fmsconta.view.ContUsuario.CreaTabla;
+import fmsconta.control.ContaDAO;
 
 public class ContEmpresa extends JFrame implements ActionListener{
 	
@@ -101,48 +106,63 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	private JTextField d9C=new JTextField();
 	private JTextField d10C=new JTextField();
 	
-	// colores y fuentes
+	// colores, fuentes, graficos
 	private Color colorfondo=new Color(220,220,220);
 	private Color colorBlanco=new Color(255,255,255);
 	private Font fuente1=new Font("",Font.BOLD,20);
 	private Font fuente2=new Font("",Font.PLAIN,16);
 	private int sizeLetras=24;
-
+	private String pathImageFiles="src/main/java/fmsconta/pictures/";
+	private Image abc;
+	private Icon iconoW;
+	private Icon iconoE;
+	private Icon iconoD;
+	
 	// botones y controles
 	private JButton imprimir;
 	private JButton modificar;
 	private JButton eliminar;
 	private JButton crear;
 	
+	private String datosEmp[];
+	private String creaEmp[];
+	private String keyEmpr;
+	private int userCat;
+	private String keyUser;
 	
-	public ContEmpresa (){
-		// builder
-	}
 	
 	
 	/* *********************************************************
 	 * Este metodo permite mostrar, modificar y borrar los datos
 	 * de cada empresa registrada para contabilidad
-	 * El metodo recibe una matriz de datos de empresa
+	 * El metodo recibe una matriz de datos de empresa, su key
+	 * de DDBB, el String nombre del usuario y true si es manager
 	 * y realiza las acciones pertinentes
 	 ********************************************************* */
 	
-	public ContEmpresa(String datosEmp[], String manager, int CompHeight){	
+	public ContEmpresa(String datosEmpmain[], String keyEmpresa, String nameUsuario, boolean isManager, String categoria, String keyUser){	
+		
+		System.out.println("El name del usuario es "+nameUsuario);
+		
+		// asignamos a variables de clase los datos recibidos
+		datosEmp=datosEmpmain;
+		keyEmpr=keyEmpresa;
+		userCat =(int)Integer.parseInt(categoria);
+		this.keyUser=keyUser;
 		
 		// primero construimos el panel para consultar
 		// *******************************************
 		
-		consultaTabla(datosEmp,manager);
+		consultarPanel(datosEmp,nameUsuario);
 		
 		// segundo construimos el panel para modificar-borrar
 		// **************************************************
 		
-		modificaTabla(datosEmp,manager,false);
+		modificarPanel(datosEmp,nameUsuario,isManager);
 
 		// tercero construimos el panel para creación nuevas empresas
 		// **********************************************************
-		String datosEmpCreac[]=new String[12];
-		creaTabla(datosEmpCreac,manager,true);
+		creaPanel(datosEmp,nameUsuario,userCat);
 
 		// y finalmente agregamos los paneles al tabbedPane
 		panTab=panelTabulado(panelUsu,"Consultar",panelUsu2,"Modificar",panelUsu3,"Creación");
@@ -151,8 +171,15 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		imprimir.addActionListener(this);
 		modificar.addActionListener(this);
 		eliminar.addActionListener(this);
+		crear.addActionListener(this);
 		
 	} //fin del builder
+	
+
+	public ContEmpresa (){
+		// builder
+	}
+	
 	
 	
 	/* ********************************************************************
@@ -185,6 +212,35 @@ public class ContEmpresa extends JFrame implements ActionListener{
 			
 		}
 		
+		if (source==modificar) {
+			// añade los datos modificables de la pantalla visual 
+			// a la tabla de datos y luego la graba en la DDBB
+			aceptaModif();
+			if (grabaModif()) {
+				JOptionPane.showMessageDialog(null, "Empresa modificada");
+			} else {
+				JOptionPane.showMessageDialog(null, "Error en modificación de empresa");
+			}
+			
+		}
+		
+		if (source==crear) {
+			// añade a la DDBB una nueva empresa
+			// comprueba que cumple los requisitos para crear empresas
+			if (cumpleRequisitos()){
+				// revisa si datos son OK y prepara tabla para grabar
+				if (preparaGrabEmp()) {
+					// graba los datos si no hay problemas
+					if (grabaNuevaEmpr()) {
+						JOptionPane.showMessageDialog(null, "Empresa creada");
+					} else {
+						JOptionPane.showMessageDialog(null, "Error en creación de empresa");
+					}
+				}
+			}
+		}
+		
+		
 	} // fin del actionPerformed
 	
 	
@@ -193,10 +249,11 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	 * el tabbedPane fabricado y listo para ser visualizado
 	 * no recibe argumentos, y devuelve un jtabbedPane
 	 ************************************************************** */
-	
+
 	public JTabbedPane retorna() {
 		return panTab;
 	}
+	
 
 	/* ******************************************************************************
 	 * Este metodo crea un tabbedpane de tres pestañas con la informacion recibida
@@ -225,7 +282,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	 * Este metodo no tiene valor de retorno
 	 ***************************************************************************/
 	
-	public void consultaTabla (String datosEmp[], String manager) {
+	public void consultarPanel (String datosEmp[], String nameUsuario) {
 		
 		// creacion del panel principal
 		panelUsu=new JPanel();
@@ -253,7 +310,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		if (d9.getText().equals("0")) {
 			d9.setText("Inactiva");
 		} else {d9.setText("Activa");}
-		d10.setText(manager);		// nombre manager
+		d10.setText(nameUsuario);		// nombre manager
 		
 		// definicion de celdas no editables
 		d1.setEditable(false);
@@ -303,6 +360,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	    imprimir.setToolTipText("abre una pantalla aparte");
 	    south.add(imprimir);
 	    
+	    panelUsuAux.setVisible(true);
 	    // agregamos componentes al panel principal
 	    panelUsu.add(n0);
 	    panelUsu.add(espacioA);
@@ -311,7 +369,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	    panelUsu.add(south);
 		
 		
-	} // fin del metodo consultaTabla
+	} // fin del metodo consultarPanel
 	
 
 	/* *************************************************************************
@@ -324,7 +382,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	 * Este metodo no retorna, modifica directamente las variables de clase
 	 ************************************************************************** */
 	
-	public void modificaTabla (String datosEmp[], String usuario, boolean manager) {
+	public void modificarPanel (String datosEmp[], String nameUsuario, boolean manager) {
 		
 		// creacion del panel principal
 		panelUsu2=new JPanel();
@@ -352,7 +410,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		if (d9B.getText().equals("0")) {
 			d9B.setText("Inactiva");
 		} else {d9B.setText("Activa");}
-		d10B.setText(usuario);		// nombre manager
+		d10B.setText(nameUsuario);		// nombre manager
 		
 		// definicion de celdas no editables
 		d7B.setEditable(false);
@@ -365,17 +423,31 @@ public class ContEmpresa extends JFrame implements ActionListener{
 			d9B.setEditable(false);
 		}
 		
+		// elaboracion de iconos
+		abc=new ImageIcon(pathImageFiles+"warning.jpg").getImage();
+		iconoW=new ImageIcon(abc.getScaledInstance(20,15,java.awt.Image.SCALE_SMOOTH));
+		abc=new ImageIcon(pathImageFiles+"enable.jpg").getImage();
+		iconoE=new ImageIcon(abc.getScaledInstance(20,15,java.awt.Image.SCALE_SMOOTH));
+		abc=new ImageIcon(pathImageFiles+"disable.jpg").getImage();
+		iconoD=new ImageIcon(abc.getScaledInstance(20,15,java.awt.Image.SCALE_SMOOTH));
+		
 		// definicion de comentarios edicion
-		JLabel sp1=new JLabel("solo manager");
-		JLabel sp2=new JLabel("permitido");
-		JLabel sp3=new JLabel("permitido");
-		JLabel sp4=new JLabel("permitido");
-		JLabel sp5=new JLabel("permitido");
-		JLabel sp6=new JLabel("solo manager");
-		JLabel sp7=new JLabel("no permitido");
-		JLabel sp8=new JLabel("no permitido");
-		JLabel sp9=new JLabel("solo manager");
-		JLabel sp10=new JLabel("no permitido");
+		int tabulacion;
+		if (manager) {
+			tabulacion=JLabel.LEFT;
+		} else {
+			tabulacion=JLabel.CENTER;
+		}
+		JLabel sp1=new JLabel("solo manager",iconoW,tabulacion);
+		JLabel sp2=new JLabel("permitido",iconoE,JLabel.LEFT);
+		JLabel sp3=new JLabel("permitido",iconoE,JLabel.LEFT);
+		JLabel sp4=new JLabel("permitido",iconoE,JLabel.LEFT);
+		JLabel sp5=new JLabel("permitido",iconoE,JLabel.LEFT);
+		JLabel sp6=new JLabel("solo manager",iconoW,tabulacion);
+		JLabel sp7=new JLabel("no permitido",iconoD,JLabel.CENTER);
+		JLabel sp8=new JLabel("no permitido",iconoD,JLabel.CENTER);
+		JLabel sp9=new JLabel("solo manager",iconoW,tabulacion);
+		JLabel sp10=new JLabel("no permitido",iconoD,JLabel.CENTER);
 		
 		// add de componentes al panel rejilla
 		panelUsuAux2.add(l1B);
@@ -439,17 +511,20 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	    panelUsu2.add(south2);
 		
 		
-	} // fin del metodo modificaTabla
+	} // fin del metodo modificarPanel
 	
 	
 	/* ************************************************************************
 	 * Este metodo permite la consulta de la tabla datos empresa
 	 * Ningun dato puede ser modificado
-	 * Se reciben un string[] con datos de empresa, y un String con el manager
+	 * Se reciben un string[] con datos de empresa, String nombre de usuario y
+	 * un int con la categoria del usuario (solo cat=1 puede crear)
 	 * Este metodo no tiene valor de retorno
 	 ***************************************************************************/
 	
-	public void creaTabla (String datosEmp[], String usuario, boolean manager) {
+	public void creaPanel (String datosEmp[], String nameUsuario, int userCat) {
+		
+		//datosEmpCreac[]=new String[12];
 		
 		// creacion del panel principal
 		panelUsu3=new JPanel();
@@ -474,19 +549,29 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		d7C.setText("");	// fecha inicio ejercicio
 		d8C.setText("");	// fecha fin ejercicio
 		d9C.setText("Inactiva");	// activa
-		d10C.setText(usuario);		// nombre manager
+		d10C.setText(nameUsuario);		// nombre manager
+		d10C.setEnabled(false);
 				
+		abc=new ImageIcon(pathImageFiles+"warning.jpg").getImage();
+		iconoW=new ImageIcon(abc.getScaledInstance(20,15,java.awt.Image.SCALE_SMOOTH));
+		
 		// definicion de comentarios edicion
-		JLabel sc1=new JLabel("máx. longitud 40");
+		JLabel sc1=new JLabel("máx. longitud 40",iconoW,JLabel.LEFT);
+		sc1.setToolTipText("Campo obligatorio");
 		JLabel sc2=new JLabel("máx. longitud 50");
 		JLabel sc3=new JLabel("máx. longitud 50");
 		JLabel sc4=new JLabel("máx. longitud 20");
-		JLabel sc5=new JLabel("máx. longitud 5");
-		JLabel sc6=new JLabel("máx. longitud 9");
-		JLabel sc7=new JLabel("máx. longitud 8");
-		JLabel sc8=new JLabel("máx. longitud 8");
-		JLabel sc9=new JLabel(" ");
+		JLabel sc5=new JLabel("longitud obligatoria 5",iconoW,JLabel.LEFT);
+		sc5.setToolTipText("Campo obligatorio");
+		JLabel sc6=new JLabel("longitud obligatoria 9",iconoW,JLabel.LEFT);
+		sc6.setToolTipText("Campo obligatorio");
+		JLabel sc7=new JLabel("longitud obligatoria 8",iconoW,JLabel.LEFT);
+		sc7.setToolTipText("Campo obligatorio");
+		JLabel sc8=new JLabel("longitud obligatoria 8",iconoW,JLabel.LEFT);
+		sc8.setToolTipText("Campo obligatorio");
+		JLabel sc9=new JLabel("1-Activa 0-Inactiva");
 		JLabel sc10=new JLabel(" ");
+		
 		
 		// add de componentes al panel rejilla
 		panelUsuAux3.add(l1C);
@@ -532,11 +617,12 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	    south3.setBackground(colorfondo);
 	    crear=new JButton("Crear empresa");
 	    crear.setToolTipText("crea una empresa con los datos introducidos");
-	    if (!manager) {
+	    if (userCat!=1) {
 	    	crear.setEnabled(false);
-	    	crear.setToolTipText("Solo pueden crear los managers");
+	    	crear.setToolTipText("Solo pueden crear empresas los managers");
 	    }
 	    south3.add(crear);
+	    
 
 	    // agregamos componentes al panel principal
 	    panelUsu3.add(n3);
@@ -549,8 +635,175 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	} // fin del metodo creaTabla
 	
 	
+	
+	/* ************************************************************************
+	 * Este metodo realiza la modificacion de la tabla datos empresa
+	 * Actuando sobre el string[] con los datos de empresa
+	 * Este metodo no tiene parametros y no tiene valor de retorno
+	 ************************************************************************** */
+	
+	private void aceptaModif() {
+		
+		// datos de la empresa actualizados a las casillas editables
+		
+		datosEmp[2]=d1B.getText();		// nombre empresa
+		datosEmp[3]=d2B.getText();		// direccion
+		datosEmp[4]=d3B.getText();		// localidad
+		datosEmp[5]=d4B.getText();		// provincia
+		datosEmp[6]=d5B.getText();		// codigo postal
+		datosEmp[7]=d6B.getText();		// cif
+		if (d9B.getText().equals("Inactiva")) {
+			datosEmp[10]="0";
+		} else {datosEmp[10]="1";}		// activa
+			
+		for(int i=0;i<datosEmp.length;i++) {
+		System.out.print(datosEmp[i]+"-");
+		}
+		
+	} // fin del metodo aceptaModif
+	
+	
+	/* ************************************************************************
+	 * Este metodo graba la modificacion de la tabla empresa en la DDBB
+	 * 
+	 * Este metodo no tiene parametros y devuelve valor de retorno true false
+	 * segun haya ido la grabacion
+	 ************************************************************************** */
+
+	private boolean grabaModif() {
+		
+		// Instanciamos el metodo DAO para efectuar la grabacion
+		
+		ContaDAO dao=new ContaDAO();
+		
+		// graba los datos residentes en datosEmp en la DDBB con key keyEmpr
+		if (dao.grabaEmpDB (keyEmpr, datosEmp, "UPDATE")){
+			System.out.println("alright");
+		} else {
+			// fallo al intentar grabar la empresa
+			System.err.println("Fallo al intentar modificar los datos de empresa ");
+			return false;
+		}
+		
+		return true;
+		
+	} // fin del metodo grabaModif
+	
+	
+	
+	/* **************************************************************************
+	 * Este metodo comprueba el cumplimiento de los requisitos para crear empresa
+	 * El primer requisito es tener categoria manager = 1
+	 * EL segundo requisito es no poder crear mas de 3 empresas
+	 * retorna true o false segun cumpla o no los requisitos
+	 ************************************************************************** */
+	
+	private boolean cumpleRequisitos() {
+		return true;
+	}
+	
+	
+	/* ************************************************************************
+	 * Este metodo realiza la preparacion de la tabla empresa
+	 * Actuando sobre el string[] con los datos de empresa
+	 * Este metodo no recibe parametros
+	 * retorna true o false segun todo este correcto o no
+	 ************************************************************************** */
+	
+	private boolean preparaGrabEmp() {
+		
+		int numAleat=(int) (Math.floor(Math.random()*898))+100;
+		// elabora la tabla de empresa para grabacion en DDBB
+		// creaEmp[0]=d1B.getText();		es autoincrement
+		// componemos el key empresa con las dos primeras letras de la empresa
+		// mas un numero aleatorio de 3 cifras
+		System.out.println("aleatorio "+numAleat);
+		//creaEmp[1]=d1C.getText().substring(0, 1)+String.valueOf(numAleat) ;		// key empresa
+		creaEmp=new String[12];
+		creaEmp[1]="AA003";
+		if (d1C.getText().length()<3 || d1C.getText().length()>40) {
+			JOptionPane.showMessageDialog(null, "Nombre de empresa de longitud inadecuada");
+			return false;
+		} else creaEmp[2]=d1C.getText();		// nombre empresa
+		
+		if (d2C.getText().length()>50) {
+			JOptionPane.showMessageDialog(null, "Dirección tiene más de 50 caracteres");
+			return false;
+		} else creaEmp[3]=d2C.getText();		// direccion
+		
+		if (d3C.getText().length()>50) {
+			JOptionPane.showMessageDialog(null, "Localidad tiene más de 50 caracteres");
+			return false;
+		} else creaEmp[4]=d3C.getText();		// localidad
+		
+		if (d4C.getText().length()>20) {
+			JOptionPane.showMessageDialog(null, "Provincia tiene más de 20 caracteres");
+			return false;
+		} else creaEmp[5]=d4C.getText();		// provincia
+		
+		if (d5C.getText().length()!=5) {
+			JOptionPane.showMessageDialog(null, "Código postal debe tener 5 caracteres");
+			return false;
+		} else creaEmp[6]=d5C.getText();		// codigo postal
+		
+		if (d6C.getText().length()!=9) {
+			JOptionPane.showMessageDialog(null, "N.I.F. debe tener 9 caracteres");
+			return false;
+		} else creaEmp[7]=d6C.getText();		// cif
+		
+		if (d7C.getText().length()!=8) {
+			JOptionPane.showMessageDialog(null, "Formato fecha inicial: XX-XX-XX");
+			return false;
+		} else creaEmp[8]=d7C.getText();		// fecha inicio
+		
+		if (d8C.getText().length()!=8) {
+			JOptionPane.showMessageDialog(null, "Formato fecha final: XX-XX-XX");
+			return false;
+		} else creaEmp[9]=d8C.getText();		// fecha fin
+		
+		if (!(d9C.getText().equals("0") || d9C.getText().equals("1"))) {
+			JOptionPane.showMessageDialog(null, "Introduzca 1 para activa, 0 para inactiva");
+			return false;
+		} else creaEmp[10]=d9C.getText();		// activa
+				
+		creaEmp[11]=keyUser;			// key manager
+
+		return true;
+		
+	} // fin del metodo preparaGrabEmp
+	
+	
+	
+	/* ************************************************************************
+	 * Este metodo graba nueva empresa de la tabla empresa en la DDBB
+	 * 
+	 * Este metodo no tiene parametros y devuelve valor de retorno true false
+	 * segun haya ido la grabacion
+	 ************************************************************************** */
+
+	private boolean grabaNuevaEmpr() {
+		
+		// Instanciamos el metodo DAO para efectuar la grabacion
+		
+		ContaDAO daoN=new ContaDAO();
+		
+		// graba los datos residentes en datosEmp en la DDBB con key keyEmpr
+		if (daoN.grabaEmpDB (creaEmp[1], creaEmp, "INSERT")){
+			System.out.println("alright");
+		} else {
+			// fallo al intentar grabar la empresa
+			System.err.println("Fallo al intentar grabar la nueva empresa ");
+			return false;
+		}
+		
+		return true;
+		
+	} // fin del metodo grabanuevaempr
+	
+	
+	
 	/* *****************************************************************************
-	 * Esta clase crea la tabla con los datos de la empresa para mostrar
+	 * Esta clase interna crea la tabla con los datos de la empresa para mostrar
 	 * la informacion a mostrar a sido previamente leida y modificada (en su caso)
 	 * dentro del metodo que la llama
 	 * la clase es una extension y los metodos devuelven la informacion y longitud
