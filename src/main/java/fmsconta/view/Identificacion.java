@@ -31,6 +31,7 @@ public class Identificacion extends JFrame implements ActionListener{
 	private JLabel texto1;
 	private JLabel userNameL;
 	private JLabel userPassL;
+	private ContaDAO newUserConta;
 	
 	
 	public Identificacion() {
@@ -67,9 +68,9 @@ public class Identificacion extends JFrame implements ActionListener{
 		entrar= new JButton("Entrar");
 		salir= new JButton("Salir");
 		userName=new JTextField(15);
-		userName.setToolTipText("Longitud entre 3 y 10 caracteres");
+		userName.setToolTipText("Longitud entre 5 y 10 caracteres");
 		userPass=new JPasswordField(15);
-		userPass.setToolTipText("Longitud entre 3 y 10 caracteres");
+		userPass.setToolTipText("Longitud entre 5 y 10 caracteres");
 		
 		// añadimos los componentes
 		Component comp;
@@ -126,12 +127,19 @@ public class Identificacion extends JFrame implements ActionListener{
 
 	
 	
-	/* ******************************************************************
+	/* **********************************************************************
 	 * Este metodo implementa la accion de los botones entrar y salir
 	 * de la ventana de identificacion
-	 * Recibe el evento y lo controla. Llama al metodo idCorrect para
-	 * controlar el usuario y/o contraseña validos
-	 ********************************************************************/
+	 * 
+	 * SALIR : cierra la aplicacion.
+	 * 
+	 * ENTRAR : Recibe el evento y lo controla. 
+	 * Llama al metodo idCorrect para controlar el usuario y/o pass validos
+	 * Llama al idExist para comprobar si existe el usuario/password
+	 * Llama al lpdcgu para comprobar si había aceptado las LPD/CGU
+	 * En caso de no haber aceptado, pregunta y graba la aceptacion
+	 * En caso de no aceptar cierra la aplicacion
+	 **********************************************************************/
 	
 	public void actionPerformed (ActionEvent e) {
 		// leemos los eventos
@@ -149,7 +157,26 @@ public class Identificacion extends JFrame implements ActionListener{
 			if (idCorrect()){
 				// comprueba la existencia del login/pass
 				if (idExist()) {
-					idUser.setVisible(false);
+					// comprueba si estaba aceptada la lpdcgu
+					if (lpdcgu()){
+						// todo se cumple - cierra la ventana
+						idUser.setVisible(false);
+					} else {
+						JOptionPane.showMessageDialog(null, "Debe aceptar las CGU y la LPD");
+						if (aceptoLPD() && aceptoCGU()) {
+							// Aceptar las condiciones
+							grabaCGULPD();
+							// despues de grabar la aceptacion cierra la ventana
+							idUser.setVisible(false);							
+						} else {
+							// NO ACEPTA LAS CONDICIONES
+							// SE CIERRA LA APLICACION
+							JOptionPane.showMessageDialog(null, "No ha aceptado las condiciones," +
+									" la aplicación se cerrará");
+							System.exit(0);
+						}
+					}
+					
 				} else {
 					// no existe y se muestra un mensaje
 					JOptionPane.showMessageDialog(null, "Ese usuario o contraseña no existe");
@@ -167,7 +194,7 @@ public class Identificacion extends JFrame implements ActionListener{
 	/* *******************************************************************
 	 * Este metodo comprueba en si el login y password suministrado
 	 * cumple los requisitos basicos que son:
-	 * campo no vacio, y longitud min 3 y max 10
+	 * campo no vacio, y longitud min 5 y max 10
 	 * No recibe ningun argumento y retorna un true/false si cumple o no
 	 ******************************************************************** */
 	
@@ -183,8 +210,8 @@ public class Identificacion extends JFrame implements ActionListener{
 			return false;
 		}
 		
-		//  verifica si userName mide entre 3 y 10
-		if ((login.length()<3 || login.length()>10)) {
+		//  verifica si userName mide entre 5 y 10
+		if ((login.length()<5 || login.length()>10)) {
 			JOptionPane.showMessageDialog(null, "Longitud de usuario inadecuada");
 			return false;
 		}		
@@ -195,8 +222,8 @@ public class Identificacion extends JFrame implements ActionListener{
 			return false;
 		}		
 		
-		// verifica si userPass mide entre 3 y 10
-		if ((passw.length<3 || passw.length>10)) {
+		// verifica si userPass mide entre 5 y 10
+		if ((passw.length<5 || passw.length>10)) {
 			JOptionPane.showMessageDialog(null, "Longitud de contraseña inadecuada");
 			return false;
 		}
@@ -221,12 +248,12 @@ public class Identificacion extends JFrame implements ActionListener{
 		// y devuelve true o false segun 
 		
 		// instanciamos el pool de conexiones ContaDAO
-		ContaDAO newUserConta=new ContaDAO();
+		this.newUserConta=new ContaDAO();
 		
 		boolean usExist=false;
 		// comprobamos los datos del usuario
 		// y recibimos true o false
-		usExist=newUserConta.idExist(getUser(),getPassword());
+		usExist=this.newUserConta.idExist(getUser(),getPassword());
 		
 		return usExist;
 		
@@ -235,20 +262,77 @@ public class Identificacion extends JFrame implements ActionListener{
 	
 	
 	// get del user
-		
 	protected String getUser() {
-		// retorna el usuario
+		// retorna el login del usuario
 		return userName.getText();
 	} 
 
 	// get del password
-	
 	protected String getPassword() {
-		// retorna la password
+		// retorna la password del usuario
 		char tuPass[]=new char[10];
 		tuPass=userPass.getPassword();
 		String pass=String.valueOf(tuPass);
 		tuPass=null;
 		return pass;
-	} 
+	}
+	
+	
+	
+	/* *************************************************************
+	 * Metodo que sirve para verificar si cumple la lpdcgu
+	 * implementa un metodo existente en contaDAO
+	 * retorna true si cumple y false si no cumple
+	 ****************************************************************/
+	
+	protected boolean lpdcgu() {
+		// retorna si cumple o no las CGULPD
+		return this.newUserConta.cumpleCGULPD();
+	}
+	
+	
+	
+	/* *************************************************************
+	 * Metodo a implementar
+	 * consiste en mostrar el texto de la LPD y que el cliente
+	 * clicke una casilla y acepte o deniegue la LPD
+	 * deberia retornar true si acepta y false si no acepta
+	 ****************************************************************/
+	
+	protected boolean aceptoLPD() {
+		
+		JOptionPane.showMessageDialog(null, "Acepto la LPD");
+		return true;
+	}
+
+	
+	
+	/* *************************************************************
+	 * Metodo a implementar
+	 * consiste en mostrar el texto de las CGU y que el cliente
+	 * clicke una casilla y acepte o deniegue las CGU
+	 * deberia retornar true si acepta y false si no acepta
+	 ****************************************************************/
+	
+	protected boolean aceptoCGU() {
+		
+		JOptionPane.showMessageDialog(null, "Acepto las CGU");
+		
+		return true;
+	}
+	
+	
+	
+	/* *************************************************************
+	 * Metodo que realiza la grabacion de la aceptacion
+	 * de la LPD y de la CGU
+	 * 
+	 * implementa un metodo de contaDAO que graba 'Y' en ambas
+	 * no retorna nada
+	 ****************************************************************/
+	
+	protected void grabaCGULPD(){
+		// graba la aceptacion de la LPD y CGU
+		this.newUserConta.grabaCGULPD(getUser(),getPassword());
+	}
 }

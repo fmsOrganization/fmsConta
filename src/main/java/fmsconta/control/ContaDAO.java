@@ -8,11 +8,16 @@ import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
+
 
 
 public class ContaDAO {
 	
 	private static Connection conexionDB;
+	private String cgu;
+	private String lpd;
+	
 	
 	public ContaDAO () {
 		
@@ -43,10 +48,11 @@ public class ContaDAO {
 			*/
         
         try {
-        	conexionDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/db393934124","root", "0600105314");
+        	conexionDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/db393934124","root", "150653");
         } catch (SQLException ex) {
             System.out.println("Error conectando a la base de datos");
             Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "No conecta con Base de Datos: salga de la aplicación");
             return null;
         }
         	
@@ -224,6 +230,9 @@ public class ContaDAO {
         			// es que existe la coincidencia
         			if (!(rs.getString(1).equals(null))) {
         				userRet=true;
+        				this.lpd=rs.getString(14);
+        				this.cgu=rs.getString(15);
+     
         			}
         		}
         	} catch (SQLException ex) {
@@ -410,7 +419,6 @@ public class ContaDAO {
 			}
     		return false;
     	} 
-       
 
     	// si todo ha ido bien
     	// cerramos la conexion y retornamos el String[]
@@ -424,6 +432,86 @@ public class ContaDAO {
     	
     	return true;
     
-    } // fin de grabaEmpDB ***********************************
+    }  // fin de grabaEmpDB ***********************************
+    
+    
+    
+    /* **********************************************************************************
+     * este metodo sirve para grabar en la DDBB la aceptación de la LPD y de las CGU
+     * 
+     * Recibe como argumento el login y el password y no devuelve nada 
+     ********************************************************************************** */
+    
+    
+    public void grabaCGULPD (String login, String pass) {
+           
+    	// crea una conexion
+    	Connection con=ConnectDB();
+    	
+    	Statement st=null;
+    	try {
+    		st = con.createStatement();
+    	} catch (SQLException ex) {
+    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	
+    	// recoge los valores a grabar o actualizar
+    	String lpd="Y";
+    	String cgu="Y";
+    	int rs=0;
+    	
+    	try { 
+    		rs = st.executeUpdate("UPDATE c_usuario SET lpd='"+lpd+"', " +
+    			"cgu='"+cgu+"' WHERE usuario='"+login+"' AND password='"+pass+"' LIMIT 1");
+    			
+    	} catch (SQLException ex) {
+    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	} 
+
+    	// si todo ha ido bien
+    	// cerramos la conexion y retornamos el String[]
+    	try {
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    
+    }  // fin de grabaCGULPD ***********************************
+    
+    
+    
+    
+    /* *************************************************************
+     * Este metodo comprueba si la lpd y las cgu estaban aceptadas
+     * ambas han obtenido el valor en idExist()
+     * retorna true si cumplen y false si no cumplen 
+     *************************************************************** */
+    
+    public boolean cumpleCGULPD() {
+    	
+    	if ((this.cgu.equals("Y"))&&(this.lpd.equals("Y"))) {
+    		return true;
+    	}
+    	
+    	return false;
+    }
+    
+    
+    
     
 }
