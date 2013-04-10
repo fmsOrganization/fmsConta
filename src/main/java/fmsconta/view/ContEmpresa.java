@@ -124,12 +124,14 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	private JButton eliminar;
 	private JButton crear;
 	
-	private String datosEmp[];
-	private String creaEmp[];
-	private String keyEmpr;
-	private int userCat;
-	private String keyUser;
-	
+	private String datosUsuario[];	// matriz con los datos del usuario
+	private String datosEmp[];		// matriz con los datos de la empresa
+	private String creaEmp[];		// matriz para creacion datos empresa
+	private String keyEmpr;			// key de la empresa actual
+	private int userCat;			// categoria que tiene el usuario 
+	private String keyUser;			// key del usuario
+	private ContaDAO dao;			// instanciar objeto tipo conexiones empresa actual
+	private ContaDAO daoN;			// instanciar objeto tipo conexiones empresa nueva
 	
 	
 	/* *********************************************************
@@ -140,29 +142,29 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	 * y realiza las acciones pertinentes
 	 ********************************************************* */
 	
-	public ContEmpresa(String datosEmpmain[], String keyEmpresa, String nameUsuario, boolean isManager, String categoria, String keyUser){	
-		
-		System.out.println("El name del usuario es "+nameUsuario);
+	//public ContEmpresa(String datosEmpmain[], String keyEmpresa, String nameUsuario, boolean isManager, String categoria, String keyUser){	
+	public ContEmpresa(String datosEmpmain[], String datosUsuario[]){	
 		
 		// asignamos a variables de clase los datos recibidos
+		this.datosUsuario=datosUsuario;
 		datosEmp=datosEmpmain;
-		keyEmpr=keyEmpresa;
-		userCat =(int)Integer.parseInt(categoria);
-		this.keyUser=keyUser;
+		keyEmpr=datosEmpmain[1];
+		userCat =(int)Integer.parseInt(datosUsuario[6]);
+		this.keyUser=datosUsuario[1];
 		
 		// primero construimos el panel para consultar
 		// *******************************************
 		
-		consultarPanel(datosEmp,nameUsuario);
+		consultarPanel(datosEmp,datosUsuario[2]);
 		
 		// segundo construimos el panel para modificar-borrar
 		// **************************************************
 		
-		modificarPanel(datosEmp,nameUsuario,isManager);
+		modificarPanel(datosEmp,datosUsuario[2],userCat);
 
 		// tercero construimos el panel para creación nuevas empresas
 		// **********************************************************
-		creaPanel(datosEmp,nameUsuario,userCat);
+		creaPanel(datosEmp,datosUsuario[2],userCat);
 
 		// y finalmente agregamos los paneles al tabbedPane
 		panTab=panelTabulado(panelUsu,"Consultar",panelUsu2,"Modificar",panelUsu3,"Creación");
@@ -227,7 +229,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		if (source==crear) {
 			// añade a la DDBB una nueva empresa
 			// comprueba que cumple los requisitos para crear empresas
-			if (cumpleRequisitos()){
+			if (cumpleRequisitos(this.keyUser,this.userCat)){
 				// revisa si datos son OK y prepara tabla para grabar
 				if (preparaGrabEmp()) {
 					// graba los datos si no hay problemas
@@ -244,6 +246,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	} // fin del actionPerformed
 	
 	
+	
 	/* ****************************************************************
 	 * el metodo retorna es el que devuelve a la pantalla principal
 	 * el tabbedPane fabricado y listo para ser visualizado
@@ -255,6 +258,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	}
 	
 
+	
 	/* ******************************************************************************
 	 * Este metodo crea un tabbedpane de tres pestañas con la informacion recibida
 	 * recibe tres JPanel con sus string titulos correspondientes
@@ -273,6 +277,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		return menu;
 		
 	} // fin del metodo panelTabulado
+	
 	
 	
 	/* ************************************************************************
@@ -371,6 +376,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		
 	} // fin del metodo consultarPanel
 	
+	
 
 	/* *************************************************************************
 	 * Este metodo permite la modificacion de la tabla datos empresa
@@ -382,7 +388,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	 * Este metodo no retorna, modifica directamente las variables de clase
 	 ************************************************************************** */
 	
-	public void modificarPanel (String datosEmp[], String nameUsuario, boolean manager) {
+	public void modificarPanel (String datosEmp[], String nameUsuario, int categoria) {
 		
 		// creacion del panel principal
 		panelUsu2=new JPanel();
@@ -416,7 +422,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		d7B.setEditable(false);
 		d8B.setEditable(false);
 		d10B.setEditable(false);
-		if (!manager) {
+		if (categoria!=1) {
 			// los usuarios no manager tampoco puede modificar estas
 			d1B.setEditable(false);
 			d6B.setEditable(false);
@@ -433,7 +439,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		
 		// definicion de comentarios edicion
 		int tabulacion;
-		if (manager) {
+		if (categoria==1) {
 			tabulacion=JLabel.LEFT;
 		} else {
 			tabulacion=JLabel.CENTER;
@@ -495,9 +501,9 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	    modificar.setToolTipText("guarda los datos actuales");
 	    eliminar=new JButton("Eliminar");
 	    eliminar.setToolTipText("borra definitivamente la empresa");
-	    if (!manager) {
+	    if (categoria!=1) {
 	    	// si no eres manager no puede borrar la empresa
-	    	eliminar.setEnabled(manager);
+	    	eliminar.setEnabled(false);
 	    	eliminar.setToolTipText("solo permitido al manager");
 	    }
 	    south2.add(modificar);
@@ -512,6 +518,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		
 		
 	} // fin del metodo modificarPanel
+	
 	
 	
 	/* ************************************************************************
@@ -663,6 +670,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	} // fin del metodo aceptaModif
 	
 	
+	
 	/* ************************************************************************
 	 * Este metodo graba la modificacion de la tabla empresa en la DDBB
 	 * 
@@ -674,7 +682,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		
 		// Instanciamos el metodo DAO para efectuar la grabacion
 		
-		ContaDAO dao=new ContaDAO();
+		dao=new ContaDAO();
 		
 		// graba los datos residentes en datosEmp en la DDBB con key keyEmpr
 		if (dao.grabaEmpDB (keyEmpr, datosEmp, "UPDATE")){
@@ -698,8 +706,17 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	 * retorna true o false segun cumpla o no los requisitos
 	 ************************************************************************** */
 	
-	private boolean cumpleRequisitos() {
-		return true;
+	private boolean cumpleRequisitos(String keyUsuario, int categoria) {
+		
+		// si no es un manager no puede crear empresa
+		if (categoria != 1) return false;
+		
+		// si tiene sitios vacios es que puede crear empresas
+		if (this.datosUsuario[8].equals("") || this.datosUsuario[9].equals("")) {
+			return true;
+		}
+		
+		return false;
 	}
 	
 	
@@ -783,18 +800,25 @@ public class ContEmpresa extends JFrame implements ActionListener{
 
 	private boolean grabaNuevaEmpr() {
 		
-		// Instanciamos el metodo DAO para efectuar la grabacion
-		
-		ContaDAO daoN=new ContaDAO();
+		// instanciamos un nuevo contaDAO
+		daoN=new ContaDAO();
 		
 		// graba los datos residentes en datosEmp en la DDBB con key keyEmpr
-		if (daoN.grabaEmpDB (creaEmp[1], creaEmp, "INSERT")){
+		if (this.daoN.grabaEmpDB (creaEmp[1], creaEmp, "INSERT")){
 			System.out.println("alright");
 		} else {
 			// fallo al intentar grabar la empresa
 			System.err.println("Fallo al intentar grabar la nueva empresa ");
 			return false;
-		}
+			}
+		
+		// graba el dato de la nueva empresa creada en el user
+		// primero define el registro donde grabar
+		// segun sea la tercera o segunda empresa
+		int oper=9;
+		if (this.datosUsuario[8].equals("")) oper=8;
+		// suministra los datos y procede a grabar
+		daoN.grabaEmpresaUsu(this.keyUser, creaEmp[1], oper);
 		
 		return true;
 		

@@ -19,33 +19,24 @@ public class ContaDAO {
 	private String lpd;
 	
 	
+	
 	public ContaDAO () {
-		
 		// builder
-
 	}
     
+	
     
-    /*
+    /* **************************************************************
      * Este metodo sirve para crear una conexion a la DB del usuario
      * No recibe argumentos
      * Si no hay problemas devuelve un objeto Connection
      * Si hay errores devuelve null
-     */
+     ****************************************************************/
     
     public Connection ConnectDB () {
         
         // CONECTOR CON LAS BASES DE DATOS
         // DEVUELVE UN OBJETO CONNECTION SI LO CONSIGUE Y NULL SI FALLA
-       	
-			/*	
-					try {
-						Class.forName("Driver");
-					} catch (ClassNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-			*/
         
         try {
         	conexionDB = DriverManager.getConnection("jdbc:mysql://localhost:3306/db393934124","root", "150653");
@@ -59,6 +50,8 @@ public class ContaDAO {
           return conexionDB;
        } // fin del metodo connectDB *******************************************
     
+    
+    
     /* *********************************
      * Este metodo devuelve conexiones
      * está pensado para multihilo
@@ -71,6 +64,7 @@ public class ContaDAO {
     }    
     
     
+    
     /* **********************************************************************************
      * este metodo sirve para leer en las tablas correspondientes los datos solicitados
      * a un login y password determinado.
@@ -78,7 +72,6 @@ public class ContaDAO {
      * Devuelve un null si hay errores
      * Si el login-pasword son correctos, devuelve un String[15]
      ********************************************************************************** */
-    
     
     public String[] idUserDB (String login, String password) {
         
@@ -126,7 +119,6 @@ public class ContaDAO {
     		return null;
     	} 
        
-    
     	try {
     		
     		while (rs.next()){ 
@@ -173,6 +165,7 @@ public class ContaDAO {
     } // fin de idUserDB ***********************************
 
     
+    
     /* ***************************************************************
      * este metodo sirve para comprobar en la tabla correspondiente 
      * si existe un login y password determinado.
@@ -180,7 +173,6 @@ public class ContaDAO {
      * Devuelve un boolean como respuesta
      * Encontrado = TRUE ; no encontrado = FALSE
     ****************************************************************** */
-    
     
     public boolean idExist (String login, String password) {
         
@@ -267,7 +259,6 @@ public class ContaDAO {
      * Si el keyEmp es correcto, devuelve un String[12]
      ********************************************************************************** */
     
-    
     public String[] idEmpDB (String keyEmp) {
            
     	// crea una conexion
@@ -352,13 +343,12 @@ public class ContaDAO {
     
     
     /* **********************************************************************************
-     * este metodo sirve para grabar en la DDBB los datos de la empresa
+     * Este metodo sirve para grabar en la DDBB los datos de la empresa
      * 
      * Recibe el key de empresa en formato String,un String[] con los datos
      * y un muy importante String oper ("INSERT" o "UPDATE") segun corresponda
      * Devuelve un true o false si hay errores 
      ********************************************************************************** */
-    
     
     public boolean grabaEmpDB (String keyEmp, String datosEmp[], String oper) {
            
@@ -394,7 +384,7 @@ public class ContaDAO {
     	int act=(int)Integer.parseInt(datosEmp[10]);
     	String man=datosEmp[11];
     	
-    	int rs=0; 
+    	int rs=0;
     	try {   
     		if (oper.equals("UPDATE")) {
     			rs = st.executeUpdate("UPDATE c_empresas SET keyempresa='"+key+"', " +
@@ -436,12 +426,70 @@ public class ContaDAO {
     
     
     
+    /* ********************************************************************
+     * este metodo sirve para grabar en la tabla del usuario
+     * la empresa que acaba de crear
+     * 
+     * Recibe como argumentos el keyUser y el KeyEmpr y no devuelve nada
+     ********************************************************************** */
+    
+    public void grabaEmpresaUsu (String keyUser, String keyEmpr, int position) {
+           
+    	// crea una conexion
+    	Connection con=ConnectDB();
+    	
+    	Statement st=null;
+    	try {
+    		st = con.createStatement();
+    	} catch (SQLException ex) {
+    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	
+    	// recoge los valores a grabar o actualizar
+
+    	int rs=0;
+    	
+    	try {
+    		if (position==8) {
+    			rs = st.executeUpdate("UPDATE c_usuario SET emp2='"+keyEmpr+"' WHERE keyuser='"+keyUser+"' LIMIT 1");
+    		} else rs = st.executeUpdate("UPDATE c_usuario SET emp3='"+keyEmpr+"' WHERE keyuser='"+keyUser+"' LIMIT 1");
+    			
+    	} catch (SQLException ex) {
+    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	} 
+
+    	// si todo ha ido bien
+    	// cerramos la conexion y retornamos el String[]
+    	try {
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    
+    }  // fin de grabaEmpresaUsu ***********************************
+    
+    
+    
     /* **********************************************************************************
      * este metodo sirve para grabar en la DDBB la aceptación de la LPD y de las CGU
      * 
      * Recibe como argumento el login y el password y no devuelve nada 
      ********************************************************************************** */
-    
     
     public void grabaCGULPD (String login, String pass) {
            
@@ -492,9 +540,8 @@ public class ContaDAO {
 		}
     
     }  // fin de grabaCGULPD ***********************************
-    
-    
-    
+     
+   
     
     /* *************************************************************
      * Este metodo comprueba si la lpd y las cgu estaban aceptadas
@@ -510,8 +557,6 @@ public class ContaDAO {
     	
     	return false;
     }
-    
-    
     
     
 }

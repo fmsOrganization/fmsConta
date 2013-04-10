@@ -350,7 +350,8 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 			panelAuxCen=new JPanel();
 			panelAuxCen.setBackground(colorfondo);
 			// invocamos y mostramos el nuevo panel central
-			ContEmpresa hola=new ContEmpresa(datosEmpr,keyEmpr,nameUser,isManager,datosUser[6],keyUser);
+			//ContEmpresa hola=new ContEmpresa(datosEmpr,keyEmpr,nameUser,isManager,datosUser[6],keyUser);
+			ContEmpresa hola=new ContEmpresa(datosEmpr,datosUser);
 			panelAuxCen.add(hola.retorna());
 			panelCen.add(panelAuxCen);
 			panelCen.setVisible(true);
