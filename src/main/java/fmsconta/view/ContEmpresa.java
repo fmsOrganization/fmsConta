@@ -142,7 +142,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	 * y realiza las acciones pertinentes
 	 ********************************************************* */
 	
-	//public ContEmpresa(String datosEmpmain[], String keyEmpresa, String nameUsuario, boolean isManager, String categoria, String keyUser){	
+		
 	public ContEmpresa(String datosEmpmain[], String datosUsuario[]){	
 		
 		// asignamos a variables de clase los datos recibidos
