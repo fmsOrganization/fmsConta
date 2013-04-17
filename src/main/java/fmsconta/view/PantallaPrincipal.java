@@ -334,8 +334,8 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 			panelCen.validate();
 			panelAuxCen=new JPanel();
 			panelAuxCen.setBackground(colorfondo);
-			ContUsuario hola=new ContUsuario(datosUser,datosEmpr,panelCen.getHeight());
-			panelAuxCen.add(hola.retorna());
+			ContUsuario hola1=new ContUsuario(datosUser,datosEmpr);
+			panelAuxCen.add(hola1.retorna());
 			panelCen.add(panelAuxCen);
 			panelCen.setVisible(true);
 		}
