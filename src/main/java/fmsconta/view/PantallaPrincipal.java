@@ -25,9 +25,6 @@ import javax.swing.SwingConstants;
 import fmsconta.control.ContaDAO;
 
 
-
-
-
 public class PantallaPrincipal extends JFrame implements ActionListener {
 	
 	// panel principal y variables diversas

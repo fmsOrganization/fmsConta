@@ -32,7 +32,6 @@ import fmsconta.control.ContaDAO;
 
 public class ContEmpresa extends JFrame implements ActionListener{
 	
-	
 	// contenedores
 	private JFrame ventanaListado;
 	private JTabbedPane panTab;
