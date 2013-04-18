@@ -19,7 +19,6 @@ public class ContaDAO {
 	private String lpd;
 	
 	
-	
 	public ContaDAO () {
 		// builder
 	}

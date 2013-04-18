@@ -1,6 +1,7 @@
 package fmsconta.view;
 
 import java.awt.Color;
+
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -29,6 +30,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+
 
 public class ContUsuario extends JFrame implements ActionListener{
 	
@@ -90,7 +92,7 @@ public class ContUsuario extends JFrame implements ActionListener{
 	 * de DDBB, el String nombre del usuario y true si es manager
 	 * y realiza las acciones pertinentes
 	 ********************************************************* */
-		
+	
 	/* **************************************************************
 	 * Este metodo permite mostrar, modificar y borrar los datos
 	 * de cada usuario operador
