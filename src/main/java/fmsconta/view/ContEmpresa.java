@@ -1,12 +1,9 @@
 package fmsconta.view;
 
 import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -14,21 +11,19 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.ScrollPaneLayout;
-import javax.swing.border.Border;
 import javax.swing.table.AbstractTableModel;
 
-import fmsconta.view.ContUsuario.CreaTabla;
 import fmsconta.control.ContaDAO;
+
 
 public class ContEmpresa extends JFrame implements ActionListener{
 	
@@ -92,7 +87,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	private JTextField d6B=new JTextField();
 	private JTextField d7B=new JTextField();
 	private JTextField d8B=new JTextField();
-	private JTextField d9B=new JTextField();
+	private JComboBox d9B=new JComboBox();
 	private JTextField d10B=new JTextField();
 	private JTextField d1C=new JTextField();
 	private JTextField d2C=new JTextField();
@@ -102,7 +97,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	private JTextField d6C=new JTextField();
 	private JTextField d7C=new JTextField();
 	private JTextField d8C=new JTextField();
-	private JTextField d9C=new JTextField();
+	private JComboBox d9C=new JComboBox();
 	private JTextField d10C=new JTextField();
 	
 	// colores, fuentes, graficos
@@ -141,7 +136,6 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	 * y realiza las acciones pertinentes
 	 ********************************************************* */
 	
-		
 	public ContEmpresa(String datosEmpmain[], String datosUsuario[]){	
 		
 		// asignamos a variables de clase los datos recibidos
@@ -173,6 +167,8 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		modificar.addActionListener(this);
 		eliminar.addActionListener(this);
 		crear.addActionListener(this);
+		d9B.addActionListener(this);
+		d9C.addActionListener(this);
 		
 	} //fin del builder
 	
@@ -238,9 +234,18 @@ public class ContEmpresa extends JFrame implements ActionListener{
 						JOptionPane.showMessageDialog(null, "Error en creación de empresa");
 					}
 				}
-			}
+			} else JOptionPane.showMessageDialog(null, "No es posible crear más empresas");
 		}
 		
+		if (source==d9B) {
+			// modificacion de empresas:
+			d9B.getSelectedItem().toString();
+		}
+		
+		if (source==d9C) {
+			// modificacion de empresas:
+			d9C.getSelectedItem().toString();
+		}
 		
 	} // fin del actionPerformed
 	
@@ -372,7 +377,6 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	    panelUsu.add(espacioB);
 	    panelUsu.add(south);
 		
-		
 	} // fin del metodo consultarPanel
 	
 	
@@ -411,10 +415,13 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		d6B.setText(datosEmp[7]);	// cif
 		d7B.setText(datosEmp[8]);	// fecha inicio ejercicio
 		d8B.setText(datosEmp[9]);	// fecha fin ejercicio
-		d9B.setText(datosEmp[10]);	// activa
-		if (d9B.getText().equals("0")) {
-			d9B.setText("Inactiva");
-		} else {d9B.setText("Activa");}
+		// actividad
+		d9B.addItem("Activa");
+		d9B.addItem("Inactiva");
+		if (datosEmp[10].equals("0")) {
+			d9B.setSelectedIndex(1);
+		} else d9B.setSelectedIndex(0);
+
 		d10B.setText(nameUsuario);		// nombre manager
 		
 		// definicion de celdas no editables
@@ -530,8 +537,6 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	
 	public void creaPanel (String datosEmp[], String nameUsuario, int userCat) {
 		
-		//datosEmpCreac[]=new String[12];
-		
 		// creacion del panel principal
 		panelUsu3=new JPanel();
 		panelUsu3.setLayout(new BoxLayout(panelUsu3,BoxLayout.Y_AXIS));
@@ -554,7 +559,8 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		d6C.setText("");	// cif
 		d7C.setText("");	// fecha inicio ejercicio
 		d8C.setText("");	// fecha fin ejercicio
-		d9C.setText("Inactiva");	// activa
+		d9C.addItem("Activa");
+		d9C.addItem("Inactiva");
 		d10C.setText(nameUsuario);		// nombre manager
 		d10C.setEnabled(false);
 				
@@ -575,7 +581,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		sc7.setToolTipText("Campo obligatorio");
 		JLabel sc8=new JLabel("longitud obligatoria 8",iconoW,JLabel.LEFT);
 		sc8.setToolTipText("Campo obligatorio");
-		JLabel sc9=new JLabel("1-Activa 0-Inactiva");
+		JLabel sc9=new JLabel("Activa o Inactiva");
 		JLabel sc10=new JLabel(" ");
 		
 		
@@ -658,9 +664,9 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		datosEmp[5]=d4B.getText();		// provincia
 		datosEmp[6]=d5B.getText();		// codigo postal
 		datosEmp[7]=d6B.getText();		// cif
-		if (d9B.getText().equals("Inactiva")) {
-			datosEmp[10]="0";
-		} else {datosEmp[10]="1";}		// activa
+		if (d9B.getSelectedItem().toString().equals("Activa")) {
+			datosEmp[10]="1";					// activa
+		} else datosEmp[10]="0";	
 			
 		for(int i=0;i<datosEmp.length;i++) {
 		System.out.print(datosEmp[i]+"-");
@@ -728,59 +734,79 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	
 	private boolean preparaGrabEmp() {
 		
-		int numAleat=(int) (Math.floor(Math.random()*898))+100;
 		// elabora la tabla de empresa para grabacion en DDBB
-		// creaEmp[0]=d1B.getText();		es autoincrement
-		// componemos el key empresa con las dos primeras letras de la empresa
-		// mas un numero aleatorio de 3 cifras
-		System.out.println("aleatorio "+numAleat);
-		//creaEmp[1]=d1C.getText().substring(0, 1)+String.valueOf(numAleat) ;		// key empresa
 		creaEmp=new String[12];
-		creaEmp[1]="AA003";
+		
+		// se limpian los avisos visuales de error
+		d1C.setBackground(Color.WHITE);
+		d2C.setBackground(Color.WHITE);
+		d3C.setBackground(Color.WHITE);
+		d4C.setBackground(Color.WHITE);
+		d5C.setBackground(Color.WHITE);
+		d6C.setBackground(Color.WHITE);
+		d7C.setBackground(Color.WHITE);
+		d8C.setBackground(Color.WHITE);
+		d9C.setBackground(Color.WHITE);
+		
+		// creaEmp[0]=d1B.getText();		es autoincrement
+
+		// Revision del nombre de empresa
 		if (d1C.getText().length()<3 || d1C.getText().length()>40) {
 			JOptionPane.showMessageDialog(null, "Nombre de empresa de longitud inadecuada");
+			d1C.setBackground(Color.ORANGE);
 			return false;
 		} else creaEmp[2]=d1C.getText();		// nombre empresa
 		
+		// componemos el key empresa con las dos primeras letras de la empresa
+		// mas un numero aleatorio de 3 cifras
+		String aleatorio=String.valueOf(100+(int)(Math.floor((Math.random()*898)+1)));
+		creaEmp[1]=creaEmp[2].substring(0, 2)+aleatorio;
+		
 		if (d2C.getText().length()>50) {
 			JOptionPane.showMessageDialog(null, "Dirección tiene más de 50 caracteres");
+			d2C.setBackground(Color.ORANGE);
 			return false;
 		} else creaEmp[3]=d2C.getText();		// direccion
 		
 		if (d3C.getText().length()>50) {
 			JOptionPane.showMessageDialog(null, "Localidad tiene más de 50 caracteres");
+			d3C.setBackground(Color.ORANGE);
 			return false;
 		} else creaEmp[4]=d3C.getText();		// localidad
 		
 		if (d4C.getText().length()>20) {
 			JOptionPane.showMessageDialog(null, "Provincia tiene más de 20 caracteres");
+			d4C.setBackground(Color.ORANGE);
 			return false;
 		} else creaEmp[5]=d4C.getText();		// provincia
 		
 		if (d5C.getText().length()!=5) {
 			JOptionPane.showMessageDialog(null, "Código postal debe tener 5 caracteres");
+			d5C.setBackground(Color.ORANGE);
 			return false;
 		} else creaEmp[6]=d5C.getText();		// codigo postal
 		
 		if (d6C.getText().length()!=9) {
 			JOptionPane.showMessageDialog(null, "N.I.F. debe tener 9 caracteres");
+			d6C.setBackground(Color.ORANGE);
 			return false;
 		} else creaEmp[7]=d6C.getText();		// cif
 		
 		if (d7C.getText().length()!=8) {
 			JOptionPane.showMessageDialog(null, "Formato fecha inicial: XX-XX-XX");
+			d7C.setBackground(Color.ORANGE);
 			return false;
 		} else creaEmp[8]=d7C.getText();		// fecha inicio
 		
 		if (d8C.getText().length()!=8) {
 			JOptionPane.showMessageDialog(null, "Formato fecha final: XX-XX-XX");
+			d8C.setBackground(Color.ORANGE);
 			return false;
 		} else creaEmp[9]=d8C.getText();		// fecha fin
 		
-		if (!(d9C.getText().equals("0") || d9C.getText().equals("1"))) {
-			JOptionPane.showMessageDialog(null, "Introduzca 1 para activa, 0 para inactiva");
-			return false;
-		} else creaEmp[10]=d9C.getText();		// activa
+		if (d9C.getSelectedItem().toString().equals("Activa")) {
+			creaEmp[10]="1";					// activa
+		} else creaEmp[10]="0";	
 				
 		creaEmp[11]=keyUser;			// key manager
 

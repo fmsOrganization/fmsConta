@@ -11,7 +11,6 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -23,6 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import fmsconta.control.ContaDAO;
+
 
 
 public class PantallaPrincipal extends JFrame implements ActionListener {
@@ -87,8 +87,6 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 	 ******************************************************************************** */
 	
 	public PantallaPrincipal (JFrame mainWindow, String titulo, String loginUser, String passUser){
-		
-			
 			
 			// instanciamos el pool de conexiones ContaDAO
 			ContaDAO newUserConta=new ContaDAO();
@@ -125,7 +123,6 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 			
 		// ***********************************************
 		// ***********************************************
-		
 		// **** CREAMOS LAS CONDICIONES DE LA VENTANA PRINCIPAL
 		
 		pantallaMain=new JDialog(mainWindow,titulo,false);
@@ -251,7 +248,6 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 		
 		horizontal6=new BoxLayout(panelAuxCen,BoxLayout.Y_AXIS);
 		
-		//panelAuxCen.setLayout(horizontal6);
 		// CREAMOS LOS COLORES DE FONDO Y DE LOS TIPOS DE LETRA
 		fuente2=new Font("",Font.BOLD,16);
 		panelCen.setBackground(colorfondo);
@@ -299,7 +295,6 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 			// MOSTRAMOS EL PANEL GENERAL
 		pantallaMain.pack();
 		pantallaMain.setVisible(true);	
-
 
 		// CREAMOS LOS LISTENER DE LOS BOTONES
 		
@@ -352,7 +347,6 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 			panelAuxCen.add(hola.retorna());
 			panelCen.add(panelAuxCen);
 			panelCen.setVisible(true);
-
 		}
 		
 		if (source == botonesFijos.faqs) {
@@ -375,5 +369,4 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 			}
 		}
 	}
-
-}
+} // fin del actionPerformed
