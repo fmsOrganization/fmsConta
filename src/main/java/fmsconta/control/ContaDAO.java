@@ -249,6 +249,147 @@ public class ContaDAO {
     } // fin de idExist ***********************************    
     
     
+    
+    /* ***************************************************************
+     * este metodo sirve para comprobar en DDBB 
+     * si existe un keyUser determinado
+     * Recibe un String con el keyUser
+     * Devuelve un boolean como respuesta
+     * Encontrado = TRUE ; no encontrado = FALSE
+    ****************************************************************** */
+    
+    public boolean idKeyExist (String keyUser) {
+        
+        //  este metodo comprueba el key y devuelve true o false
+            
+    	// crea una conexion
+    	Connection con=ConnectDB();
+    	
+        Statement st=null;
+        try {
+        	st = con.createStatement();
+        	} catch (SQLException ex) {
+        		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+        		// si hay algun error cerramos la conexion y return false
+        		try {
+    				con.close();
+    			} catch (SQLException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+        		return false;
+        } 
+              
+        ResultSet rs=null;      	
+        try {   
+        	rs = st.executeQuery("SELECT * FROM c_usuario WHERE keyuser='"+keyUser+"'");
+        	} catch (SQLException ex) {
+        		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+        		// si hay algun error cerramos la conexion y return false
+        		try {
+    				con.close();
+    			} catch (SQLException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+        	return false;
+        } 
+       	
+        boolean userRet=false;
+        	// si rs no es null es que hay una lectura, y entonces retornamos
+        	// true que implica que existe ese idExist
+        
+		// lee el primer dato, si existe
+        try {
+    		while (rs.next()){ 
+    			// si el primer dato es distinto de null
+    			// es que existe la coincidencia
+    			if (!(rs.getString(1).equals(null))) {
+    				userRet=true;
+    			}
+    		}
+    	} catch (SQLException ex) {
+    		// si hay algun error cerramos la conexion y return false
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+		}
+    	return false;
+    }
+         
+        // todo ha ido bien, cerramos la conexion y retornamos el String[]
+        try {
+    			con.close();
+    			} catch (SQLException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+        return userRet;
+        
+    } // fin de idKeyExist ***********************************    
+    
+    
+    
+    /* ***************************************************************
+     * este metodo sirve para eliminar en DDBB un usuario determinado 
+     *
+     * Recibe un String con el keyUser
+     * Devuelve un boolean como respuesta
+     * borrado = TRUE ; no borrado = FALSE
+    ****************************************************************** */
+    
+    public boolean eraseUser (String keyUser) {
+        
+        //  este metodo comprueba el key y devuelve true o false
+            
+    	// crea una conexion
+    	Connection con=ConnectDB();
+    	
+        Statement st=null;
+        try {
+        	st = con.createStatement();
+        	} catch (SQLException ex) {
+        		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+        		// si hay algun error cerramos la conexion y return false
+        		try {
+    				con.close();
+    			} catch (SQLException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+        		return false;
+        	} 
+              
+        int rs=0;      	
+        try {   
+        	rs = st.executeUpdate("UPDATE c_usuario WHERE keyuser='"+keyUser+"' LIMIT 1");
+        	} catch (SQLException ex) {
+        		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+        		// si hay algun error cerramos la conexion y return false
+        		try {
+    				con.close();
+    			} catch (SQLException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+        	return false;
+        	} 
+        
+         
+        // todo ha ido bien, cerramos la conexion y retornamos el String[]
+        try {
+    			con.close();
+    			} catch (SQLException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    				return false;
+    			}
+        return true;
+        
+    } // fin de eraseUser *********************************** 
+    
    
     /* **********************************************************************************
      * este metodo sirve para leer en la tabla correspondiente los datos de la empresa
@@ -338,6 +479,212 @@ public class ContaDAO {
     	return datosEmpr;
     
     } // fin de idEmpDB ***********************************
+    
+    
+    
+    /* **********************************************************************************
+     * este metodo sirve para buscar en la DDBB los datos de las empresas de un usuario
+     * 
+     * Recibe un key de user en formato String
+     * Devuelve un null si hay errores
+     * Si el keyUser es correcto, devuelve un String[n][12] siendo n el num.de empresas
+     ********************************************************************************** */
+    
+    public String[][] buscaEmpresasUsuDB (String keyUser) {
+           
+    	// crea una conexion
+    	Connection con=ConnectDB();
+    	
+    	Statement st=null;
+    	try {
+    		st = con.createStatement();
+    	} catch (SQLException ex) {
+    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		return null;
+    	}
+          
+    	// preparamos un String para recuperar todos los datos de usuario
+    	String datosEmpr[][]=new String[3][12];
+    	
+    	ResultSet rs=null; 
+    	try {   
+    		rs = st.executeQuery("SELECT * FROM c_empresas WHERE keymanager='"+keyUser+"'");
+    	} catch (SQLException ex) {
+    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		return null;
+    	} 
+       
+    
+    	try {
+    		int n=0;
+    		while (rs.next()){ 
+    			// lee todos los datos y los transforma a String
+    			datosEmpr[n][0] = String.valueOf(rs.getInt(1));
+    			datosEmpr[n][1] = rs.getString(2);
+    			datosEmpr[n][2] = rs.getString(3);
+    			datosEmpr[n][3] = rs.getString(4);
+    			datosEmpr[n][4] = rs.getString(5);
+    			datosEmpr[n][5] = rs.getString(6);
+    			datosEmpr[n][6] = rs.getString(7);
+    			datosEmpr[n][7] = rs.getString(8);
+    			datosEmpr[n][8] = rs.getString(9);
+    			datosEmpr[n][9] = rs.getString(10);
+    			datosEmpr[n][10] =String.valueOf(rs.getInt(11));
+    			datosEmpr[n][11] = rs.getString(12);
+    			n++;
+    		}
+    		
+    	} catch (SQLException ex) {
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		return null;
+    	} 
+
+    	// si todo ha ido bien
+    	// cerramos la conexion y retornamos el String[]
+    	try {
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return datosEmpr;
+    
+    } // fin de BuscaEmpresasUsuDB ***********************************
+    
+    
+    
+    /* **********************************************************************************
+     * este metodo sirve para buscar en la DDBB los usuarios gestionados por un manager
+     * 
+     * Recibe un key de user en formato String
+     * Instancia el metodo buscaEmpresasUsuDB para encontrar las empresas
+     * y luego busca en los usuarios en la DDBB
+     * 
+     * Devuelve un null si hay errores
+     * Si el keyUser es correcto, devuelve un String[n][15] siendo n el num.de usuarios
+     ********************************************************************************** */
+    
+    public String[][] buscaUsuariosManagerDB (String keyUser) {
+         
+    	// busca las empresas del manager
+    	String empMan[][]=buscaEmpresasUsuDB(keyUser);
+    	// si no hay empresas no hay usuarios gestionados: salimos con null
+    	if (empMan==null) return null;
+    	
+    	// crea una conexion
+    	Connection con=ConnectDB();
+    	
+    	Statement st=null;
+    	try {
+    		st = con.createStatement();
+    	} catch (SQLException ex) {
+    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		return null;
+    	}
+          
+    	// preparamos un String para recuperar todos los datos de usuario
+    	// consideramos el maximo de casos posibles que son 6 usuarios
+    	String datosUser[][]=new String[6][16];
+    	
+    	ResultSet rs=null;
+    	
+    	int i=0; // contador de usuarios grabados
+    	int n=0; // contador de empresas
+    	String empbusc;
+    while (n<3 && empMan[n][1]!="") {	
+    	empbusc=empMan[n][1]; // empresa a buscar en fichero usuarios
+    	try { 
+    		// se busca a usuarios que no sean el manager y tenga como empresa la administrada
+    		rs = st.executeQuery("SELECT * FROM c_usuario WHERE keyUser!='"+keyUser+"' && " +
+    				"(emp1='"+empbusc+"' || emp2='"+empbusc+"' || emp3='"+empbusc+"')");
+    	} catch (SQLException ex) {
+    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		return null;
+    	} 
+       
+    
+    	try {
+    		while (rs.next()){ 
+    			// lee todos los datos y los transforma a String
+    			datosUser[i][0] = String.valueOf(rs.getInt(1));
+    			datosUser[i][1] = rs.getString(2);
+    			datosUser[i][2] = rs.getString(3);
+    			datosUser[i][3] = rs.getString(4);
+    			datosUser[i][4] = rs.getString(5);
+    			datosUser[i][5] = rs.getString(6);
+    			datosUser[i][6] = String.valueOf(rs.getInt(7));
+    			datosUser[i][7] = rs.getString(8);
+    			datosUser[i][8] = rs.getString(9);
+    			datosUser[i][9] = rs.getString(10);
+    			datosUser[i][10] = rs.getString(11);
+    			datosUser[i][11] = String.valueOf(rs.getInt(12));
+    			datosUser[i][12] = String.valueOf(rs.getInt(13));
+    			datosUser[i][13] = rs.getString(14);
+    			datosUser[i][14] = rs.getString(15);
+    			datosUser[i][15] = "";	// en blanco, sin uso en este metodo
+    			i++;
+    		}
+    		
+    	} catch (SQLException ex) {
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		return null;
+    	} 
+    	n++;
+    } // fin del WHILE
+    
+    	// si todo ha ido bien
+    	// cerramos la conexion y retornamos el String[]
+    	try {
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return datosUser;
+    
+    } // fin de BuscaUsuariosManagerDB ***********************************
     
     
     
@@ -556,6 +903,190 @@ public class ContaDAO {
     	
     	return false;
     }
+    
+    
+    
+    /* **********************************************************************************
+     * Este metodo sirve para grabar en la DDBB los datos del usuario
+     * 
+     * Recibe como parametros un array con los datos de usuario
+     * un muy importante String oper ("INSERT" o "UPDATE") segun corresponda
+     * la categoria del usuario  siendo 1=manager, etc
+     * 
+     * Devuelve un true o false si hay errores 
+     ********************************************************************************** */
+    
+    public boolean grabaUsuDB (String datosUsu[], String oper, int categoria) {
+           
+    	// crea una conexion
+    	Connection con=ConnectDB();
+    	
+    	Statement st=null;
+    	try {
+    		st = con.createStatement();
+    	} catch (SQLException ex) {
+    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		return false;
+    	}
+    	
+    	// recoge los valores a grabar o actualizar
+      //  int id=(int)Integer.parseInt(datosUsu[0]); realmente es un autoincrement
+        String key=datosUsu[1];
+    	String nom=datosUsu[2];
+    	String log=datosUsu[3];
+    	String pas=datosUsu[4];
+    	String ema=datosUsu[5];
+    	int cat;
+    	if (datosUsu[6].equals("") || datosUsu[6]==null) {
+    		cat=0;
+    	} else cat=(int) Integer.parseInt(datosUsu[6]);
+    	String em1=datosUsu[7];
+    	String em2=datosUsu[8];
+    	String em3=datosUsu[9];
+    	String sel=datosUsu[10];
+    	int fec;
+    	if (datosUsu[11].equals("") || datosUsu[11]==null) {
+    		fec=0;
+    	} else  fec=(int) Integer.parseInt(datosUsu[11]);
+    	int act;
+    	if (datosUsu[12].equals("") || datosUsu[12]==null) {
+    		act=0;
+    	} else  act=(int) Integer.parseInt(datosUsu[12]);
+    	String lpd=datosUsu[13];
+    	String cgu=datosUsu[14];
+    	
+    	int rs=0;
+    	try {   
+    		if (oper.equals("UPDATE")) {
+    			rs = st.executeUpdate("UPDATE c_usuario SET keyuser='"+key+"', " +
+    				"nombre='"+nom+"', usuario='"+log+"', password='"+pas+"', email='"+ema+"'," +
+    				" categoria='"+cat+"', emp1='"+em1+"', emp2='"+em2+"',emp3='"+em3+"'," +
+    				" empselec='"+sel+"', yearselec='"+fec+"', activo='"+act+"',lpd='"+lpd+"'," +
+    						" cgu='"+cgu+"' WHERE keyuser='"+key+"' LIMIT 1");
+    		} else if (oper.equals("INSERT")) {
+    			rs = st.executeUpdate("INSERT c_usuario SET keyuser='"+key+"', " +
+        				"nombre='"+nom+"', usuario='"+log+"', password='"+pas+"', email='"+ema+"'," +
+        				" categoria='"+cat+"', emp1='"+em1+"', emp2='"+em2+"',emp3='"+em3+"'," +
+        				" empselec='"+sel+"', yearselec='"+fec+"', activo='"+act+"',lpd='"+lpd+"'," +
+        						" cgu='"+cgu+"' ");
+    		} else System.err.println("No se recibió orden de Update o Insert. Operación no efectuada ");
+    			
+    	} catch (SQLException ex) {
+    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		return false;
+    	} 
+
+    	// si todo ha ido bien
+    	// cerramos la conexion y retornamos el String[]
+    	try {
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+    	
+    	return true;
+    
+    }  // fin de grabaUsuDB ***********************************
+    
+    
+    
+    /* ***************************************************************
+     * Este metodo sirve para comprobar en la tabla correspondiente 
+     * cuantos usuarios tiene una empresa
+     * 
+     * Recibe un parametro String con el keyEmpresa a buscar 
+     * Devuelve un INT como respuesta del numero de usuarios
+     * Si hay algun error devuelve -1
+    ****************************************************************** */
+    
+    public int numUserAutorizados(String keyEmpresa) {
+        
+        //  este metodo comprueba los usuarios en una empresa
+        
+    	// crea una conexion
+    	Connection con=ConnectDB();
+    	
+        Statement st=null;
+        try {
+        	st = con.createStatement();
+        	} catch (SQLException ex) {
+        		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+        		// si hay algun error cerramos la conexion y return false
+        		try {
+    				con.close();
+    			} catch (SQLException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+        		return -1;
+        } 
+              
+        ResultSet rs=null;      	
+        try {   
+        	rs = st.executeQuery("SELECT * FROM c_usuario WHERE emp1='"+keyEmpresa+"' || emp2='"+keyEmpresa+"' || emp3='"+keyEmpresa+"'");
+        	} catch (SQLException ex) {
+        		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+        		// si hay algun error cerramos la conexion y return false
+        		try {
+    				con.close();
+    			} catch (SQLException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+        		return -1;
+        } 
+        	 	
+        int i=0; // numero de usuarios con esa empresa
+        try {
+        		// lee el primer dato, si existe
+        	
+        		while (rs.next()){ 
+        			// si el primer dato es distinto de null
+        			// es que existe la coincidencia
+        			if (!(rs.getString(1).equals(null))) {
+        				// en i acumulamos el numero de usuarios
+        				i++;
+        			}
+        			
+        		}
+        	} catch (SQLException ex) {
+        		// si hay algun error cerramos la conexion y return false
+        		try {
+    				con.close();
+    			} catch (SQLException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    		}
+        	return -1;
+        } 
+         
+        // todo ha ido bien, cerramos la conexion y retornamos el String[]
+        try {
+    			con.close();
+    			} catch (SQLException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    				return -1;
+    			}
+        return i;
+        
+    } // fin de numUserAutorizados *********************************** 
     
     
 }
