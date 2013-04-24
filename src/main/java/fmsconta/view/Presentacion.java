@@ -40,11 +40,11 @@ public class Presentacion extends JFrame implements ActionListener{
 		
 	
 	
-	/*
+	/* ********************************************************
 	 * Este constructor es un inicializador de pantalla soporte
 	 * para colocar sobre ella el JDialog de identificacion
 	 * Recibe un JFrame principal y el titulo de la ventana 
-	 */
+	 ********************************************************* */
 	
 	public Presentacion (JFrame initWindow,String titulo) {
 		
@@ -84,12 +84,8 @@ public class Presentacion extends JFrame implements ActionListener{
 		pantallagen.setVisible(true);
 		
 		// instanciamos y mostramos el jdialog de identificacion
-		nwUser=new Identificacion(pantallagen);
-		nwUser.setVisible(true);
-		
-		// recogemos el nombre y pass del usuario identificado
-		userConta=nwUser.getUser();
-		userPass=nwUser.getPassword();
+		nwUser=new Identificacion();
+		nwUser.identificacionPant(pantallagen);
 
 		// implementamos el boton salida
 		botonSalir.setActionCommand("Salida");
@@ -100,7 +96,7 @@ public class Presentacion extends JFrame implements ActionListener{
 
 
 	public void actionPerformed(ActionEvent e) {
-		// 
+		
 		
 		if (e.getActionCommand().equals("Salida")) {
 			// si pulsa el boton salida reconfirma la accion
@@ -121,10 +117,12 @@ public class Presentacion extends JFrame implements ActionListener{
 		
 		// llama al correspondiente metodo en identificacion
 		return nwUser.idCorrect();
+		
 	}
 	
 	
 	public String getUserConta() {
+		userConta=nwUser.getUser();
 		return userConta;
 	}
 
@@ -135,6 +133,7 @@ public class Presentacion extends JFrame implements ActionListener{
 
 
 	public String getUserPass() {
+		userPass=nwUser.getPassword();
 		return userPass;
 	}
 
@@ -143,4 +142,18 @@ public class Presentacion extends JFrame implements ActionListener{
 		this.userPass = userPass;
 	}
 	
+	// metodo para hacer visible la pantalla de identificacion
+	// instanciamos
+	public void openPant() {
+		this.nwUser.openPant();
+		this.nwUser.setVisible(true);
+	}
+	
+	// metodo para cerrar la pantalla de identificacion
+	// instanciamos el metodo
+	public void closePant() {
+		this.nwUser.closePant();
+		this.nwUser.setVisible(false);
+		this.nwUser=null;
+	}
 }

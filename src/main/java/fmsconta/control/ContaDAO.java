@@ -1089,4 +1089,89 @@ public class ContaDAO {
     } // fin de numUserAutorizados *********************************** 
     
     
+    
+    /* ************************************************************************************
+     * este metodo devuelve un string de datos con los nombres de las empresas del usuario
+     * 
+     * Recibe un array con los datos del usuario
+     * Devuelve un null si hay errores
+     * Si el keyEmp es correcto, devuelve un String[3] con nombres
+     ********************************************************************************** */
+    
+    public String[] showNamesCompDB (String user[]) {
+           
+    	// crea una conexion
+    	Connection con=ConnectDB();
+    	
+    	Statement st=null;
+    	try {
+    		st = con.createStatement();
+    	} catch (SQLException ex) {
+    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		return null;
+    	}
+          
+    	// cogemos los keyEmpr del array del usuario
+    	String emp1=user[7];
+    	String emp2=user[8];
+    	String emp3=user[9];
+    	// preparamos un String para devolver la informacion solicitada
+    	String nameEmpr[]=new String[3];
+    	
+    	ResultSet rs=null; 
+    	try {   
+    		rs = st.executeQuery("SELECT * FROM c_empresas WHERE keyempresa='"+emp1+"' || keyempresa='"+emp2+"' || keyempresa='"+emp3+"'");
+    	} catch (SQLException ex) {
+    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		return null;
+    	} 
+       
+    
+    	try {
+    		int n=0;
+    		while (rs.next()){ 
+    			// lee todos los nombres y los transforma a String
+    			nameEmpr[n] = rs.getString(3);
+    			n++;
+    		}
+    		
+    	} catch (SQLException ex) {
+    		// si hay algun error cerramos la conexion y return null
+    		try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		return null;
+    	} 
+
+    	// si todo ha ido bien
+    	// cerramos la conexion y retornamos el String[]
+    	try {
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return nameEmpr;
+    
+    } // fin de showNamesCompDB ***********************************
+    
+    
 }

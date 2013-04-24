@@ -1,6 +1,7 @@
 package fmsconta.view;
 
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -36,8 +37,8 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	
 	// componentes
 	private JTable tablaDatos;
-	private JLabel n0=new JLabel("Consulta de datos de la empresa");
-	private JLabel n1=new JLabel("Modificacion de los datos de la empresa");
+	private JLabel n1=new JLabel("Consulta de datos de la empresa");
+	private JLabel n2=new JLabel("Modificacion de datos de la empresa");
 	private JLabel n3=new JLabel("Creación de nueva empresa");
 	private JLabel l1=new JLabel("     Nombre de la empresa");
 	private JLabel l2=new JLabel("     Dirección");
@@ -278,6 +279,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		menu.addTab(title2,tab2);
 		menu.addTab(title3,tab3);
 		getContentPane().add(menu);
+		if (userCat!=1) menu.setEnabledAt(2, false);
 		return menu;
 		
 	} // fin del metodo panelTabulado
@@ -298,6 +300,14 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		panelUsu.setLayout(new BoxLayout(panelUsu,BoxLayout.Y_AXIS));
 		panelUsu.setAlignmentY(CENTER_ALIGNMENT);
 		panelUsu.setBackground(colorfondo);
+		
+		// titulo
+		JPanel north1=new JPanel();
+		north1.setLayout(new FlowLayout());
+		north1.setBackground(colorfondo);
+	    // cambiar el font al titulo
+	    n1.setFont(fuente1);
+		north1.add(n1);
 		
 		// creacion del panel rejilla datos
 		JPanel panelUsuAux = new JPanel();
@@ -358,24 +368,21 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		// separadores en panel principal
 		JLabel espacioA=new JLabel(" ");
 		JLabel espacioB=new JLabel(" ");
-		
-	    // cambiar el font al titulo
-	    n0.setFont(fuente1);
-	    
+		    
 	    // creacion del panel inferior
-	    JPanel south=new JPanel();
-	    south.setBackground(colorfondo);
+	    JPanel south1=new JPanel();
+	    south1.setBackground(colorfondo);
 	    imprimir=new JButton("Imprimir");
 	    imprimir.setToolTipText("abre una pantalla aparte");
-	    south.add(imprimir);
+	    south1.add(imprimir);
 	    
 	    panelUsuAux.setVisible(true);
 	    // agregamos componentes al panel principal
-	    panelUsu.add(n0);
+	    panelUsu.add(north1);
 	    panelUsu.add(espacioA);
 	    panelUsu.add(panelUsuAux);
 	    panelUsu.add(espacioB);
-	    panelUsu.add(south);
+	    panelUsu.add(south1);
 		
 	} // fin del metodo consultarPanel
 	
@@ -398,6 +405,14 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		panelUsu2.setLayout(new BoxLayout(panelUsu2,BoxLayout.Y_AXIS));
 		panelUsu2.setAlignmentX(CENTER_ALIGNMENT);
 		panelUsu2.setBackground(colorfondo);
+		
+		// titulo
+		JPanel north2=new JPanel();
+		north2.setLayout(new FlowLayout());
+		north2.setBackground(colorfondo);
+	    // cambiar el font al titulo
+	    n2.setFont(fuente1);
+		north2.add(n2);
 		
 		// creacion del panel rejilla datos
 		JPanel panelUsuAux2 = new JPanel();
@@ -496,9 +511,6 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		// separadores en panel principal
 		JLabel espacio1=new JLabel(" ");
 		JLabel espacio2=new JLabel(" ");
-		
-	    // ajustamos fuente del titulo
-	    n1.setFont(fuente1);
 	    
 	    // creacion del panel de botones inferior
 	    JPanel south2=new JPanel();
@@ -516,7 +528,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	    south2.add(eliminar);
 	    
 	    // agregamos componentes al panel principal
-	    panelUsu2.add(n1);
+	    panelUsu2.add(north2);
 	    panelUsu2.add(espacio1);
 	    panelUsu2.add(panelUsuAux2);
 	    panelUsu2.add(espacio2);
@@ -542,6 +554,14 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		panelUsu3.setLayout(new BoxLayout(panelUsu3,BoxLayout.Y_AXIS));
 		panelUsu3.setAlignmentY(CENTER_ALIGNMENT);
 		panelUsu3.setBackground(colorfondo);
+		
+		// titulo
+		JPanel north3=new JPanel();
+		north3.setLayout(new FlowLayout());
+		north3.setBackground(colorfondo);
+	    // cambiar el font al titulo
+	    n3.setFont(fuente1);
+		north3.add(n3);
 		
 		// creacion del panel rejilla datos
 		JPanel panelUsuAux3 = new JPanel();
@@ -620,9 +640,6 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		// separadores en panel principal
 		JLabel espacioY=new JLabel(" ");
 		JLabel espacioZ=new JLabel(" ");
-		
-	    // cambiar el font al titulo
-	    n3.setFont(fuente1);
 	    
 	    // creacion del panel inferior
 	    JPanel south3=new JPanel();
@@ -637,7 +654,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	    
 
 	    // agregamos componentes al panel principal
-	    panelUsu3.add(n3);
+	    panelUsu3.add(north3);
 	    panelUsu3.add(espacioY);
 	    panelUsu3.add(panelUsuAux3);
 	    panelUsu3.add(espacioZ);
