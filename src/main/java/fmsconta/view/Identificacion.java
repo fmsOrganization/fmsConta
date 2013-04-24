@@ -45,7 +45,7 @@ public class Identificacion extends JFrame implements ActionListener{
 	 * Recibe como argumento el JFrame principal
 	 ****************************************************** */
 	
-	public Identificacion (JDialog mainWindow) {
+	public void identificacionPant (JDialog mainWindow) {
 		
 		// PREPARACION DE LA VENTANA
 		// al ser de tipo identificacion es un dialog modal
@@ -67,10 +67,10 @@ public class Identificacion extends JFrame implements ActionListener{
 		userPassL= new JLabel("Password: ",SwingConstants.LEFT);
 		entrar= new JButton("Entrar");
 		salir= new JButton("Salir");
-		userName=new JTextField(15);
-		userName.setToolTipText("Longitud entre 5 y 10 caracteres");
-		userPass=new JPasswordField(15);
-		userPass.setToolTipText("Longitud entre 5 y 10 caracteres");
+		this.userName=new JTextField(15);
+		this.userName.setToolTipText("Longitud entre 5 y 10 caracteres");
+		this.userPass=new JPasswordField(15);
+		this.userPass.setToolTipText("Longitud entre 5 y 10 caracteres");
 		
 		// añadimos los componentes
 		Component comp;
@@ -78,11 +78,11 @@ public class Identificacion extends JFrame implements ActionListener{
 		idUser.add(comp);
 		comp=addComponentes(userNameL,0,1,2,1,80,50,GridBagConstraints.NONE,GridBagConstraints.CENTER);
 		idUser.add(comp);
-		comp=addComponentes(userName,2,1,2,1,30,50,GridBagConstraints.NONE,GridBagConstraints.CENTER);
+		comp=addComponentes(this.userName,2,1,2,1,30,50,GridBagConstraints.NONE,GridBagConstraints.CENTER);
 		idUser.add(comp);
 		comp=addComponentes(userPassL,0,2,2,1,80,50,GridBagConstraints.NONE,GridBagConstraints.CENTER);
 		idUser.add(comp);
-		comp=addComponentes(userPass,2,2,3,1,30,50,GridBagConstraints.NONE,GridBagConstraints.CENTER);
+		comp=addComponentes(this.userPass,2,2,3,1,30,50,GridBagConstraints.NONE,GridBagConstraints.CENTER);
 		idUser.add(comp);
 		comp=addComponentes(entrar,1,3,1,1,60,100,GridBagConstraints.NONE,GridBagConstraints.EAST);
 		idUser.add(comp);
@@ -93,8 +93,6 @@ public class Identificacion extends JFrame implements ActionListener{
 		this.entrar.addActionListener(this);
 		this.salir.addActionListener(this);
 
-		// mostramos la ventana de identificacion
-		idUser.setVisible(true);
 		
 	} // fin del builder identificacion
 	
@@ -134,11 +132,11 @@ public class Identificacion extends JFrame implements ActionListener{
 	 * SALIR : cierra la aplicacion.
 	 * 
 	 * ENTRAR : Recibe el evento y lo controla. 
-	 * Llama al metodo idCorrect para controlar el usuario y/o pass validos
-	 * Llama al idExist para comprobar si existe el usuario/password
-	 * Llama al lpdcgu para comprobar si había aceptado las LPD/CGU
-	 * En caso de no haber aceptado, pregunta y graba la aceptacion
-	 * En caso de no aceptar cierra la aplicacion
+	 * A) Llama al metodo idCorrect para controlar el usuario y/o pass validos
+	 * B) Llama al idExist para comprobar si existe el usuario/password
+	 * C) Llama al lpdcgu para comprobar si había aceptado las LPD/CGU
+	 * D) En caso de no haber aceptado, pregunta y graba la aceptacion
+	 * E) En caso de no aceptar cierra la aplicacion
 	 **********************************************************************/
 	
 	public void actionPerformed (ActionEvent e) {
@@ -199,10 +197,9 @@ public class Identificacion extends JFrame implements ActionListener{
 	 ******************************************************************** */
 	
 	public boolean idCorrect() {
-		
-		String login=userName.getText();
+		String login=this.userName.getText();
 		char passw[]=new char[10];
-		passw=userPass.getPassword();
+		passw=this.userPass.getPassword();
 		
 		// verifica si hay userName relleno
 		if ((login.equals("") || login.equals(null))) {
@@ -264,14 +261,14 @@ public class Identificacion extends JFrame implements ActionListener{
 	// get del user
 	protected String getUser() {
 		// retorna el login del usuario
-		return userName.getText();
+		return this.userName.getText();
 	} 
 
 	// get del password
 	protected String getPassword() {
 		// retorna la password del usuario
 		char tuPass[]=new char[10];
-		tuPass=userPass.getPassword();
+		tuPass=this.userPass.getPassword();
 		String pass=String.valueOf(tuPass);
 		tuPass=null;
 		return pass;
@@ -335,4 +332,17 @@ public class Identificacion extends JFrame implements ActionListener{
 		// graba la aceptacion de la LPD y CGU
 		this.newUserConta.grabaCGULPD(getUser(),getPassword());
 	}
+	
+	
+	
+	public void openPant() {
+		
+		this.idUser.setVisible(true);
+	}
+	
+	public void closePant() {
+		this.idUser.setVisible(false);
+		this.idUser=null;
+	}
+	
 }

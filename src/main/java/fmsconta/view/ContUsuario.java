@@ -1,16 +1,10 @@
 package fmsconta.view;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.Insets;
-import java.awt.SystemColor.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -31,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
@@ -57,7 +52,6 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 	
 	private Font fuente1=new Font("",Font.BOLD,20);
 	private Font fuente2=new Font("",Font.PLAIN,16);
-	private int sizeLetras=24;
 	private String pathImageFiles="src/main/java/fmsconta/pictures/";
 	private Image abc;
 	private Icon iconoW;
@@ -75,38 +69,40 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 	
 	private JTable tablaDatos;
 	
-	private JLabel n0=new JLabel("Consulta de datos de usuario");
-	private JLabel l1=new JLabel("     Nombre del usuario");
+	private JLabel n1=new JLabel("Consulta de datos de usuario");
+	private JLabel l1=new JLabel("     Nombre del usuario ");
 	private JLabel l2=new JLabel("     Login");
 	private JLabel l3=new JLabel("     Password");
 	private JLabel l4=new JLabel("     Email");
 	private JLabel l5=new JLabel("     Categoría");
-	private JLabel l6=new JLabel("     Empresas activado");
-	private JLabel l7=new JLabel("     Empresa actual");
-	private JLabel l8=new JLabel("     Dirección");
-	private JLabel l9=new JLabel("     Localidad");
-	private JLabel l10=new JLabel("     Código Postal");
-	private JLabel l11=new JLabel("     N.I.F. empresa");
+	private JLabel l6a=new JLabel("     Empresa 1");
+	private JLabel l6b=new JLabel("     Empresa 2");
+	private JLabel l6c=new JLabel("     Empresa 3");
+	private JLabel l7=new JLabel("          Empresa actual");
+	private JLabel l8=new JLabel("          Dirección");
+	private JLabel l9=new JLabel("          Localidad");
+	private JLabel l10=new JLabel("          Código Postal");
+	private JLabel l11=new JLabel("          N.I.F. empresa");
 	private JTextField d1=new JTextField();
 	private JTextField d2=new JTextField();
 	private JTextField d3=new JTextField();
 	private JTextField d4=new JTextField();
 	private JTextField d5=new JTextField();
-	private JTextField d6=new JTextField();
+	private JTextField d6a=new JTextField();
+	private JTextField d6b=new JTextField();
+	private JTextField d6c=new JTextField();
 	private JTextField d7=new JTextField();
 	private JTextField d8=new JTextField();
 	private JTextField d9=new JTextField();
 	private JTextField d10=new JTextField();
 	private JTextField d11=new JTextField();
 	
-	private JButton imprimir;
-	
 	// **** PANTALLA MODIFICACIONES
 	
 	private JPanel panelUsu2;
 	private JPanel panelUsuAux2;
 	private JPanel south2;
-	private JLabel n1=new JLabel("Modificación de datos de usuario");
+	private JLabel n2=new JLabel("Modificación de datos de usuario ");
 	private JLabel l1B=new JLabel("     Nombre del usuario");
 	private JLabel l2B=new JLabel("     Login");
 	private JLabel l3B=new JLabel("     Password");
@@ -132,13 +128,14 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 	
 	private JButton modificar;
 	
+	
 	// **** PANTALLA CREAR
 	
 	private JPanel panelUsu3;
 	private JPanel panelUsuAux3;
 
 	private JLabel n3=new JLabel("Creación de usuario");
-	private JLabel l1C=new JLabel("     Nombre del usuario");
+	private JLabel l1C=new JLabel("     Nombre del usuario ");
 	private JLabel l2C=new JLabel("     Login");
 	private JLabel l3C=new JLabel("     Password");
 	private JLabel l4C=new JLabel("     Email");
@@ -161,7 +158,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 	private JTextField d10C=new JTextField();
 	private JTextField d11C=new JTextField();
 
-	private String selectCateg="";
+	private String selectCateg=""; // controla la seleccion de categoria entre contable y auxiliar
 	
 	private JButton crear;
 	
@@ -171,7 +168,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 	private JPanel panelUsu4;
 	private JPanel panelUsuAux4;
 
-	private JLabel n4=new JLabel("Mantenimiento de usuarios",JLabel.CENTER);
+	private JLabel n4=new JLabel("Mantenimiento de usuarios");
 	private JLabel l0D=new JLabel("     Usuarios administrados");
 	private JLabel l1D=new JLabel("     Nombre usuario");
 	private JLabel l2D=new JLabel("     Login");
@@ -190,8 +187,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 	private JCheckBox d7D=new JCheckBox();
 	private JCheckBox d8D=new JCheckBox();
 	private JCheckBox d9D=new JCheckBox();
-
-
+	
 	private JButton actualizar;
 	private JButton eliminar;
 
@@ -232,17 +228,14 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		mantenUsuarios(datosUsuario,datosEmpresa,userCat);
 
 		// y finalmente agregamos los paneles al tabbedPane
-		if (userCat==1) { // si es manager
-			panTab=panelTabulado(panelEmp,"Consultar",panelUsu2,"Modificar",
+		panTab=panelTabulado(panelEmp,"Consultar",panelUsu2,"Modificar",
 					panelUsu3,"Creación",panelUsu4,"Mantenimiento usuarios");
-		} else 	panTab=panelTabulado2(panelEmp,"Consultar",panelUsu2,"Modificar"); // si no es manager
-		
+	
 		// añadimos los itemlistener
 		d7D.addItemListener(this);
 		d8D.addItemListener(this);
 		d9D.addItemListener(this);
 		// finalmente añadimos los actionlistener
-		imprimir.addActionListener(this);
 		modificar.addActionListener(this);
 		crear.addActionListener(this);
 		eliminar.addActionListener(this);
@@ -259,118 +252,15 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		// builder
 	}
 	
-	public void actionPerformed(ActionEvent e) {
-		
-		Object source=e.getSource();
-		
-		if (source==imprimir) {
-			
-			// abre una pantalla para imprimir en un JDialog
-			
-			JDialog listado=new JDialog(ventanaListado,"Listado de datos de usuario",false);
-			listado.setSize(900,600);
-			listado.setLocationRelativeTo(rootPane);
-			listado.setResizable(true);
-			listado.setBackground(colorBlanco);
-
-			listado.getContentPane().setBackground(colorBlanco);
-			tablaDatos.setBackground(colorBlanco);
-			panelEmp.setBackground(colorBlanco);
-			listado.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-			
-			listado.add(panelEmp);
-			listado.setVisible(true);
-			
-		}
-		
-		
-		if (source==modificar) {
-			// añade los datos modificables de la pantalla visual 
-			// a la tabla de datos y luego la graba en la DDBB
-			if (aceptaModif()) {
-				if (grabaModif(this.datosUsuario)) {
-					JOptionPane.showMessageDialog(null, "Usuario MODIFICADO");
-				} else {
-					JOptionPane.showMessageDialog(null, "ERROR en modificación del usuario");
-				}
-			}
-		}
-		
-		
-		if (source==crear) {
-			// añade los datos introducidos en la pantalla visual 
-			// a la tabla de datos y luego la graba en la DDBB
-			aceptaCreacion();
-			// comprueba los datos y si la operativa es posible
-			// devuelve true, en caso contrario false
-			if(compruebaDatos()) {
-				dao=new ContaDAO();
-				if (dao.grabaUsuDB(datosNuevoUsuario, "INSERT", userCat)) {
-					JOptionPane.showMessageDialog(null, "Usuario CREADO");
-				} else JOptionPane.showMessageDialog(null, "ERROR en creación de usuario");
-			}
-		}
-		
-		if (source==d5C) {
-			// creacion de usuarios:
-			// Combobox de categoria -> contable o auxiliar
-			this.selectCateg=d5C.getSelectedItem().toString();
-			
-		}
-		
-		/* **********************************************************
-		 * Zona de lectura de los combos de mantenimiento de usuarios
-		 *********************************************************** */
-		
-		if (source==d0D) {
-			// mantenimiento de usuarios:
-			// Combobox de usuarios managed
-			String buscaUser=d0D.getSelectedItem().toString();
-			// cambia los datos segun los correspondientes a la eleccion
-			muestraAdministrado(buscaUser);
-		}
-		
-		if (source==d4D) {
-			// mantenimiento de usuarios:
-			// Combobox de empresas del manager
-			d4D.getSelectedItem().toString();
-		}
-		
-		if (source==d6D) {
-			// mantenimiento de usuarios:
-			// Combobox de empresas del manager
-			d6D.getSelectedItem().toString();
-		}
-		
-		if (source==eliminar) {
-			// coge el nombre seleccionado del panel 
-			// pide una confirmacion y luego la borra en la DDBB
-			int optionErase=JOptionPane.showConfirmDialog(null, "¿Desea eliminar definitivamente al usuario seleccionado?", "Borrado de usuario", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-			if (optionErase==0) {
-				// si acepta eliminar se coge el nombre del usuario
-				// y ejecuta el metodo borraAdministrado
-				if (borraAdministrado(d1D.getText())) {
-					JOptionPane.showMessageDialog(null, "Usuario borrado");
-				} else JOptionPane.showMessageDialog(null, "El usuario no ha podido ser borrado");
-			}
-		}
-		
-		if (source==actualizar) {
-			// coge el nombre seleccionado del panel 
-			String cambiaUser=d0D.getSelectedItem().toString();
-			// y llama a la actualizacion
-			if (actualizaAdministrado(cambiaUser)) {
-				JOptionPane.showMessageDialog(null, "Usuario actualizado");
-			} else JOptionPane.showMessageDialog(null, "El usuario no ha podido ser actualizado");
-		}
-		
-	} // fin del actionPerformed
+	/* ***************************************
+	 * metodo donde leemos los tres checkbox 
+	 * que controlan las empresas
+	 *****************************************/
 	
 	public void itemStateChanged(ItemEvent e) {
 		// TODO Auto-generated method stub
 		
 		Object source=e.getItemSelectable();
-		String empr="";
 		
 		if (source==d7D) {
 			// mantenimiento de usuarios:
@@ -439,7 +329,6 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 				}
 			} else {
 				l8D.setText("     Situacion empresa: ALTA");
-
 				// Comprueba cual de las empresa se ha dado de alta
 				// y la añade al array de usuario
 				if (!(datosNuevoUsuario[7].equals(datosEmprAdmin[1][1]) || 
@@ -498,8 +387,107 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 				}
 			}
 		}
-	}
+		
+	} // fin del itemperformed
 	
+	
+	/* **************************************************
+	 * Metodo donde leemos los botones y los combobox
+	 *
+	 *************************************************/
+	
+	public void actionPerformed(ActionEvent e) {
+		
+		Object source=e.getSource();
+			
+		if (source==modificar) {
+			// añade los datos modificables de la pantalla visual 
+			// a la tabla de datos y luego la graba en la DDBB
+			if (aceptaModif()) {
+				if (grabaModif(this.datosUsuario)) {
+					JOptionPane.showMessageDialog(null, "Usuario MODIFICADO");
+				} else {
+					JOptionPane.showMessageDialog(null, "ERROR en modificación del usuario");
+				}
+			}
+		}
+		
+		
+		if (source==crear) {
+			// añade los datos introducidos en la pantalla visual 
+			// a la tabla de datos y luego la graba en la DDBB
+			aceptaCreacion();
+			// comprueba los datos y si la operativa es posible
+			// devuelve true, en caso contrario false
+			if(compruebaDatos()) {
+				dao=new ContaDAO();
+				if (dao.grabaUsuDB(datosNuevoUsuario, "INSERT", userCat)) {
+					JOptionPane.showMessageDialog(null, "Usuario CREADO");
+				} else JOptionPane.showMessageDialog(null, "ERROR en creación de usuario");
+			}
+		}
+		
+		if (source==d5C) {
+			// creacion de usuarios:
+			// Combobox de categoria -> contable o auxiliar
+			this.selectCateg=d5C.getSelectedItem().toString();
+			
+		}
+		
+		/* **********************************************************
+		 * Zona de lectura de los combos de mantenimiento de usuarios
+		 *********************************************************** */
+		
+		if (source==d0D) {
+			// mantenimiento de usuarios:
+			// Combobox de usuarios managed
+			String buscaUser=d0D.getSelectedItem().toString();
+			// cambia los datos segun los correspondientes a la eleccion
+			muestraAdministrado(buscaUser);
+		}
+		
+		if (source==d4D) {
+			// mantenimiento de usuarios:
+			// Combobox de empresas del manager
+			d4D.getSelectedItem().toString();
+		}
+		
+		if (source==d6D) {
+			// mantenimiento de usuarios:
+			// Combobox de empresas del manager
+			d6D.getSelectedItem().toString();
+		}
+		
+		if (source==eliminar) {
+			// coge el nombre seleccionado del panel 
+			// pide una confirmacion y luego la borra en la DDBBdatosUsuarioAdmin
+			int optionErase=JOptionPane.showConfirmDialog(null, "¿Desea eliminar definitivamente al usuario seleccionado?", "Borrado de usuario", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+			if (optionErase==0) {
+				// si acepta eliminar se coge el nombre del usuario
+				// y ejecuta el metodo borraAdministrado
+				if (borraAdministrado(d1D.getText())) {
+					JOptionPane.showMessageDialog(null, "Usuario borrado");
+				} else JOptionPane.showMessageDialog(null, "El usuario no ha podido ser borrado");
+			}
+		}
+		
+		if (source==actualizar) {
+			// coge el nombre seleccionado del panel 
+			String cambiaUser=d0D.getSelectedItem().toString();
+			// y llama a la actualizacion
+			if (actualizaAdministrado(cambiaUser)) {
+				JOptionPane.showMessageDialog(null, "Usuario actualizado");
+			} else JOptionPane.showMessageDialog(null, "El usuario no ha podido ser actualizado");
+		}
+		
+	} // fin del actionPerformed
+	
+	
+	
+	/* ************************************************************
+	 * Este metodo tiene por objeto retornar el tabbedPane
+	 * a la clase que lo ha llamado: Pantalla principal
+	 ************************************************************* */
 	
 	public JTabbedPane retorna() {
 		return panTab;
@@ -516,7 +504,6 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 	
 	public void consultarPanel (String datosUsu[], String datosEmp[]) {
 		
-		
 		int categoria=this.userCat;
 		
 		// creacion del panel principal
@@ -525,9 +512,17 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		panelEmp.setAlignmentY(CENTER_ALIGNMENT);
 		panelEmp.setBackground(colorfondo);
 		
+		// titulo
+		JPanel north1=new JPanel();
+		north1.setLayout(new FlowLayout());
+		north1.setBackground(colorfondo);
+	    // cambiar el font al titulo
+	    n1.setFont(fuente1);
+		north1.add(n1);
+		
 		// creacion del panel rejilla datos
 		JPanel panelEmpAux = new JPanel();
-		panelEmpAux.setLayout(new GridLayout(11,2));
+		panelEmpAux.setLayout(new GridLayout(13,2));
 		panelEmpAux.setAlignmentY(CENTER_ALIGNMENT);
 		panelEmpAux.setFont(fuente2);
 		panelEmpAux.setBackground(colorfondo);
@@ -543,11 +538,12 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		} else if (categoria==2) {
 			d5.setText("Contable");
 		} else d5.setText("Auxiliar");
-		// nº de empresas
-		int numemp=1;
-		if (!(datosUsu[8].equals("")|| datosUsu[8]==null)) numemp++;
-		if (!(datosUsu[9].equals("")|| datosUsu[9]==null)) numemp++;
-		d6.setText(String.valueOf(numemp));
+		// nombre de empresas
+		// los datos se obtienen del panel de empresas en mantenimientoUsuarios
+		d6a.setText("");
+		d6b.setText("");
+		d6c.setText("");
+		
 		d7.setText(datosEmp[2]);	// Empresa activa
 		d8.setText(datosEmp[3]);	// direccion
 		d9.setText(datosEmp[4]);	// localidad
@@ -560,7 +556,9 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		d3.setEditable(false);
 		d4.setEditable(false);
 		d5.setEditable(false);
-		d6.setEditable(false);
+		d6a.setEditable(false);
+		d6b.setEditable(false);
+		d6c.setEditable(false);
 		d7.setEditable(false);
 		d8.setEditable(false);
 		d9.setEditable(false);
@@ -578,8 +576,12 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		panelEmpAux.add(d4);
 		panelEmpAux.add(l5);
 		panelEmpAux.add(d5);
-		panelEmpAux.add(l6);
-		panelEmpAux.add(d6);
+		panelEmpAux.add(l6a);
+		panelEmpAux.add(d6a);
+		panelEmpAux.add(l6b);
+		panelEmpAux.add(d6b);
+		panelEmpAux.add(l6c);
+		panelEmpAux.add(d6c);
 		panelEmpAux.add(l7);
 		panelEmpAux.add(d7);
 		panelEmpAux.add(l8);
@@ -594,20 +596,14 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		// separadores en panel principal
 		JLabel espacioA=new JLabel(" ");
 		JLabel espacioB=new JLabel(" ");
-		
-	    // cambiar el font al titulo
-	    n0.setFont(fuente1);
 	    
 	    // creacion del panel inferior
 	    JPanel south=new JPanel();
 	    south.setBackground(colorfondo);
-	    imprimir=new JButton("Imprimir");
-	    imprimir.setToolTipText("abre una pantalla aparte");
-	    south.add(imprimir);
 	    
 	    panelEmpAux.setVisible(true);
 	    // agregamos componentes al panel principal
-	    panelEmp.add(n0);
+	    panelEmp.add(north1);
 	    panelEmp.add(espacioA);
 	    panelEmp.add(panelEmpAux);
 	    panelEmp.add(espacioB);
@@ -637,6 +633,14 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		panelUsu2.setLayout(new BoxLayout(panelUsu2,BoxLayout.Y_AXIS));
 		panelUsu2.setAlignmentX(CENTER_ALIGNMENT);
 		panelUsu2.setBackground(colorfondo);
+		
+		// titulo
+		JPanel north2=new JPanel();
+		north2.setLayout(new FlowLayout());
+		north2.setBackground(colorfondo);
+	    // cambiar el font al titulo
+	    n2.setFont(fuente1);
+		north2.add(n2);
 		
 		// creacion del panel rejilla datos
 		panelUsuAux2 = new JPanel();
@@ -754,11 +758,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 			
 		// separadores en panel principal
 		JLabel espacioA=new JLabel(" ");
-		JLabel espacioB=new JLabel(" ");
-		
-		// cambiar el font al titulo
-		n1.setFont(fuente1);
-		
+		JLabel espacioB=new JLabel(" ");	
 			    
 	    // creacion del panel de botones inferior
 	    south2=new JPanel();
@@ -769,7 +769,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 	    south2.add(modificar);
 	    
 	    // agregamos componentes al panel principal
-	    panelUsu2.add(n1);
+	    panelUsu2.add(north2);
 	    panelUsu2.add(espacioA);
 	    panelUsu2.add(panelUsuAux2);
 	    panelUsu2.add(espacioB);
@@ -796,14 +796,21 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		panelUsu3.setAlignmentY(CENTER_ALIGNMENT);
 		panelUsu3.setBackground(colorfondo);
 		
+		// titulo
+		JPanel north3=new JPanel();
+		north3.setLayout(new FlowLayout());
+		north3.setBackground(colorfondo);
+	    // cambiar el font al titulo
+	    n3.setFont(fuente1);
+		north3.add(n3);
+		
 		// creacion del panel rejilla datos
-		panelUsuAux4 = new JPanel();
-		panelUsuAux4.setLayout(new GridLayout(10,3));
-		panelUsuAux4.setAlignmentY(CENTER_ALIGNMENT);
-		panelUsuAux4.setFont(fuente2);
-		panelUsuAux4.setBackground(colorfondo);
-		    
-
+		panelUsuAux3 = new JPanel();
+		panelUsuAux3.setLayout(new GridLayout(10,3));
+		panelUsuAux3.setAlignmentY(CENTER_ALIGNMENT);
+		panelUsuAux3.setFont(fuente2);
+		panelUsuAux3.setBackground(colorfondo);
+		   
 		// datos del usuario activo actual
 		d1C.setText("");	// nombre usuario
 		d2C.setText("");	// login
@@ -846,50 +853,46 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		JLabel sc8=new JLabel(" INFO ");
 		JLabel sc9=new JLabel(" INFO ");
 		JLabel sc10=new JLabel(" INFO ");
-		JLabel sc11=new JLabel(" INFO ");
-		
+		JLabel sc11=new JLabel(" INFO ");		
 		
 		// add de componentes al panel rejilla
-		panelUsuAux4.add(l1C);
-		panelUsuAux4.add(d1C);
-		panelUsuAux4.add(sc1);
-		panelUsuAux4.add(l2C);
-		panelUsuAux4.add(d2C);
-		panelUsuAux4.add(sc2);
-		panelUsuAux4.add(l3C);
-		panelUsuAux4.add(d3C);
-		panelUsuAux4.add(sc3);
-		panelUsuAux4.add(l4C);
-		panelUsuAux4.add(d4C);
-		panelUsuAux4.add(sc4);
-		panelUsuAux4.add(l5C);
-		panelUsuAux4.add(d5C);
-		panelUsuAux4.add(sc5);
-		//panelUsuAux4.add(l6C); 	- NO SE MUESTRA EN CREACION
-		//panelUsuAux4.add(d6C);	- NO SE MUESTRA EN CREACION
-		//panelUsuAux4.add(sc6);	- NO SE MUESTRA EN CREACION
-		panelUsuAux4.add(l7C);
-		panelUsuAux4.add(d7C);
-		panelUsuAux4.add(sc7);
-		panelUsuAux4.add(l8C);
-		panelUsuAux4.add(d8C);
-		panelUsuAux4.add(sc8);
-		panelUsuAux4.add(l9C);
-		panelUsuAux4.add(d9C);
-		panelUsuAux4.add(sc9);
-		panelUsuAux4.add(l10C);
-		panelUsuAux4.add(d10C);
-		panelUsuAux4.add(sc10);
-		panelUsuAux4.add(l11C);
-		panelUsuAux4.add(d11C);
-		panelUsuAux4.add(sc11);
+		panelUsuAux3.add(l1C);
+		panelUsuAux3.add(d1C);
+		panelUsuAux3.add(sc1);
+		panelUsuAux3.add(l2C);
+		panelUsuAux3.add(d2C);
+		panelUsuAux3.add(sc2);
+		panelUsuAux3.add(l3C);
+		panelUsuAux3.add(d3C);
+		panelUsuAux3.add(sc3);
+		panelUsuAux3.add(l4C);
+		panelUsuAux3.add(d4C);
+		panelUsuAux3.add(sc4);
+		panelUsuAux3.add(l5C);
+		panelUsuAux3.add(d5C);
+		panelUsuAux3.add(sc5);
+		//panelUsuAux3.add(l6C); 	- NO SE MUESTRA EN CREACION
+		//panelUsuAux3.add(d6C);	- NO SE MUESTRA EN CREACION
+		//panelUsuAux3.add(sc6);	- NO SE MUESTRA EN CREACION
+		panelUsuAux3.add(l7C);
+		panelUsuAux3.add(d7C);
+		panelUsuAux3.add(sc7);
+		panelUsuAux3.add(l8C);
+		panelUsuAux3.add(d8C);
+		panelUsuAux3.add(sc8);
+		panelUsuAux3.add(l9C);
+		panelUsuAux3.add(d9C);
+		panelUsuAux3.add(sc9);
+		panelUsuAux3.add(l10C);
+		panelUsuAux3.add(d10C);
+		panelUsuAux3.add(sc10);
+		panelUsuAux3.add(l11C);
+		panelUsuAux3.add(d11C);
+		panelUsuAux3.add(sc11);
 		
 		// separadores en panel principal
 		JLabel espacioY=new JLabel(" ");
 		JLabel espacioZ=new JLabel(" ");
-		
-	    // cambiar el font al titulo
-	    n3.setFont(fuente1);
 	    
 	    // creacion del panel inferior
 	    JPanel south3=new JPanel();
@@ -902,11 +905,10 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 	    }
 	    south3.add(crear);
 	    
-
 	    // agregamos componentes al panel principal
-	    panelUsu3.add(n3);
+	    panelUsu3.add(north3);
 	    panelUsu3.add(espacioY);
-	    panelUsu3.add(panelUsuAux4);
+	    panelUsu3.add(panelUsuAux3);
 	    panelUsu3.add(espacioZ);
 	    panelUsu3.add(south3);
 
@@ -932,6 +934,14 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		panelUsu4.setAlignmentY(CENTER_ALIGNMENT);
 		panelUsu4.setBackground(colorfondo);
 		
+		// titulo
+		JPanel north4=new JPanel();
+		north4.setLayout(new FlowLayout());
+		north4.setBackground(colorfondo);
+	    // cambiar el font al titulo
+	    n4.setFont(fuente1);
+		north4.add(n4);
+		
 		// creacion del panel rejilla datos
 		panelUsuAux4 = new JPanel();
 		panelUsuAux4.setLayout(new GridLayout(9,3));
@@ -941,9 +951,22 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		    
 
 		// para crear el panel, primero busca las empresas del manager
+		if (userCat==1) {
+			datosEmprAdmin=buscaEmpresasManager(datosUsu[1]);
+			// ATENCION: CONEXION CON EL PANEL DE CONSULTAUSUARIO
+			// se muestran los nombres de las empresas
+			if (datosEmprAdmin[0][2]!=null) d6a.setText(datosEmprAdmin[0][2]);
+			if (datosEmprAdmin[1][2]!=null) d6b.setText(datosEmprAdmin[1][2]);
+			if (datosEmprAdmin[2][2]!=null) d6c.setText(datosEmprAdmin[2][2]);
+		} else {
+			String namesEmprUser[]=new String[3];
+			namesEmprUser=buscaNombresEmpresas(datosUsu);
+			if (namesEmprUser[0]!=null) d6a.setText(namesEmprUser[0]);
+			if (namesEmprUser[1]!=null) d6b.setText(namesEmprUser[1]);
+			if (namesEmprUser[2]!=null) d6c.setText(namesEmprUser[2]);
+		}
 		
-		datosEmprAdmin=buscaEmpresasManager(datosUsu[1]);
-		
+		// texto de los checkbox con los nombres de las empresas
 		if (!(datosEmprAdmin==null || datosEmprAdmin[0][2]==null)) {
 			d7D.setText(datosEmprAdmin[0][2]);
 		}
@@ -953,8 +976,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		if (!(datosEmprAdmin==null || datosEmprAdmin[2][2]==null)) {
 			d9D.setText(datosEmprAdmin[2][2]);
 		}
-	
-		
+
 		// usuarios administrados 
 		datosUsuarioAdmin=new String[9][16];
 		// obtenemos la info de la DDBB
@@ -1025,7 +1047,6 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		JLabel sc7=new JLabel(" Activar como usuario");
 		JLabel sc8=new JLabel(" Activar como usuario");
 		JLabel sc9=new JLabel(" Activar como usuario");
-
 		
 		// add de componentes al panel rejilla
 		panelUsuAux4.add(l0D);
@@ -1065,9 +1086,6 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		// separadores en panel principal
 		JLabel espacioX=new JLabel(" ");
 		JLabel espacioW=new JLabel(" ");
-		
-	    // cambiar el font al titulo
-	    n4.setFont(fuente1);
 	    
 	    // creacion del panel inferior
 	    JPanel south4=new JPanel();
@@ -1085,7 +1103,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 	    
 
 	    // agregamos componentes al panel principal
-	    panelUsu4.add(n4);
+	    panelUsu4.add(north4);
 	    panelUsu4.add(espacioX);
 	    panelUsu4.add(panelUsuAux4);
 	    panelUsu4.add(espacioW);
@@ -1096,16 +1114,14 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 	
 	
 	
-	
 	/* ******************************************************************************
 	 * Este metodo crea un tabbedpane de cuatro pestañas con la informacion recibida
 	 * recibe cuatro JPanel con sus string titulos correspondientes
 	 * devuelve un objeto tabbedpane - es la version para managers
 	 * 
 	 * La version panelTabulado2 hace lo mismo pero solo con dos pestañas
-	 * es una version para usuarios no manager
+	 * de momento no utilizada
 	 **************************************************************************** */
-
 
 	public JTabbedPane panelTabulado(JPanel tab1,String title1,JPanel tab2,String title2,
 			JPanel tab3,String title3,JPanel tab4,String title4) {
@@ -1118,9 +1134,17 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		menu.addTab(title3,tab3);
 		menu.addTab(title4,tab4);
 		getContentPane().add(menu);
+		// si no eres manager, entonces deshabilitamos las 
+		// pestañas de creacion y mantenimiento usuarios
+		if (userCat!=1) {
+			menu.setEnabledAt(2, false);
+			menu.setEnabledAt(3, false);
+		}
+		
 		return menu;
 		
 	} // fin del metodo panelTabulado
+	
 	
 	
 	public JTabbedPane panelTabulado2(JPanel tab1,String title1,JPanel tab2,String title2) {
@@ -1146,6 +1170,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 	
 	private boolean aceptaModif() {
 		
+		// ponemos en blanco posible textfield de aviso
 		d2B.setBackground(Color.WHITE);
 		d3B.setBackground(Color.WHITE);
 		d4B.setBackground(Color.WHITE);
@@ -1398,6 +1423,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 	/* **********************************************************
 	 * Este metodo instancia una conexion dao
 	 * y busca las empresas que tiene el manager en DDBB
+	 * 
 	 * Recibe como parametro el keyuser del manager
 	 * Devuelve un null si hay algun error o no tiene empresas
 	 * Devuelve un Array con los datos de las empresas si O.K.
@@ -1418,6 +1444,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 	/* **********************************************************
 	 * Este metodo instancia una conexion dao
 	 * y busca los usuarios que gestiona el manager en DDBB
+	 * 
 	 * Recibe como parametro el keyuser del manager
 	 * Devuelve un null si hay algun error o no tiene empresas
 	 * Devuelve un Array con los datos de los usuarios si O.K.
@@ -1451,7 +1478,27 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		
 		return dao.numUserAutorizados(empresa);
 		
-	}  // fin del metodo buscausuariosmanager
+	}  // fin del metodo numUsuariosAutorizados
+	
+	
+	
+	/* ****************************************************************
+	 * Este metodo busca los nombres de las empresas en la DDBB
+	 *
+	 * Recibe como parametro el array del usuario
+	 * Devuelve un null si hay algun error
+	 * Devuelve un array[3] con los nombre de las empresas del usuario
+	 **************************************************************** */
+	
+	private String[] buscaNombresEmpresas(String usuario[]) {
+		// TODO Auto-generated method stub
+		
+		// instancia una conexion
+		dao=new ContaDAO();
+		
+		return dao.showNamesCompDB(usuario);
+		
+	}  // fin del metodo buscaNombresEmpresas
 	
 	
 	
@@ -1482,6 +1529,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 		while (n<6 && datosUsuarioAdmin[n][2]!=null) {
 			if (administrado.equals(datosUsuarioAdmin[n][2])) {
 				// copias la informacion del seleccionado
+				datosNuevoUsuario=null;
 				datosNuevoUsuario=datosUsuarioAdmin[n];
 				// mostramos los datos del array sin mas
 				d1D.setText(datosUsuarioAdmin[n][2]);
@@ -1496,35 +1544,30 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 				// se comparan las tres empresas administradas una por una con los datos
 				// de los usuarios, para comprobar si el usuario esta dado de alta en alguna
 				// y si es asi, se da la casilla del checkbox como true
+				
 				if (datosEmprAdmin[0][1]!=null && datosEmprAdmin[0][1].equals(datosUsuarioAdmin[n][7])) {
 					d7D.setSelected(true);
-				}
-				if (datosEmprAdmin[0][1]!=null && datosEmprAdmin[0][1].equals(datosUsuarioAdmin[n][8])) {
+				} else if (datosEmprAdmin[0][1]!=null && datosEmprAdmin[0][1].equals(datosUsuarioAdmin[n][8])) {
 					d7D.setSelected(true);
-				}
-				if (datosEmprAdmin[0][1]!=null && datosEmprAdmin[0][1].equals(datosUsuarioAdmin[n][9])) {
+				} else if (datosEmprAdmin[0][1]!=null && datosEmprAdmin[0][1].equals(datosUsuarioAdmin[n][9])) {
 					d7D.setSelected(true);
-				}
+				} else d7D.setSelected(false);
 				
 				if (datosEmprAdmin[1][1]!=null && datosEmprAdmin[1][1].equals(datosUsuarioAdmin[n][7])) {
 					d8D.setSelected(true);
-				}
-				if (datosEmprAdmin[1][1]!=null && datosEmprAdmin[1][1].equals(datosUsuarioAdmin[n][8])) {
+				} else	if (datosEmprAdmin[1][1]!=null && datosEmprAdmin[1][1].equals(datosUsuarioAdmin[n][8])) {
 					d8D.setSelected(true);
-				}
-				if (datosEmprAdmin[1][1]!=null && datosEmprAdmin[1][1].equals(datosUsuarioAdmin[n][9])) {
+				} else	if (datosEmprAdmin[1][1]!=null && datosEmprAdmin[1][1].equals(datosUsuarioAdmin[n][9])) {
 					d8D.setSelected(true);
-				}
+				} else 	d8D.setSelected(false);
 				
 				if (datosEmprAdmin[2][1]!=null && datosEmprAdmin[2][1].equals(datosUsuarioAdmin[n][7])) {
 					d9D.setSelected(true);
-				}
-				if (datosEmprAdmin[2][1]!=null && datosEmprAdmin[2][1].equals(datosUsuarioAdmin[n][8])) {
+				} else	if (datosEmprAdmin[2][1]!=null && datosEmprAdmin[2][1].equals(datosUsuarioAdmin[n][8])) {
 					d9D.setSelected(true);
-				}
-				if (datosEmprAdmin[2][1]!=null && datosEmprAdmin[2][1].equals(datosUsuarioAdmin[n][9])) {
+				} else	if (datosEmprAdmin[2][1]!=null && datosEmprAdmin[2][1].equals(datosUsuarioAdmin[n][9])) {
 					d9D.setSelected(true);
-				}
+				} else 	d9D.setSelected(false);
 
 				// aqui se selecciona activo o desactivado, cuyo valores son 
 				// 1 Activado y 0 Desactivado
@@ -1722,44 +1765,4 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 	}  // fin del metodo actualizaAdministrado
 	
 	
-	public class CreaTabla extends AbstractTableModel {
-		
-		
-		String nombreColum[]={"cliente","Datos"};
-		
-		Object info[][]= {
-				{"Nombre usuario",d1.getText()},
-				{"Usuario",d2.getText()},
-				{"Password",d3.getText()},
-				{"email",d4.getText()},
-				{"Categoría",d5.getText()},
-				{"Empresas activas ",d6.getText()},
-				{"Empresa",d7.getText()},
-				{"Dirección",d8.getText()},
-				{"Localidad",d9.getText()},
-				{"Cod.Postal",d10.getText()},
-				{"N.I.F.",d11.getText()}
-		};
-
-		
-		public int getRowCount() {
-			// TODO Auto-generated method stub
-			return info.length;
-		}
-
-		public int getColumnCount() {
-			// TODO Auto-generated method stub
-			return nombreColum.length;
-		}
-
-		public Object getValueAt(int rowIndex, int nombreColum) {
-			// TODO Auto-generated method stub
-			return info[rowIndex][nombreColum];
-		}
-
-	}
-
-
-
-
-}
+}  // ******************** FIN DE LA CLASE ********************

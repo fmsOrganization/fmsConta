@@ -30,25 +30,33 @@ public class Fmsconta1 extends JFrame {
 		
 		// ARRANCAMOS LA APLICACION
 		
-		JFrame initWindow=new JFrame(version);	
+		JFrame initWindow=new JFrame();	
 		initWindow.setExtendedState(Frame.MAXIMIZED_BOTH);
-
+		
 		// Ventana de presentacion e identificacion
 		Presentacion enterSandMan=new Presentacion(initWindow,version);
+		enterSandMan.setVisible(true);
+		
+		// Abre la pantalla de identificacion
+		enterSandMan.openPant();
 		
 		// si la identificacion es correcta
-		// y existe el usuario abre la pantalla principal
-		// y cierra la intro
+		// y existe el usuario abre la pantalla 
 		
 		if (enterSandMan.idCorrect()) {
-			// cierra intro
-			initWindow.setVisible(false);
 			// recupera nombre y pass de usuario
 			nameUser=enterSandMan.getUserConta();
 			passUser=enterSandMan.getUserPass();
+			
+			// cierra el marco de la pantalla de identificacion
+			enterSandMan.closePant();
+			// cierra el marco de la pantalla de presentacion
+			enterSandMan.setVisible(false);
+			initWindow.setVisible(false);
+			
 			// accede a la pantalla principal
 			// la operativa contable se realiza aqui
-			PantallaPrincipal ventana=new PantallaPrincipal(initWindow,version,nameUser,passUser);
+			PantallaPrincipal ventanaMain=new PantallaPrincipal(initWindow,version,nameUser,passUser);
 		}
 
 						
