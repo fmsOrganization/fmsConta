@@ -14,24 +14,40 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
 import fmsconta.control.ContaDAO;
 
 
 
-public class PantallaPrincipal extends JFrame implements ActionListener {
+public class PantallaPrincipal extends JFrame implements ActionListener, Settings {
+	
+	
+	// matrices de retorno de DDBB
+	private String datosUser[]=new String[15];
+	private String datosEmpr[]=new String[12];
+	// variables de id y DDBB
+	private String company="";			// nombre de la compañia (info pantalla)
+	private String year="";				// año de operaciones (info pantalla)
+	private String nameUser="";			// nombre del usuario (info pantalla)
+	private String keyUser="";			// key del user para DDBB
+	private String keyEmpr="";			// key de la empresa para DDBB
+	private boolean isManager=false;	// es manager (true) o usuario (false)
+	
+	private JFrame mainWindow;
+	private String titulo;
+	private String loginUser;
+	private String passUser;
 	
 	// panel principal y variables diversas
 	private JDialog pantallaMain;
-	private Color colorfondo=new Color(220,220,220);
-	// path de los jpg
-	private String pathImageFiles="src/main/java/fmsconta/pictures/";
 	
 	// panel superior title y sus componentes 
 	private JPanel panelIco;
@@ -46,14 +62,18 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 	private JLabel nombreUsuario;
 	// panel de los combos y sus componentes
 	private JPanel panelCombos;
+	private CombosSuperior combos;
 	private BoxLayout horizontal2;
+	private CambioEmpresa changeCompany;
+	private ContListadoMayor listaMayor;
 	// panel de la izquierda y sus componentes
 	private JPanel panelIzq;
 	private BoxLayout vertical;
 	private BotonesPanelIzq botonesFijos;
 	private Dimension dimens;
 	// panel central y sus componentes
-	private JPanel panelCen;
+	//private JPanel panelCen;
+	private JScrollPane panelCen;
 	private JPanel panelAuxCen;
 	private BoxLayout horizontal6;
 	private Font fuente2;
@@ -64,18 +84,25 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 	private String textoLeyenda;
 	private JLabel leyenda;
 	
-	// matrices de retorno de DDBB
-	private String datosUser[]=new String[15];
-	private String datosEmpr[]=new String[12];
-	// variables de id y DDBB
-	private String company="";			// nombre de la compañia (info pantalla)
-	private String year="";				// año de operaciones (info pantalla)
-	private String nameUser="";			// nombre del usuario (info pantalla)
-	private String keyUser="";			// key del user para DDBB
-	private String keyEmpr="";			// key de la empresa para DDBB
-	private boolean isManager=false;	// es manager (true) o usuario (false)
+
 	
 	
+	
+	
+	public PantallaPrincipal () {
+		
+		//BUILDER
+	}
+	
+	public PantallaPrincipal (JFrame mainW, String title, String login, String password) {
+		
+		this.mainWindow=mainW;
+		this.titulo=title;
+		this.loginUser=login;
+		this.passUser=password;
+		
+		//BUILDER
+	}
 	
 	/* *****************************************************************************
 	 *  Este metodo builder muestra la pantalla principal
@@ -86,7 +113,7 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 	 *  el nombre y el password
 	 ******************************************************************************** */
 	
-	public PantallaPrincipal (JFrame mainWindow, String titulo, String loginUser, String passUser){
+	public void controlCenter (){
 			
 			// instanciamos el pool de conexiones ContaDAO
 			ContaDAO newUserConta=new ContaDAO();
@@ -126,7 +153,8 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 		// **** CREAMOS LAS CONDICIONES DE LA VENTANA PRINCIPAL
 		
 		pantallaMain=new JDialog(mainWindow,titulo,false);
-		pantallaMain.setSize(900,600);
+		pantallaMain.setMinimumSize(new Dimension(900,600));
+		pantallaMain.setSize(pantallaMain.getMaximumSize());
 		pantallaMain.setLocationRelativeTo(mainWindow);
 		pantallaMain.setResizable(true);
 		pantallaMain.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -149,6 +177,7 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 		iconoPortada=new JLabel("",portada,SwingConstants.LEFT);
 		panelIco.add(iconoPortada);
 		panelIco.setBackground(colorfondo);
+		
 			// CREAMOS LA CONFIGURACION DE PANTALLA
 		GridBagConstraints constraints=new GridBagConstraints();
 		constraints.gridx=0;
@@ -194,7 +223,7 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 		panelCombos.setLayout(horizontal2);
 		panelCombos.setBackground(colorfondo);
 		    // ELEMENTOS DEL MENU	
-		CombosSuperior combos=new CombosSuperior();
+		combos=new CombosSuperior();
 			// AÑADIMOS LOS COMBOS AL PANEL SUPERIOR
 		panelCombos.add(combos.combo1);
 		panelCombos.add(combos.combo2);
@@ -214,8 +243,8 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 			// ******************************* CREAMOS EL PANEL IZQUIERDO
 		panelIzq=new JPanel();
 		vertical=new BoxLayout(panelIzq,BoxLayout.Y_AXIS);
-		dimens=new Dimension(100,510);
-		panelIzq.setPreferredSize(dimens);
+		dimens=new Dimension(200,510);
+		//panelIzq.setPreferredSize(dimens);
 		panelIzq.setLayout(vertical);
 		panelIzq.setBackground(colorfondo);
 		     // CREAMOS LOS BOTONES LATERALES LLAMAMOS A LA CLASE QUE LOS CREA
@@ -243,8 +272,11 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 			// para poder borrar el contenedor interior sin afectar
 			// al contenedor exterior
 		
-		panelCen=new JPanel();
+		panelCen=new JScrollPane();
+		panelCen.setPreferredSize(new Dimension(900,500));
 		panelAuxCen=new JPanel();
+		panelCen.setViewportView(panelAuxCen);
+		panelCen.getViewport().setView(panelAuxCen);
 		
 		horizontal6=new BoxLayout(panelAuxCen,BoxLayout.Y_AXIS);
 		
@@ -259,7 +291,9 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 		fotoFondo=new JLabel("",fondo,SwingConstants.CENTER);
 			// AÑADIMOS EL GRAFICO
 		panelAuxCen.add(fotoFondo);
-		panelCen.add(panelAuxCen);
+		panelCen.setViewportView(panelAuxCen);
+		panelCen.getViewport().setView(panelAuxCen);
+		
 		// CREAMOS LA CONFIGURACION DE PANTALLA
 		constraints=new GridBagConstraints();
 		constraints.gridx=1;
@@ -304,6 +338,8 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 		botonesFijos.boe.addActionListener(this);
 		botonesFijos.copseg.addActionListener(this);
 		botonesFijos.salida.addActionListener(this);
+		combos.combo1.addActionListener(this);
+		combos.combo2.addActionListener(this);
 
 	} //fin del builder
 	
@@ -328,7 +364,9 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 			panelAuxCen.setBackground(colorfondo);
 			ContUsuario hola1=new ContUsuario(datosUser,datosEmpr);
 			panelAuxCen.add(hola1.retorna());
-			panelCen.add(panelAuxCen);
+			//panelCen.add(panelAuxCen);
+			panelCen.setViewportView(panelAuxCen);
+			panelCen.getViewport().setView(panelAuxCen);
 			panelCen.setVisible(true);
 		}
 		
@@ -345,7 +383,9 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 			//ContEmpresa hola=new ContEmpresa(datosEmpr,keyEmpr,nameUser,isManager,datosUser[6],keyUser);
 			ContEmpresa hola=new ContEmpresa(datosEmpr,datosUser);
 			panelAuxCen.add(hola.retorna());
-			panelCen.add(panelAuxCen);
+			//panelCen.add(panelAuxCen);
+			panelCen.setViewportView(panelAuxCen);
+			panelCen.getViewport().setView(panelAuxCen);
 			panelCen.setVisible(true);
 		}
 		
@@ -359,6 +399,7 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 		}
 		if (source == botonesFijos.copseg) {
 			panelCen.setVisible(false);	
+			refresh();
 			JOptionPane.showMessageDialog(null, "Copia seguridad pulsada");
 		}
 		if (source == botonesFijos.salida) {
@@ -368,5 +409,57 @@ public class PantallaPrincipal extends JFrame implements ActionListener {
 				System.exit(0);
 			}
 		}
+		
+		
+		if (source==combos.combo1) {
+			String loque=combos.combo1.getSelectedItem().toString();
+			if (loque.equals("Cambio empresa")) {
+				// borramos el panel central
+				panelCen.setVisible(false);	
+				panelCen.remove(panelAuxCen);
+				panelCen.validate();
+				// creamos un nuevo panel central
+				panelAuxCen=new JPanel();
+				panelAuxCen.setBackground(colorfondo);
+				// invocamos y mostramos el nuevo panel central
+				changeCompany=new CambioEmpresa(datosEmpr,datosUser);
+				panelAuxCen.add(changeCompany.retorna());
+				//panelCen.add(panelAuxCen);
+				panelCen.setViewportView(panelAuxCen);
+				panelCen.getViewport().setView(panelAuxCen);
+				panelCen.setVisible(true);
+			}	
+		}
+		
+		if (source==combos.combo2) {
+			String loque=combos.combo2.getSelectedItem().toString();
+			if (loque.equals("Libro mayor")) {
+				// borramos el panel central
+				panelCen.setVisible(false);	
+				panelCen.remove(panelAuxCen);
+				panelCen.validate();
+				// creamos un nuevo panel central
+				panelAuxCen=new JPanel();
+				panelAuxCen.setBackground(colorfondo);
+				// invocamos y mostramos el nuevo panel central
+				listaMayor=new ContListadoMayor(datosEmpr[1],datosEmpr[2],"70000000","79000002","01-01-2012","31-01-2012");
+				panelAuxCen.add(listaMayor.retorna());
+				//panelCen.add(panelAuxCen);
+				panelCen.setViewportView(panelAuxCen);
+				panelCen.getViewport().setView(panelAuxCen);
+				panelCen.setVisible(true);
+			}	
+		}
+		
+	} // fin del actionPerformed
+	
+	
+	
+	public void refresh(){
+		pantallaMain.setVisible(false);
+		pantallaMain.dispose();
+		
+		controlCenter();
 	}
-} // fin del actionPerformed
+	
+} // **************** FIN DE CLASE *********

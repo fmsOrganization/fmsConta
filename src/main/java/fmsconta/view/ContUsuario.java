@@ -37,7 +37,7 @@ import fmsconta.control.ContaDAO;
 import javax.swing.JOptionPane;
 
 
-public class ContUsuario extends JFrame implements ActionListener, ItemListener{
+public class ContUsuario extends JFrame implements ActionListener, ItemListener, Settings{
 	
 	// VARIABLES GENERALES
 	
@@ -45,14 +45,9 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 	
 	private JFrame ventanaListado;
 
-	private Color colorfondo=new Color(220,220,220);
-	private Color colorBlanco=new Color(255,255,255);
 	private JTabbedPane panTab;
 	private JPanel panelEmp;
-	
-	private Font fuente1=new Font("",Font.BOLD,20);
-	private Font fuente2=new Font("",Font.PLAIN,16);
-	private String pathImageFiles="src/main/java/fmsconta/pictures/";
+
 	private Image abc;
 	private Icon iconoW;
 	private Icon iconoE;
@@ -1220,6 +1215,14 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener{
 			d4B.setBackground(Color.ORANGE);
 			return false;
 		}
+		
+		// finalmente, se actualiza la informacion en consulta usuarios
+		d1.setText(datosUsuario[2]);
+		d2.setText(datosUsuario[3]);
+		d3.setText(datosUsuario[4]);
+		d4.setText(datosUsuario[5]);
+
+		
 		
 		return true;
 		

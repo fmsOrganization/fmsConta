@@ -33,6 +33,7 @@ public class Fmsconta1 extends JFrame {
 		JFrame initWindow=new JFrame();	
 		initWindow.setExtendedState(Frame.MAXIMIZED_BOTH);
 		
+		
 		// Ventana de presentacion e identificacion
 		Presentacion enterSandMan=new Presentacion(initWindow,version);
 		enterSandMan.setVisible(true);
@@ -57,6 +58,7 @@ public class Fmsconta1 extends JFrame {
 			// accede a la pantalla principal
 			// la operativa contable se realiza aqui
 			PantallaPrincipal ventanaMain=new PantallaPrincipal(initWindow,version,nameUser,passUser);
+			ventanaMain.controlCenter();
 		}
 
 						

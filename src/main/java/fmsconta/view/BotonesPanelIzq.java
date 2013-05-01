@@ -7,11 +7,9 @@ import javax.swing.JFrame;
 
 
 
-public class BotonesPanelIzq extends JFrame{
+public class BotonesPanelIzq extends JFrame implements Settings{
 	
-	//*********** ESTA CLASE CREA LOS BOTONES DEL PANEL LATERAL IZQUIERDO
-	// CREANDO LOS ESCUCHADORES Y MANEJADORES DE LOS EVENTOS
-	
+
 	protected JButton usuarios;
 	protected JButton empresa;
 	protected JButton faqs;
@@ -19,10 +17,13 @@ public class BotonesPanelIzq extends JFrame{
 	protected JButton copseg;
 	protected JButton salida;
 	
-	private String pathImageFiles="src/main/java/fmsconta/pictures/";
 	private Image abc;
 
 	
+	
+	/* ********************************************************************
+	 * Este constructor crea el panel lateral izquierdo con sus botones
+	 ******************************************************************** */
 	
 	public BotonesPanelIzq(){
 	    // CREAMOS LOS BOTONES LATERALES DEL PANEL IZQUIERDO
@@ -48,7 +49,6 @@ public class BotonesPanelIzq extends JFrame{
 		boe=new JButton(botonboe);
 		copseg=new JButton(botonseg);
 		salida=new JButton(botonsal);
-		
 
 	}
 

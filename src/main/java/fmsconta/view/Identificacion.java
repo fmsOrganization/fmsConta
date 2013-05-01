@@ -334,12 +334,11 @@ public class Identificacion extends JFrame implements ActionListener{
 	}
 	
 	
-	
+	// activa la pantalla de identificacion
 	public void openPant() {
-		
 		this.idUser.setVisible(true);
 	}
-	
+	// desactiva la pantalla de identificacion
 	public void closePant() {
 		this.idUser.setVisible(false);
 		this.idUser=null;

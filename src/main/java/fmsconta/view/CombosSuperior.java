@@ -15,7 +15,7 @@ public class CombosSuperior extends JFrame implements ActionListener {
 	protected JComboBox combo4;
 	protected JComboBox combo5;
 	
-	protected String[] general= {"GENERAL","Empresa","Alta apertura","Fin ejercicio","Settings"};
+	protected String[] general= {"GENERAL","Cambio empresa","Alta apertura","Fin ejercicio","Settings"};
 	protected String[] informes={"INFORMES","Libro mayor","Libro diario","Sumas y saldos","Cuenta de Resultados","Balance","Cambios patrimonio"};
 	protected String[] operativa={"OPERATIVA","Asientos","Cuentas","Enlaces"};
 	protected String[] clientes={"CLIENTES","Cuentas clientes","Listado clientes","Grabación facturas","Modificación facturas","Borrado facturas","Listado facturas","IVA emitidas","Previsiones"};
@@ -52,8 +52,8 @@ public class CombosSuperior extends JFrame implements ActionListener {
 		// lectura del boton pulsado
 		Object source=e.getSource();
 		
-		if (source == combo1) JOptionPane.showMessageDialog(null, "combo1 usado");
-		if (source == combo2) JOptionPane.showMessageDialog(null, "combo2 usado");
+		//if (source == combo1) JOptionPane.showMessageDialog(null, "combo1 usado");
+		//if (source == combo2) JOptionPane.showMessageDialog(null, "combo2 usado");
 		if (source == combo3) JOptionPane.showMessageDialog(null, "combo3 usado");
 		if (source == combo4) JOptionPane.showMessageDialog(null, "combo4 usado");
 		if (source == combo5) {

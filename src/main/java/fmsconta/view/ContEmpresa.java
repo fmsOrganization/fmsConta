@@ -7,6 +7,8 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -23,10 +25,11 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 
+import fmsconta.control.CompanyFiles;
 import fmsconta.control.ContaDAO;
 
 
-public class ContEmpresa extends JFrame implements ActionListener{
+public class ContEmpresa extends JFrame implements ActionListener, Settings{
 	
 	// contenedores
 	private JFrame ventanaListado;
@@ -101,13 +104,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	private JComboBox d9C=new JComboBox();
 	private JTextField d10C=new JTextField();
 	
-	// colores, fuentes, graficos
-	private Color colorfondo=new Color(220,220,220);
-	private Color colorBlanco=new Color(255,255,255);
-	private Font fuente1=new Font("",Font.BOLD,20);
-	private Font fuente2=new Font("",Font.PLAIN,16);
-	private int sizeLetras=24;
-	private String pathImageFiles="src/main/java/fmsconta/pictures/";
+	// graficos
 	private Image abc;
 	private Icon iconoW;
 	private Icon iconoE;
@@ -145,6 +142,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		keyEmpr=datosEmpmain[1];
 		userCat =(int)Integer.parseInt(datosUsuario[6]);
 		this.keyUser=datosUsuario[1];
+		
 		
 		// primero construimos el panel para consultar
 		// *******************************************
@@ -213,11 +211,27 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		if (source==modificar) {
 			// añade los datos modificables de la pantalla visual 
 			// a la tabla de datos y luego la graba en la DDBB
-			aceptaModif();
-			if (grabaModif()) {
-				JOptionPane.showMessageDialog(null, "Empresa modificada");
-			} else {
-				JOptionPane.showMessageDialog(null, "Error en modificación de empresa");
+			if (aceptaModif()) {
+				if (grabaModif()) {
+					JOptionPane.showMessageDialog(null, "Empresa modificada");
+				} else {
+					JOptionPane.showMessageDialog(null, "Error en modificación de empresa");
+				}
+			}
+			
+		}
+		
+		if (source==eliminar) {
+			// añade los datos modificables de la pantalla visual 
+			// a la tabla de datos y luego la graba en la DDBB
+			int resp=JOptionPane.showConfirmDialog(null, "¿Está seguro de querer borrar definitivamente la empresa?\n" +
+					"No será posible recuperar los datos y desaparecerá toda la información","",JOptionPane.YES_NO_OPTION);
+			if (resp==0 && verificaBorrado()) {
+					if (borraEmpresa(this.keyEmpr)) {
+						JOptionPane.showMessageDialog(null, "Empresa eliminada completamente");
+					} else {
+						JOptionPane.showMessageDialog(null, "No ha sido posible borrar la empresa");
+					}
 			}
 			
 		}
@@ -230,7 +244,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 				if (preparaGrabEmp()) {
 					// graba los datos si no hay problemas
 					if (grabaNuevaEmpr()) {
-						JOptionPane.showMessageDialog(null, "Empresa creada");
+						JOptionPane.showMessageDialog(null,"Empresa creada","Creación de empresas",JOptionPane.INFORMATION_MESSAGE);
 					} else {
 						JOptionPane.showMessageDialog(null, "Error en creación de empresa");
 					}
@@ -244,7 +258,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		}
 		
 		if (source==d9C) {
-			// modificacion de empresas:
+			// creacion de empresas:
 			d9C.getSelectedItem().toString();
 		}
 		
@@ -293,7 +307,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	 * Este metodo no tiene valor de retorno
 	 ***************************************************************************/
 	
-	public void consultarPanel (String datosEmp[], String nameUsuario) {
+	private void consultarPanel (String datosEmp[], String nameUsuario) {
 		
 		// creacion del panel principal
 		panelUsu=new JPanel();
@@ -322,9 +336,94 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		d3.setText(datosEmp[4]);	// localidad
 		d4.setText(datosEmp[5]);	// provincia
 		d5.setText(datosEmp[6]);	// codigo postal
-		d6.setText(datosEmp[7]);	// cif
-		d7.setText(datosEmp[8]);	// fecha inicio ejercicio
-		d8.setText(datosEmp[9]);	// fecha fin ejercicio
+		d6.setText(datosEmp[7]);	// cif	
+		
+		// fecha inicio ejercicio
+		int mes1=(int)Integer.parseInt(datosEmp[8].substring(3, 5));
+		String nameMes1="";
+		switch (mes1){
+			case 1: 
+			nameMes1="Enero";
+			break;
+			case 2: 
+			nameMes1="Febrero";
+			break;
+			case 3: 
+			nameMes1="Marzo";
+			break;
+			case 4: 
+			nameMes1="Abril";
+			break;
+			case 5: 
+			nameMes1="Mayo";
+			break;
+			case 6: 
+			nameMes1="Junio";
+			break;
+			case 7: 
+			nameMes1="Julio";
+			break;
+			case 8: 
+			nameMes1="Agosto";
+			break;
+			case 9: 
+			nameMes1="Septiembre";
+			break;
+			case 10: 
+			nameMes1="Octubre";
+			break;
+			case 11: 
+			nameMes1="Noviembre";
+			break;
+			case 12: 
+			nameMes1="Diciembre";
+			break;
+		}
+		d7.setText(datosEmp[8].substring(0, 3)+nameMes1);	
+		
+		// fecha fin ejercicio
+		mes1=(int)Integer.parseInt(datosEmp[9].substring(3, 5));
+		nameMes1="";
+		switch (mes1){
+			case 1: 
+			nameMes1="Enero";
+			break;
+			case 2: 
+			nameMes1="Febrero";
+			break;
+			case 3: 
+			nameMes1="Marzo";
+			break;
+			case 4: 
+			nameMes1="Abril";
+			break;
+			case 5: 
+			nameMes1="Mayo";
+			break;
+			case 6: 
+			nameMes1="Junio";
+			break;
+			case 7: 
+			nameMes1="Julio";
+			break;
+			case 8: 
+			nameMes1="Agosto";
+			break;
+			case 9: 
+			nameMes1="Septiembre";
+			break;
+			case 10: 
+			nameMes1="Octubre";
+			break;
+			case 11: 
+			nameMes1="Noviembre";
+			break;
+			case 12: 
+			nameMes1="Diciembre";
+			break;
+		}
+		d8.setText(datosEmp[9].substring(0, 3)+nameMes1);	
+		
 		d9.setText(datosEmp[10]);	// activa
 		if (d9.getText().equals("0")) {
 			d9.setText("Inactiva");
@@ -398,7 +497,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	 * Este metodo no retorna, modifica directamente las variables de clase
 	 ************************************************************************** */
 	
-	public void modificarPanel (String datosEmp[], String nameUsuario, int categoria) {
+	private void modificarPanel (String datosEmp[], String nameUsuario, int categoria) {
 		
 		// creacion del panel principal
 		panelUsu2=new JPanel();
@@ -428,8 +527,95 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		d4B.setText(datosEmp[5]);	// provincia
 		d5B.setText(datosEmp[6]);	// codigo postal
 		d6B.setText(datosEmp[7]);	// cif
-		d7B.setText(datosEmp[8]);	// fecha inicio ejercicio
-		d8B.setText(datosEmp[9]);	// fecha fin ejercicio
+		
+		// fecha inicio ejercicio
+		int mes1=(int)Integer.parseInt(datosEmp[8].substring(3, 5));
+		String nameMes1="";
+		switch (mes1){
+			case 1: 
+			nameMes1="Enero";
+			break;
+			case 2: 
+			nameMes1="Febrero";
+			break;
+			case 3: 
+			nameMes1="Marzo";
+			break;
+			case 4: 
+			nameMes1="Abril";
+			break;
+			case 5: 
+			nameMes1="Mayo";
+			break;
+			case 6: 
+			nameMes1="Junio";
+			break;
+			case 7: 
+			nameMes1="Julio";
+			break;
+			case 8: 
+			nameMes1="Agosto";
+			break;
+			case 9: 
+			nameMes1="Septiembre";
+			break;
+			case 10: 
+			nameMes1="Octubre";
+			break;
+			case 11: 
+			nameMes1="Noviembre";
+			break;
+			case 12: 
+			nameMes1="Diciembre";
+			break;
+		}
+		d7B.setText(datosEmp[8].substring(0, 3)+nameMes1);	
+		
+		// fecha fin ejercicio
+		mes1=(int)Integer.parseInt(datosEmp[9].substring(3, 5));
+		nameMes1="";
+		switch (mes1){
+			case 1: 
+			nameMes1="Enero";
+			break;
+			case 2: 
+			nameMes1="Febrero";
+			break;
+			case 3: 
+			nameMes1="Marzo";
+			break;
+			case 4: 
+			nameMes1="Abril";
+			break;
+			case 5: 
+			nameMes1="Mayo";
+			break;
+			case 6: 
+			nameMes1="Junio";
+			break;
+			case 7: 
+			nameMes1="Julio";
+			break;
+			case 8: 
+			nameMes1="Agosto";
+			break;
+			case 9: 
+			nameMes1="Septiembre";
+			break;
+			case 10: 
+			nameMes1="Octubre";
+			break;
+			case 11: 
+			nameMes1="Noviembre";
+			break;
+			case 12: 
+			nameMes1="Diciembre";
+			break;
+		}
+		d8B.setText(datosEmp[9].substring(0, 3)+nameMes1);
+		
+		
+		
 		// actividad
 		d9B.addItem("Activa");
 		d9B.addItem("Inactiva");
@@ -447,7 +633,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 			// los usuarios no manager tampoco puede modificar estas
 			d1B.setEditable(false);
 			d6B.setEditable(false);
-			d9B.setEditable(false);
+			d9B.setEnabled(false);
 		}
 		
 		// elaboracion de iconos
@@ -547,7 +733,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	 * Este metodo no tiene valor de retorno
 	 ***************************************************************************/
 	
-	public void creaPanel (String datosEmp[], String nameUsuario, int userCat) {
+	private void creaPanel (String datosEmp[], String nameUsuario, int userCat) {
 		
 		// creacion del panel principal
 		panelUsu3=new JPanel();
@@ -577,8 +763,8 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		d4C.setText("");	// provincia
 		d5C.setText("");	// codigo postal
 		d6C.setText("");	// cif
-		d7C.setText("");	// fecha inicio ejercicio
-		d8C.setText("");	// fecha fin ejercicio
+		d7C.setText("01-01");	// fecha inicio ejercicio
+		d8C.setText("31-12");	// fecha fin ejercicio
 		d9C.addItem("Activa");
 		d9C.addItem("Inactiva");
 		d10C.setText(nameUsuario);		// nombre manager
@@ -597,9 +783,9 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		sc5.setToolTipText("Campo obligatorio");
 		JLabel sc6=new JLabel("longitud obligatoria 9",iconoW,JLabel.LEFT);
 		sc6.setToolTipText("Campo obligatorio");
-		JLabel sc7=new JLabel("longitud obligatoria 8",iconoW,JLabel.LEFT);
+		JLabel sc7=new JLabel("Formato obligatorio DD-MM",iconoW,JLabel.LEFT);
 		sc7.setToolTipText("Campo obligatorio");
-		JLabel sc8=new JLabel("longitud obligatoria 8",iconoW,JLabel.LEFT);
+		JLabel sc8=new JLabel("Formato obligatorio DD-MM",iconoW,JLabel.LEFT);
 		sc8.setToolTipText("Campo obligatorio");
 		JLabel sc9=new JLabel("Activa o Inactiva");
 		JLabel sc10=new JLabel(" ");
@@ -671,23 +857,91 @@ public class ContEmpresa extends JFrame implements ActionListener{
 	 * Este metodo no tiene parametros y no tiene valor de retorno
 	 ************************************************************************** */
 	
-	private void aceptaModif() {
+	private boolean aceptaModif() {
 		
 		// datos de la empresa actualizados a las casillas editables
 		
-		datosEmp[2]=d1B.getText();		// nombre empresa
-		datosEmp[3]=d2B.getText();		// direccion
-		datosEmp[4]=d3B.getText();		// localidad
-		datosEmp[5]=d4B.getText();		// provincia
-		datosEmp[6]=d5B.getText();		// codigo postal
-		datosEmp[7]=d6B.getText();		// cif
+		// reseteamos los posible resaltes backgrounds de errores anteriores
+				d1B.setBackground(Color.WHITE);
+				d2B.setBackground(Color.WHITE);
+				d3B.setBackground(Color.WHITE);
+				d4B.setBackground(Color.WHITE);
+				d5B.setBackground(Color.WHITE);
+				d6B.setBackground(Color.WHITE);
+
+				// ************** nombre empresa ******************* 
+				datosEmp[2]=d1B.getText();		// nombre empresa
+							
+				if ((datosEmp[2].equals("") || datosEmp[2].equals(null))) {
+					JOptionPane.showMessageDialog(null, "nombre de empresa no rellenado");
+					d1B.setBackground(Color.ORANGE);
+					return false;
+				}
+				if (datosEmp[2].length()<3 || datosEmp[2].length()>40) {
+					JOptionPane.showMessageDialog(null, "nombre de empresa de longitud inadecuada" );
+					d1B.setBackground(Color.ORANGE);
+					return false;
+				}
+				// ************** direccion ******************* 
+				datosEmp[3]=d2B.getText();		// direccion		
+
+				if (datosEmp[3].length()>50) {
+					JOptionPane.showMessageDialog(null, "La dirección tiene longitud inadecuada" );
+					d2B.setBackground(Color.ORANGE);
+					return false;
+				}
+				// ************** localidad ******************* 
+				datosEmp[4]=d3B.getText();		// localidad
+				if (datosEmp[4].length()>50) {
+					JOptionPane.showMessageDialog(null, "La localidad tiene longitud inadecuada" );
+					d3B.setBackground(Color.ORANGE);
+					return false;
+				}
+				
+				// ************** provincia ******************* 
+				datosEmp[5]=d4B.getText();		// provincia		
+				if (datosEmp[5].length()>20) {
+					JOptionPane.showMessageDialog(null, "La provincia tiene longitud inadecuada" );
+					d4B.setBackground(Color.ORANGE);
+					return false;
+				}
+				// ************** codigo postal ******************* 
+				datosEmp[6]=d5B.getText();		// codigo postal
+				if (datosEmp[6].length()>5) {
+					JOptionPane.showMessageDialog(null, "El codigo postal debe tener 5 numeros max." );
+					d5B.setBackground(Color.ORANGE);
+					return false;
+				}
+				// ************** NIF ******************* 
+				datosEmp[7]=d6B.getText();		// nif
+							
+				if ((datosEmp[7].equals("") || datosEmp[7].equals(null))) {
+					JOptionPane.showMessageDialog(null, "Es obligatorio rellenar el NIF");
+					d6B.setBackground(Color.ORANGE);
+					return false;
+				}
+				if (datosEmp[7].length()!=9) {
+					JOptionPane.showMessageDialog(null, "El NIF debe tener exactamente 9 dígitos" );
+					d6B.setBackground(Color.ORANGE);
+					return false;
+				}
+		
 		if (d9B.getSelectedItem().toString().equals("Activa")) {
 			datosEmp[10]="1";					// activa
 		} else datosEmp[10]="0";	
 			
-		for(int i=0;i<datosEmp.length;i++) {
-		System.out.print(datosEmp[i]+"-");
-		}
+		d1.setText(datosEmp[2]);
+		d2.setText(datosEmp[3]);
+		d3.setText(datosEmp[4]);
+		d4.setText(datosEmp[5]);
+		d5.setText(datosEmp[6]);
+		d6.setText(datosEmp[7]);
+		if (datosEmp[10].equals("1")) {
+			d9.setText("Activa");
+		} else d9.setText("Inactiva");
+		
+
+		return true;
 		
 	} // fin del metodo aceptaModif
 	
@@ -708,7 +962,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		
 		// graba los datos residentes en datosEmp en la DDBB con key keyEmpr
 		if (dao.grabaEmpDB (keyEmpr, datosEmp, "UPDATE")){
-			System.out.println("alright");
+			
 		} else {
 			// fallo al intentar grabar la empresa
 			System.err.println("Fallo al intentar modificar los datos de empresa ");
@@ -739,7 +993,8 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		}
 		
 		return false;
-	}
+	} // FIN del metodo cumplerequisitos
+	
 	
 	
 	/* ************************************************************************
@@ -809,17 +1064,150 @@ public class ContEmpresa extends JFrame implements ActionListener{
 			return false;
 		} else creaEmp[7]=d6C.getText();		// cif
 		
-		if (d7C.getText().length()!=8) {
-			JOptionPane.showMessageDialog(null, "Formato fecha inicial: XX-XX-XX");
+
+		
+		// coge el año actual
+		Calendar dat=Calendar.getInstance();
+		int dato=dat.get(Calendar.YEAR);
+		String yearAct=String.valueOf(dato);
+		
+		
+		if (d7C.getText().length()!=5) {
+			JOptionPane.showMessageDialog(null, "Formato fecha inicial: DD-MM 5 digitos obligatorio");
 			d7C.setBackground(Color.ORANGE);
 			return false;
-		} else creaEmp[8]=d7C.getText();		// fecha inicio
+		} 
 		
-		if (d8C.getText().length()!=8) {
-			JOptionPane.showMessageDialog(null, "Formato fecha final: XX-XX-XX");
+		String dig1=d7C.getText().substring(0,1);
+		String dig2=d7C.getText().substring(1,2);
+		String dig3=d7C.getText().substring(3,4);
+		String dig4=d7C.getText().substring(4,5);
+		
+		if (!(dig1.equals("0") || dig1.equals("1") || dig1.equals("2") || dig1.equals("3"))) {
+			JOptionPane.showMessageDialog(null, "Formato fecha inicial: DD-MM 1");
+			d7C.setBackground(Color.ORANGE);
+			return false;
+		}
+		if (!(dig2.equals("0") || dig2.equals("1") || dig2.equals("2") || dig2.equals("3") ||
+				dig2.equals("4") || dig2.equals("5") || dig2.equals("6") || dig2.equals("7") ||
+				dig2.equals("8") || dig2.equals("9"))) {
+			JOptionPane.showMessageDialog(null, "Formato fecha inicial: DD-MM 2");
+			d7C.setBackground(Color.ORANGE);
+			return false;
+		}
+		if (!(dig3.equals("0") || dig3.equals("1"))) {
+			JOptionPane.showMessageDialog(null, "Formato fecha inicial: DD-MM 3");
+			d7C.setBackground(Color.ORANGE);
+			return false;
+		}
+		if (!(dig4.equals("0") || dig4.equals("1") || dig4.equals("2") || dig4.equals("3") ||
+				dig4.equals("4") || dig4.equals("5") || dig4.equals("6") || dig4.equals("7") ||
+				dig4.equals("8") || dig4.equals("9"))) {
+			JOptionPane.showMessageDialog(null, "Formato fecha inicial: DD-MM 4");
+			d7C.setBackground(Color.ORANGE);
+			return false;
+		}
+		
+		// comprobacion de correccion de fechas
+		int dia=(int)Integer.parseInt(d7C.getText().substring(0,2));
+		int mes=(int)Integer.parseInt(d7C.getText().substring(3,5));
+		
+		if (dia<1 || dia>31) {
+			JOptionPane.showMessageDialog(null, "El día "+dia+" no es correcto");
+			d7C.setBackground(Color.ORANGE);
+			return false;
+		}
+		
+		if (mes<1 || mes>12) {
+			JOptionPane.showMessageDialog(null, "El mes "+mes+" no es correcto");
+			d7C.setBackground(Color.ORANGE);
+			return false;
+		}
+		
+		if (mes==2 && dia>29) {
+			JOptionPane.showMessageDialog(null, "La fecha "+dia+"-"+mes+" no es correcta");
+			d7C.setBackground(Color.ORANGE);
+			return false;
+		}
+		
+		if ((mes==4 || mes==6 || mes==9 || mes==11 ) && dia>30) {
+			JOptionPane.showMessageDialog(null, "La fecha "+dia+"-"+mes+" no es correcta");
+			d7C.setBackground(Color.ORANGE);
+			return false;
+		}
+		
+		// si llega aqui ha pasado el text :)
+		creaEmp[8]=d7C.getText()+"-"+yearAct;		// fecha inicio
+		
+		
+		
+		if (d8C.getText().length()!=5) {
+			JOptionPane.showMessageDialog(null, "Formato fecha final: DD-MM 5 digitos obligatorio");
 			d8C.setBackground(Color.ORANGE);
 			return false;
-		} else creaEmp[9]=d8C.getText();		// fecha fin
+		} 
+		
+		dig1=d8C.getText().substring(0,1);
+		dig2=d8C.getText().substring(1,2);
+		dig3=d8C.getText().substring(3,4);
+		dig4=d8C.getText().substring(4,5);
+		
+		if (!(dig1.equals("0") || dig1.equals("1") || dig1.equals("2") || dig1.equals("3"))) {
+			JOptionPane.showMessageDialog(null, "Formato fecha final: DD-MM");
+			d8C.setBackground(Color.ORANGE);
+			return false;
+		}
+		if (!(dig2.equals("0") || dig2.equals("1") || dig2.equals("2") || dig2.equals("3") ||
+				dig2.equals("4") || dig2.equals("5") || dig2.equals("6") || dig2.equals("7") ||
+				dig2.equals("8") || dig2.equals("9"))) {
+			JOptionPane.showMessageDialog(null, "Formato fecha final: DD-MM");
+			d8C.setBackground(Color.ORANGE);
+			return false;
+		}
+		if (!(dig3.equals("0") || dig3.equals("1"))) {
+			JOptionPane.showMessageDialog(null, "Formato fecha final: DD-MM");
+			d8C.setBackground(Color.ORANGE);
+			return false;
+		}
+		if (!(dig4.equals("0") || dig4.equals("1") || dig4.equals("2") || dig4.equals("3") ||
+				dig4.equals("4") || dig4.equals("5") || dig4.equals("6") || dig4.equals("7") ||
+				dig4.equals("8") || dig4.equals("9"))) {
+			JOptionPane.showMessageDialog(null, "Formato fecha final: DD-MM");
+			d8C.setBackground(Color.ORANGE);
+			return false;
+		}
+		
+		// comprobacion de correccion de fechas
+		dia=(int)Integer.parseInt(d8C.getText().substring(0,2));
+		mes=(int)Integer.parseInt(d8C.getText().substring(3,5));
+		
+		if (dia<1 || dia>31) {
+			JOptionPane.showMessageDialog(null, "El día "+dia+" no es correcto");
+			d8C.setBackground(Color.ORANGE);
+			return false;
+		}
+		
+		if (mes <1 || mes>12) {
+			JOptionPane.showMessageDialog(null,"El mes "+mes+" no es correcto");
+			d8C.setBackground(Color.ORANGE);
+			return false;
+		}
+		
+		if (mes==2 && dia>29) {
+			JOptionPane.showMessageDialog(null, "La fecha "+dia+"-"+mes+" no es correcta");
+			d8C.setBackground(Color.ORANGE);
+			return false;
+		}
+		
+		if ((mes==4 || mes==6 || mes==9 || mes==11 ) && dia>30) {
+			JOptionPane.showMessageDialog(null, "La fecha "+dia+"-"+mes+" no es correcta");
+			d8C.setBackground(Color.ORANGE);
+			return false;
+		}	
+		
+		// si llega aqui ha pasado el text :)
+		creaEmp[9]=d8C.getText()+"-"+yearAct;		// fecha fin
+
 		
 		if (d9C.getSelectedItem().toString().equals("Activa")) {
 			creaEmp[10]="1";					// activa
@@ -847,7 +1235,7 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		
 		// graba los datos residentes en datosEmp en la DDBB con key keyEmpr
 		if (this.daoN.grabaEmpDB (creaEmp[1], creaEmp, "INSERT")){
-			System.out.println("alright");
+			
 		} else {
 			// fallo al intentar grabar la empresa
 			System.err.println("Fallo al intentar grabar la nueva empresa ");
@@ -862,9 +1250,76 @@ public class ContEmpresa extends JFrame implements ActionListener{
 		// suministra los datos y procede a grabar
 		daoN.grabaEmpresaUsu(this.keyUser, creaEmp[1], oper);
 		
+		// finalmente crea los ficheros de empresa
+		CompanyFiles makeFile=new CompanyFiles(creaEmp[1]);
+		
+		if (!makeFile.creaFilesCompany()) {
+			// si algo falla con la creación de ficheros
+			JOptionPane.showMessageDialog(null,"Se produjo un error al crear los ficheros","Error de grabación",JOptionPane.WARNING_MESSAGE);
+			return false;
+		}
+		
 		return true;
 		
 	} // fin del metodo grabanuevaempr
+	
+	
+	
+	/* ************************************************************************
+	 * Este metodo comprueba si es posible borrar la empresa de la DDBB
+	 * 
+	 * Este metodo no recibe parametros
+	 * Devuelve true si es posible borrar o false en caso contrario
+	 ************************************************************************** */
+
+	private boolean verificaBorrado() {
+		
+		// este metodo deberia implementar un metodo de comprobacion
+		// y verificacion de los datos de la empresa
+		// para comprobar si es posible borrarse
+		
+		// LAS CONDICIONES DEBERIAN SER:
+		// A) NO ES POSIBLE BORRAR SI LA EMPRESA TIENE INFORMACION GRABADA
+		//    Y ANTES DE BORRAR NO HA HECHO COPIA DE SEGURIDAD
+		// B) NO ES POSIBLE BORRAR SI NO ERES EL MANAGER DE EMPRESA
+
+		return true;
+		
+	} // fin del metodo verificaborrado
+	
+	
+	
+	/* ************************************************************************
+	 * Este metodo borra completamente la empresa de la DDBB
+	 * Ademas elimina todos los ficheros relativos a la empresa
+	 * 
+	 * Este metodo recibe un String con el keyEmpresa de la empresa
+	 * Devuelve true si consigue borrar o false en caso contrario
+	 ************************************************************************** */
+
+	private boolean borraEmpresa(String keyEmpresaBorrar) {
+		
+		
+		//Borrado en el fichero de empresas
+		// y el borrado en los clientes
+		
+		dao=new ContaDAO();
+		if (dao.eraseCompany(keyEmpresaBorrar)){
+			// si no ha habido problemas con el borrado de la empresa
+			// continuamos con el borrado de ficheros
+			CompanyFiles borraFich=new CompanyFiles(keyEmpresaBorrar);
+			// si el borrado de ficheros no genera problemas
+			// retorna con un true
+			if (borraFich.deleteFilesCompany()) {
+				return true;	
+			} else {
+				JOptionPane.showMessageDialog(null,"Se produjo un error al borrar los ficheros","Error de borrado",JOptionPane.WARNING_MESSAGE);
+			}
+		}
+		// sale con false en cualquier situacion de problemas	
+		return false;
+		
+	} // fin del metodo borraEmpresa
 	
 	
 	
