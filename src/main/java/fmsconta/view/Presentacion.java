@@ -16,17 +16,14 @@ import javax.swing.JPanel;
 
 
 
-public class Presentacion extends JFrame implements ActionListener{
+public class Presentacion extends JFrame implements ActionListener, Settings{
 	
 	private JDialog pantallagen;
 	
 	private JLabel imagenCentral;
 	private Image abc;	
 	private JPanel south;
-	
-	private String pathImageFiles="src/main/java/fmsconta/pictures/";
 	private JButton botonSalir;
-	private Color colorfondo=new Color(220,220,220);
 
 	private String userConta="";
 	private String userPass="";
