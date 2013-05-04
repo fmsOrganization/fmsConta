@@ -66,6 +66,7 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 	private BoxLayout horizontal2;
 	private CambioEmpresa changeCompany;
 	private ContListadoMayor listaMayor;
+	private ContMnuMayor menuMayor;
 	// panel de la izquierda y sus componentes
 	private JPanel panelIzq;
 	private BoxLayout vertical;
@@ -158,7 +159,7 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 		pantallaMain.setLocationRelativeTo(mainWindow);
 		pantallaMain.setResizable(true);
 		pantallaMain.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		pantallaMain.getContentPane().setBackground(colorfondo);
+		pantallaMain.getContentPane().setBackground(ColorFondo);
 				
 		// ******************************CREAMOS EL PANEL GENERAL
 		// **** EN ESTE PANEL GENERAL VAN MONTADOS EN FORMA DE GRIDBAGLAYOUT TODOS LOS
@@ -172,11 +173,11 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 		panelIco=new JPanel();
 		 	// IMAGEN DE PORTADA
 		horizontal0=new FlowLayout();
-		abc=new ImageIcon(pathImageFiles+"portada.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"portada.jpg").getImage();
 		ImageIcon portada=new ImageIcon(abc.getScaledInstance(125,100,java.awt.Image.SCALE_SMOOTH));
 		iconoPortada=new JLabel("",portada,SwingConstants.LEFT);
 		panelIco.add(iconoPortada);
-		panelIco.setBackground(colorfondo);
+		panelIco.setBackground(ColorFondo);
 		
 			// CREAMOS LA CONFIGURACION DE PANTALLA
 		GridBagConstraints constraints=new GridBagConstraints();
@@ -196,8 +197,8 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 		nombreEmpresa=new JLabel(company+" - "+year,SwingConstants.CENTER);
 		nombreUsuario=new JLabel("usuario: "+nameUser,SwingConstants.CENTER);
 			// CREAMOS LOS COLORES DE FONDO Y DE LOS TIPOS DE LETRA
-		panelTitle.setBackground(colorfondo);
-		panelTitle.setForeground(colorfondo);
+		panelTitle.setBackground(ColorFondo);
+		panelTitle.setForeground(ColorFondo);
 		fuente=new Font("",Font.BOLD,24);
 		nombreEmpresa.setFont(fuente);
 		fuente=new Font("",Font.BOLD,20);
@@ -221,7 +222,7 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 		panelCombos=new JPanel();
 		horizontal2=new BoxLayout(panelCombos,BoxLayout.X_AXIS);
 		panelCombos.setLayout(horizontal2);
-		panelCombos.setBackground(colorfondo);
+		panelCombos.setBackground(ColorFondo);
 		    // ELEMENTOS DEL MENU	
 		combos=new CombosSuperior();
 			// AÑADIMOS LOS COMBOS AL PANEL SUPERIOR
@@ -246,7 +247,7 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 		dimens=new Dimension(200,510);
 		//panelIzq.setPreferredSize(dimens);
 		panelIzq.setLayout(vertical);
-		panelIzq.setBackground(colorfondo);
+		panelIzq.setBackground(ColorFondo);
 		     // CREAMOS LOS BOTONES LATERALES LLAMAMOS A LA CLASE QUE LOS CREA
 		botonesFijos=new BotonesPanelIzq();
 		     // AÑADIMOS LOS BOTONES AL PANEL IZQUIERDO		
@@ -282,11 +283,11 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 		
 		// CREAMOS LOS COLORES DE FONDO Y DE LOS TIPOS DE LETRA
 		fuente2=new Font("",Font.BOLD,16);
-		panelCen.setBackground(colorfondo);
-		panelAuxCen.setBackground(colorfondo);
+		panelCen.setBackground(ColorFondo);
+		panelAuxCen.setBackground(ColorFondo);
 		
 		    // CREAMOS EL GRAFICO
-		abc=new ImageIcon(pathImageFiles+"fondo.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"fondo.jpg").getImage();
 		ImageIcon fondo=new ImageIcon(abc.getScaledInstance(600,400,java.awt.Image.SCALE_SMOOTH));
 		fotoFondo=new JLabel("",fondo,SwingConstants.CENTER);
 			// AÑADIMOS EL GRAFICO
@@ -308,7 +309,7 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 		panelInf=new JPanel();
 		horizontal3=new BoxLayout(panelInf,BoxLayout.Y_AXIS);
 		panelInf.setLayout(horizontal3);
-		panelInf.setBackground(colorfondo);
+		panelInf.setBackground(ColorFondo);
 		     // CREAMOS EL TEXTO INFERIOR
 		textoLeyenda="Este programa es propiedad de fms. " +
 				"Los usuarios autorizados solamente tienen derechos de uso. " +
@@ -361,7 +362,7 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 			panelCen.remove(panelAuxCen);
 			panelCen.validate();
 			panelAuxCen=new JPanel();
-			panelAuxCen.setBackground(colorfondo);
+			panelAuxCen.setBackground(ColorFondo);
 			ContUsuario hola1=new ContUsuario(datosUser,datosEmpr);
 			panelAuxCen.add(hola1.retorna());
 			//panelCen.add(panelAuxCen);
@@ -378,7 +379,7 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 			panelCen.validate();
 			// creamos un nuevo panel central
 			panelAuxCen=new JPanel();
-			panelAuxCen.setBackground(colorfondo);
+			panelAuxCen.setBackground(ColorFondo);
 			// invocamos y mostramos el nuevo panel central
 			//ContEmpresa hola=new ContEmpresa(datosEmpr,keyEmpr,nameUser,isManager,datosUser[6],keyUser);
 			ContEmpresa hola=new ContEmpresa(datosEmpr,datosUser);
@@ -420,7 +421,7 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 				panelCen.validate();
 				// creamos un nuevo panel central
 				panelAuxCen=new JPanel();
-				panelAuxCen.setBackground(colorfondo);
+				panelAuxCen.setBackground(ColorFondo);
 				// invocamos y mostramos el nuevo panel central
 				changeCompany=new CambioEmpresa(datosEmpr,datosUser);
 				panelAuxCen.add(changeCompany.retorna());
@@ -440,11 +441,13 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 				panelCen.validate();
 				// creamos un nuevo panel central
 				panelAuxCen=new JPanel();
-				panelAuxCen.setBackground(colorfondo);
+				panelAuxCen.setBackground(ColorFondo);
 				// invocamos y mostramos el nuevo panel central
-				listaMayor=new ContListadoMayor(datosEmpr[1],datosEmpr[2],"70000000","79000002","01-01-2012","31-01-2012");
-				panelAuxCen.add(listaMayor.retorna());
-				//panelCen.add(panelAuxCen);
+				//listaMayor=new ContListadoMayor(datosEmpr[1],datosEmpr[2],"70000000","79000002","01-01-2012","31-01-2012");
+				//panelAuxCen.add(listaMayor.retorna());
+				menuMayor=new ContMnuMayor();
+				panelAuxCen.add(menuMayor.retorna());
+				
 				panelCen.setViewportView(panelAuxCen);
 				panelCen.getViewport().setView(panelAuxCen);
 				panelCen.setVisible(true);

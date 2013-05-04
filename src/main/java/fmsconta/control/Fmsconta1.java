@@ -57,7 +57,9 @@ public class Fmsconta1 extends JFrame {
 			
 			// accede a la pantalla principal
 			// la operativa contable se realiza aqui
+			initWindow.setLocation(0, 0);
 			PantallaPrincipal ventanaMain=new PantallaPrincipal(initWindow,version,nameUser,passUser);
+			
 			ventanaMain.controlCenter();
 		}
 

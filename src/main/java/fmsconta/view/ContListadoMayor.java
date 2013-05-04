@@ -8,6 +8,7 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.ScrollPaneLayout;
 import javax.swing.SwingConstants;
@@ -35,10 +37,13 @@ public class ContListadoMayor extends JFrame implements ActionListener,Settings 
 	
 	private JLabel title1;
 	private JLabel title2;
-	private JLabel title3;
+	private JLabel space1=new JLabel(" ");
+	private JLabel space2=new JLabel(" ");
 	private String datos2[][];
+	public int sizeComponent=0;
 	
 	private JButton imprimir;
+	private JButton cancelar;
 	
 	
 	/* *************************************************************
@@ -48,47 +53,40 @@ public class ContListadoMayor extends JFrame implements ActionListener,Settings 
 	 * Recibe como parametros el key de la empresa a listar,
 	 * las cuentas inicial y final, las fechas inicial y final
 	 * 
-	 * No devuelve valores
+	 * Como constructor no devuelve valores
 	 ************************************************************ */
 	
-	public ContListadoMayor(String keyEmpresa, String nombreCompany,String ctaInicial,
+	protected ContListadoMayor(String keyEmpresa, String nombreCompany,String ctaInicial,
 			String ctaFinal, String fechaInicial, String fechaFinal) {
 		
 		listadoMayor=new JPanel();
 		listadoMayor.setLayout(new BoxLayout(listadoMayor,BoxLayout.Y_AXIS));
 		listadoMayor.setAlignmentX(LEFT_ALIGNMENT);
-		listadoMayor.setBackground(colorfondo);
+		listadoMayor.setBackground(ColorFondo);
 		
 		// titulo
 		JPanel north1=new JPanel();
 		north1.setLayout(new BoxLayout(north1,BoxLayout.Y_AXIS));
-		north1.setAlignmentX(LEFT_ALIGNMENT);
-		north1.setBackground(colorfondo);
+		north1.setBackground(ColorFondo);
 		title1=new JLabel("LIBRO MAYOR ACUMULADO DE "+nombreCompany);
 
 		// Obtiene el año actual
-		Calendar dat=Calendar.getInstance();
-		int dia=dat.get(Calendar.DAY_OF_MONTH);
-		int mes=dat.get(Calendar.MONTH);
-		int anno=dat.get(Calendar.YEAR);
-		String fecha=String.valueOf(dia)+"-"+String.valueOf(mes)+"-"+String.valueOf(anno);  
-		title2=new JLabel("Fecha de listado: "+fecha);
-		title3=new JLabel("Entre cuentas "+ctaInicial+" y "+ctaFinal+" del "+fechaInicial+" al "+fechaFinal);
+		title2=new JLabel("De cuenta: "+ctaInicial+" a "+ctaFinal+" y desde el "+fechaInicial+" al "+fechaFinal);
 		
-	    title1.setFont(fuente1);
-	    title2.setFont(fuente2);
-	    title3.setFont(fuente2);
-	    title1.setHorizontalAlignment(SwingConstants.LEFT);
-	    title1.setAlignmentX(LEFT_ALIGNMENT);
+	    title1.setFont(Fuente1);
+	    title2.setFont(Fuente3);
+
 	    north1.setAlignmentX((float)1);
 		north1.add(title1);
+		north1.add(space1);
 		north1.add(title2);
-		north1.add(title3);
+		north1.add(space2);
 		
 		// centro
 		JPanel center1=new JPanel();
 		center1.setLayout(new BoxLayout(center1,BoxLayout.Y_AXIS));
-		center1.setBackground(colorfondo);
+		center1.setBackground(ColorFondo);
+		center1.setAlignmentY((float)1);
 
 		// lee los datos
 		ContaDAO dao=new ContaDAO();
@@ -109,7 +107,7 @@ public class ContListadoMayor extends JFrame implements ActionListener,Settings 
 			constraints=new GridBagConstraints();
 			constraints.gridy=i;
 			constraints.weightx=1;
-			constraints.weighty=1.5;
+			constraints.weighty=1;
 			constraints.insets=alrededor;
 			constraints.fill=GridBagConstraints.NONE;
 			constraints.anchor=GridBagConstraints.WEST;
@@ -118,7 +116,7 @@ public class ContListadoMayor extends JFrame implements ActionListener,Settings 
 				// creamos la etiqueta y le agregamos el dato
 				lab[i][j]=new JLabel();
 				lab[i][j].setHorizontalAlignment(SwingConstants.LEFT);
-				lab[i][j].setFont(fuente4);
+				lab[i][j].setFont(Fuente4);
 				lab[i][j].setText(datos2[i][j]);
 				if (j==7) {
 					constraints.anchor=GridBagConstraints.EAST;
@@ -128,28 +126,34 @@ public class ContListadoMayor extends JFrame implements ActionListener,Settings 
 			}
 			
 		}
+		sizeComponent=(lab.length);
 		
 		center1.add(listadoDatos);
 
 	    // creacion del panel de botones inferior
 	    JPanel south1=new JPanel();
-	    south1.setBackground(colorfondo);
+	    south1.setLayout(new FlowLayout());
+	    south1.setBackground(ColorFondo);
 	    imprimir=new JButton("Imprimir");
 	    imprimir.setToolTipText("Abre una pantalla");
 	    south1.add(imprimir);
-		
+	    cancelar=new JButton("Cancelar");
+	    cancelar.setToolTipText("Borra la pantalla");
+	    south1.add(cancelar);
+	    
 		listadoMayor.add(north1);
 		listadoMayor.add(center1);
 		listadoMayor.add(south1);
 		
 		imprimir.addActionListener(this);
+		cancelar.addActionListener(this);
 		
 	} // fin del constructor
 	
 	
 	
 	/* ******************************************************************
-	 * Este metodo simplemente retorna el JPanel a la pantalla principal
+	 * Este metodo simplemente retorna el JPanel al metodo que llama
 	 ******************************************************************* */
 	
 	protected JPanel retorna() {
@@ -158,23 +162,43 @@ public class ContListadoMayor extends JFrame implements ActionListener,Settings 
 		
 	} // fin del metodo
 
+	
 
+	/* ******************************************************************
+	 * Este metodo implementa el actionPerformed
+	 ******************************************************************* */
 	
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		Object source=e.getSource();
 		
 		if (source == imprimir) {
-			
-			ShowInfoMayor nuevaVentana=new ShowInfoMayor(datos2,title1,title2,title3);
+			// si pulsa el boton imprimir muestra una pantalla independiente
+			// donde podra elegir entre imprimir en impresora o en fichero de texto
+			ShowInfoMayor nuevaVentana=new ShowInfoMayor(datos2,getTitle1(),getTitle2());
+		}
+		
+		if (source == cancelar) {
+			// solamente borra la pantalla
+			listadoMayor.setVisible(false);
 		}
 		
 	}
-	
-	
-	
-	
 
 	
 	
+/* *************************
+ *  Getters de los titulos
+ *************************** */
+
+	private String getTitle1() {
+		return title1.getText();
+	}
+
+
+	private String getTitle2() {
+		return title2.getText();
+	}
+
+
 } // ****************** FIN DE LA CLASE CONTLISTADOMAYOR

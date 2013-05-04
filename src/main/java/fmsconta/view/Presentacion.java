@@ -53,7 +53,7 @@ public class Presentacion extends JFrame implements ActionListener, Settings{
 		pantallagen.setResizable(true);
 		pantallagen.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		
-		pantallagen.getContentPane().setBackground(colorfondo);
+		pantallagen.getContentPane().setBackground(ColorFondo);
 		
 		pantallagen.setLayout(new BorderLayout());
 		
@@ -61,7 +61,7 @@ public class Presentacion extends JFrame implements ActionListener, Settings{
 		// creamos los componentes		
 		
 		// imagen central 
-		abc=new ImageIcon(pathImageFiles+"fondo.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"fondo.jpg").getImage();
 		ImageIcon imgPortada=new ImageIcon(abc.getScaledInstance(600,450,java.awt.Image.SCALE_SMOOTH));
 		imagenCentral=new JLabel(imgPortada);	
 		
@@ -69,7 +69,7 @@ public class Presentacion extends JFrame implements ActionListener, Settings{
         // boton en la parte inferior de la pantalla
 		south=new JPanel();
 		south.setLayout(new FlowLayout());   
-		south.setBackground(colorfondo);
+		south.setBackground(ColorFondo);
 		botonSalir=new JButton("Salida");
         south.add(botonSalir);
         

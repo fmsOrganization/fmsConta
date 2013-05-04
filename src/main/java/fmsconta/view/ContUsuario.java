@@ -505,22 +505,22 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener,
 		panelEmp=new JPanel();
 		panelEmp.setLayout(new BoxLayout(panelEmp,BoxLayout.Y_AXIS));
 		panelEmp.setAlignmentY(CENTER_ALIGNMENT);
-		panelEmp.setBackground(colorfondo);
+		panelEmp.setBackground(ColorFondo);
 		
 		// titulo
 		JPanel north1=new JPanel();
 		north1.setLayout(new FlowLayout());
-		north1.setBackground(colorfondo);
+		north1.setBackground(ColorFondo);
 	    // cambiar el font al titulo
-	    n1.setFont(fuente1);
+	    n1.setFont(Fuente1);
 		north1.add(n1);
 		
 		// creacion del panel rejilla datos
 		JPanel panelEmpAux = new JPanel();
 		panelEmpAux.setLayout(new GridLayout(13,2));
 		panelEmpAux.setAlignmentY(CENTER_ALIGNMENT);
-		panelEmpAux.setFont(fuente2);
-		panelEmpAux.setBackground(colorfondo);
+		panelEmpAux.setFont(Fuente2);
+		panelEmpAux.setBackground(ColorFondo);
 		      
 		// datos de la empresa activa actual
 		d1.setText(datosUsu[2]);	// nombre usuario
@@ -594,7 +594,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener,
 	    
 	    // creacion del panel inferior
 	    JPanel south=new JPanel();
-	    south.setBackground(colorfondo);
+	    south.setBackground(ColorFondo);
 	    
 	    panelEmpAux.setVisible(true);
 	    // agregamos componentes al panel principal
@@ -627,22 +627,22 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener,
 		panelUsu2=new JPanel();
 		panelUsu2.setLayout(new BoxLayout(panelUsu2,BoxLayout.Y_AXIS));
 		panelUsu2.setAlignmentX(CENTER_ALIGNMENT);
-		panelUsu2.setBackground(colorfondo);
+		panelUsu2.setBackground(ColorFondo);
 		
 		// titulo
 		JPanel north2=new JPanel();
 		north2.setLayout(new FlowLayout());
-		north2.setBackground(colorfondo);
+		north2.setBackground(ColorFondo);
 	    // cambiar el font al titulo
-	    n2.setFont(fuente1);
+	    n2.setFont(Fuente1);
 		north2.add(n2);
 		
 		// creacion del panel rejilla datos
 		panelUsuAux2 = new JPanel();
 		panelUsuAux2.setLayout(new GridLayout(11,3));
 		panelUsuAux2.setAlignmentY(CENTER_ALIGNMENT);
-		panelUsuAux2.setFont(fuente2);
-		panelUsuAux2.setBackground(colorfondo);
+		panelUsuAux2.setFont(Fuente2);
+		panelUsuAux2.setBackground(ColorFondo);
 		
 		// datos del usuario activo actual
 		d1B.setText(datosUsu[2]);	// nombre usuario
@@ -684,11 +684,11 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener,
 		}
 				
 		// elaboracion de iconos
-		abc=new ImageIcon(pathImageFiles+"warning.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"warning.jpg").getImage();
 		iconoW=new ImageIcon(abc.getScaledInstance(20,15,java.awt.Image.SCALE_SMOOTH));
-		abc=new ImageIcon(pathImageFiles+"enable.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"enable.jpg").getImage();
 		iconoE=new ImageIcon(abc.getScaledInstance(20,15,java.awt.Image.SCALE_SMOOTH));
-		abc=new ImageIcon(pathImageFiles+"disable.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"disable.jpg").getImage();
 		iconoD=new ImageIcon(abc.getScaledInstance(20,15,java.awt.Image.SCALE_SMOOTH));
 		// definicion de comentarios edicion
 		int tabulacion;
@@ -757,7 +757,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener,
 			    
 	    // creacion del panel de botones inferior
 	    south2=new JPanel();
-	    south2.setBackground(colorfondo);
+	    south2.setBackground(ColorFondo);
 	    modificar=new JButton("Modificar");
 	    modificar.setToolTipText("guarda los datos actuales");
 
@@ -789,22 +789,22 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener,
 		panelUsu3=new JPanel();
 		panelUsu3.setLayout(new BoxLayout(panelUsu3,BoxLayout.Y_AXIS));
 		panelUsu3.setAlignmentY(CENTER_ALIGNMENT);
-		panelUsu3.setBackground(colorfondo);
+		panelUsu3.setBackground(ColorFondo);
 		
 		// titulo
 		JPanel north3=new JPanel();
 		north3.setLayout(new FlowLayout());
-		north3.setBackground(colorfondo);
+		north3.setBackground(ColorFondo);
 	    // cambiar el font al titulo
-	    n3.setFont(fuente1);
+	    n3.setFont(Fuente1);
 		north3.add(n3);
 		
 		// creacion del panel rejilla datos
 		panelUsuAux3 = new JPanel();
 		panelUsuAux3.setLayout(new GridLayout(10,3));
 		panelUsuAux3.setAlignmentY(CENTER_ALIGNMENT);
-		panelUsuAux3.setFont(fuente2);
-		panelUsuAux3.setBackground(colorfondo);
+		panelUsuAux3.setFont(Fuente2);
+		panelUsuAux3.setBackground(ColorFondo);
 		   
 		// datos del usuario activo actual
 		d1C.setText("");	// nombre usuario
@@ -830,7 +830,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener,
 		d11C.setEditable(false);
 		  
 		
-		abc=new ImageIcon(pathImageFiles+"warning.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"warning.jpg").getImage();
 		iconoW=new ImageIcon(abc.getScaledInstance(20,15,java.awt.Image.SCALE_SMOOTH));
 		
 		// definicion de comentarios edicion
@@ -891,7 +891,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener,
 	    
 	    // creacion del panel inferior
 	    JPanel south3=new JPanel();
-	    south3.setBackground(colorfondo);
+	    south3.setBackground(ColorFondo);
 	    crear=new JButton("crear usuario");
 	    crear.setToolTipText("crea un usuario con los datos introducidos");
 	    if (userCat!=1) {
@@ -927,22 +927,22 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener,
 		panelUsu4=new JPanel();
 		panelUsu4.setLayout(new BoxLayout(panelUsu4,BoxLayout.Y_AXIS));
 		panelUsu4.setAlignmentY(CENTER_ALIGNMENT);
-		panelUsu4.setBackground(colorfondo);
+		panelUsu4.setBackground(ColorFondo);
 		
 		// titulo
 		JPanel north4=new JPanel();
 		north4.setLayout(new FlowLayout());
-		north4.setBackground(colorfondo);
+		north4.setBackground(ColorFondo);
 	    // cambiar el font al titulo
-	    n4.setFont(fuente1);
+	    n4.setFont(Fuente1);
 		north4.add(n4);
 		
 		// creacion del panel rejilla datos
 		panelUsuAux4 = new JPanel();
 		panelUsuAux4.setLayout(new GridLayout(9,3));
 		panelUsuAux4.setAlignmentY(CENTER_ALIGNMENT);
-		panelUsuAux4.setFont(fuente2);
-		panelUsuAux4.setBackground(colorfondo);
+		panelUsuAux4.setFont(Fuente2);
+		panelUsuAux4.setBackground(ColorFondo);
 		    
 
 		// para crear el panel, primero busca las empresas del manager
@@ -1024,7 +1024,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener,
 		d6D.addItem("Activo");
 		d6D.addItem("Desactivado");
 			
-		abc=new ImageIcon(pathImageFiles+"warning.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"warning.jpg").getImage();
 		iconoW=new ImageIcon(abc.getScaledInstance(20,15,java.awt.Image.SCALE_SMOOTH));
 		
 		// definicion de comentarios edicion
@@ -1084,7 +1084,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener,
 	    
 	    // creacion del panel inferior
 	    JPanel south4=new JPanel();
-	    south4.setBackground(colorfondo);
+	    south4.setBackground(ColorFondo);
 	    actualizar=new JButton("actualizar usuario");
 	    actualizar.setToolTipText("actualiza los datos registrados");
 	    eliminar=new JButton("eliminar usuario");
@@ -1123,7 +1123,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener,
 		
 		setTitle("");
 		JTabbedPane menu=new JTabbedPane();
-		menu.setBackground(colorfondo);
+		menu.setBackground(ColorFondo);
 		menu.addTab(title1,tab1);
 		menu.addTab(title2,tab2);
 		menu.addTab(title3,tab3);
@@ -1146,7 +1146,7 @@ public class ContUsuario extends JFrame implements ActionListener, ItemListener,
 		
 		setTitle("");
 		JTabbedPane menu=new JTabbedPane();
-		menu.setBackground(colorfondo);
+		menu.setBackground(ColorFondo);
 		menu.addTab(title1,tab1);
 		menu.addTab(title2,tab2);
 		getContentPane().add(menu);
