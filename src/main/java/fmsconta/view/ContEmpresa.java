@@ -196,11 +196,11 @@ public class ContEmpresa extends JFrame implements ActionListener, Settings{
 			listado.setSize(900,600);
 			listado.setLocationRelativeTo(rootPane);
 			listado.setResizable(true);
-			listado.setBackground(colorBlanco);
+			listado.setBackground(ColorBlanco);
 
-			listado.getContentPane().setBackground(colorBlanco);
-			tablaDatos.setBackground(colorBlanco);
-			panelUsu.setBackground(colorBlanco);
+			listado.getContentPane().setBackground(ColorBlanco);
+			tablaDatos.setBackground(ColorBlanco);
+			panelUsu.setBackground(ColorBlanco);
 			listado.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 			
 			listado.add(panelUsu);
@@ -288,7 +288,7 @@ public class ContEmpresa extends JFrame implements ActionListener, Settings{
 		
 		setTitle("");
 		JTabbedPane menu=new JTabbedPane();
-		menu.setBackground(colorfondo);
+		menu.setBackground(ColorFondo);
 		menu.addTab(title1,tab1);
 		menu.addTab(title2,tab2);
 		menu.addTab(title3,tab3);
@@ -313,22 +313,22 @@ public class ContEmpresa extends JFrame implements ActionListener, Settings{
 		panelUsu=new JPanel();
 		panelUsu.setLayout(new BoxLayout(panelUsu,BoxLayout.Y_AXIS));
 		panelUsu.setAlignmentY(CENTER_ALIGNMENT);
-		panelUsu.setBackground(colorfondo);
+		panelUsu.setBackground(ColorFondo);
 		
 		// titulo
 		JPanel north1=new JPanel();
 		north1.setLayout(new FlowLayout());
-		north1.setBackground(colorfondo);
+		north1.setBackground(ColorFondo);
 	    // cambiar el font al titulo
-	    n1.setFont(fuente1);
+	    n1.setFont(Fuente1);
 		north1.add(n1);
 		
 		// creacion del panel rejilla datos
 		JPanel panelUsuAux = new JPanel();
 		panelUsuAux.setLayout(new GridLayout(10,2));
 		panelUsuAux.setAlignmentY(CENTER_ALIGNMENT);
-		panelUsuAux.setFont(fuente2);
-		panelUsuAux.setBackground(colorfondo);
+		panelUsuAux.setFont(Fuente2);
+		panelUsuAux.setBackground(ColorFondo);
 		      
 		// datos de la empresa activa actual
 		d1.setText(datosEmp[2]);	// nombre empresa
@@ -470,7 +470,7 @@ public class ContEmpresa extends JFrame implements ActionListener, Settings{
 		    
 	    // creacion del panel inferior
 	    JPanel south1=new JPanel();
-	    south1.setBackground(colorfondo);
+	    south1.setBackground(ColorFondo);
 	    imprimir=new JButton("Imprimir");
 	    imprimir.setToolTipText("abre una pantalla aparte");
 	    south1.add(imprimir);
@@ -503,22 +503,22 @@ public class ContEmpresa extends JFrame implements ActionListener, Settings{
 		panelUsu2=new JPanel();
 		panelUsu2.setLayout(new BoxLayout(panelUsu2,BoxLayout.Y_AXIS));
 		panelUsu2.setAlignmentX(CENTER_ALIGNMENT);
-		panelUsu2.setBackground(colorfondo);
+		panelUsu2.setBackground(ColorFondo);
 		
 		// titulo
 		JPanel north2=new JPanel();
 		north2.setLayout(new FlowLayout());
-		north2.setBackground(colorfondo);
+		north2.setBackground(ColorFondo);
 	    // cambiar el font al titulo
-	    n2.setFont(fuente1);
+	    n2.setFont(Fuente1);
 		north2.add(n2);
 		
 		// creacion del panel rejilla datos
 		JPanel panelUsuAux2 = new JPanel();
 		panelUsuAux2.setLayout(new GridLayout(10,3));
 		panelUsuAux2.setAlignmentY(CENTER_ALIGNMENT);
-		panelUsuAux2.setFont(fuente2);
-		panelUsuAux2.setBackground(colorfondo);
+		panelUsuAux2.setFont(Fuente2);
+		panelUsuAux2.setBackground(ColorFondo);
 		      
 		// datos de la empresa activa actual
 		d1B.setText(datosEmp[2]);	// nombre empresa
@@ -637,11 +637,11 @@ public class ContEmpresa extends JFrame implements ActionListener, Settings{
 		}
 		
 		// elaboracion de iconos
-		abc=new ImageIcon(pathImageFiles+"warning.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"warning.jpg").getImage();
 		iconoW=new ImageIcon(abc.getScaledInstance(20,15,java.awt.Image.SCALE_SMOOTH));
-		abc=new ImageIcon(pathImageFiles+"enable.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"enable.jpg").getImage();
 		iconoE=new ImageIcon(abc.getScaledInstance(20,15,java.awt.Image.SCALE_SMOOTH));
-		abc=new ImageIcon(pathImageFiles+"disable.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"disable.jpg").getImage();
 		iconoD=new ImageIcon(abc.getScaledInstance(20,15,java.awt.Image.SCALE_SMOOTH));
 		
 		// definicion de comentarios edicion
@@ -700,7 +700,7 @@ public class ContEmpresa extends JFrame implements ActionListener, Settings{
 	    
 	    // creacion del panel de botones inferior
 	    JPanel south2=new JPanel();
-	    south2.setBackground(colorfondo);
+	    south2.setBackground(ColorFondo);
 	    modificar=new JButton("Modificar");
 	    modificar.setToolTipText("guarda los datos actuales");
 	    eliminar=new JButton("Eliminar");
@@ -739,22 +739,22 @@ public class ContEmpresa extends JFrame implements ActionListener, Settings{
 		panelUsu3=new JPanel();
 		panelUsu3.setLayout(new BoxLayout(panelUsu3,BoxLayout.Y_AXIS));
 		panelUsu3.setAlignmentY(CENTER_ALIGNMENT);
-		panelUsu3.setBackground(colorfondo);
+		panelUsu3.setBackground(ColorFondo);
 		
 		// titulo
 		JPanel north3=new JPanel();
 		north3.setLayout(new FlowLayout());
-		north3.setBackground(colorfondo);
+		north3.setBackground(ColorFondo);
 	    // cambiar el font al titulo
-	    n3.setFont(fuente1);
+	    n3.setFont(Fuente1);
 		north3.add(n3);
 		
 		// creacion del panel rejilla datos
 		JPanel panelUsuAux3 = new JPanel();
 		panelUsuAux3.setLayout(new GridLayout(10,2));
 		panelUsuAux3.setAlignmentY(CENTER_ALIGNMENT);
-		panelUsuAux3.setFont(fuente2);
-		panelUsuAux3.setBackground(colorfondo);
+		panelUsuAux3.setFont(Fuente2);
+		panelUsuAux3.setBackground(ColorFondo);
 		      
 		// datos de la empresa activa actual
 		d1C.setText("");	// nombre empresa
@@ -770,7 +770,7 @@ public class ContEmpresa extends JFrame implements ActionListener, Settings{
 		d10C.setText(nameUsuario);		// nombre manager
 		d10C.setEnabled(false);
 				
-		abc=new ImageIcon(pathImageFiles+"warning.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"warning.jpg").getImage();
 		iconoW=new ImageIcon(abc.getScaledInstance(20,15,java.awt.Image.SCALE_SMOOTH));
 		
 		// definicion de comentarios edicion
@@ -829,7 +829,7 @@ public class ContEmpresa extends JFrame implements ActionListener, Settings{
 	    
 	    // creacion del panel inferior
 	    JPanel south3=new JPanel();
-	    south3.setBackground(colorfondo);
+	    south3.setBackground(ColorFondo);
 	    crear=new JButton("Crear empresa");
 	    crear.setToolTipText("crea una empresa con los datos introducidos");
 	    if (userCat!=1) {

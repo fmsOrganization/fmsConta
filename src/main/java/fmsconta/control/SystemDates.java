@@ -2,8 +2,8 @@ package fmsconta.control;
 
 public interface SystemDates {
 	
-	final String nameDB="jdbc:mysql://localhost:3306/db393934124";
-	final String userDB="root";
-	final String passDB="150653";
+	final String NameDB="jdbc:mysql://localhost:3306/db393934124";
+	final String UserDB="root";
+	final String PassDB="150653";
 
 }

@@ -45,7 +45,7 @@ public class CompanyFiles implements SystemDates{
         // DEVUELVE UN OBJETO CONNECTION SI LO CONSIGUE Y NULL SI FALLA
         
         try {
-        	conexionDB = DriverManager.getConnection(nameDB,userDB, passDB);
+        	conexionDB = DriverManager.getConnection(NameDB, UserDB, PassDB);
         } catch (SQLException ex) {
             System.out.println("Error conectando a la base de datos");
             Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);

@@ -29,17 +29,17 @@ public class BotonesPanelIzq extends JFrame implements Settings{
 	    // CREAMOS LOS BOTONES LATERALES DEL PANEL IZQUIERDO
 			
 			// LES ASIGNAMOS UNA IMAGEN, Y LA DIMENSIONAMOS
-		abc=new ImageIcon(pathImageFiles+"botonusuarios.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"botonusuarios.jpg").getImage();
 		ImageIcon botonusu=new ImageIcon(abc.getScaledInstance(100,75,java.awt.Image.SCALE_SMOOTH));
-		abc=new ImageIcon(pathImageFiles+"botonempresas.jpg").getImage();		
+		abc=new ImageIcon(PathImageFiles+"botonempresas.jpg").getImage();		
 		ImageIcon botonemp=new ImageIcon(abc.getScaledInstance(100,75,java.awt.Image.SCALE_SMOOTH));
-		abc=new ImageIcon(pathImageFiles+"botonfaqs.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"botonfaqs.jpg").getImage();
 		ImageIcon botonfaq=new ImageIcon(abc.getScaledInstance(100,75,java.awt.Image.SCALE_SMOOTH));
-		abc=new ImageIcon(pathImageFiles+"botonboe.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"botonboe.jpg").getImage();
 		ImageIcon botonboe=new ImageIcon(abc.getScaledInstance(100,75,java.awt.Image.SCALE_SMOOTH));
-		abc=new ImageIcon(pathImageFiles+"botoncopia.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"botoncopia.jpg").getImage();
 		ImageIcon botonseg=new ImageIcon(abc.getScaledInstance(100,75,java.awt.Image.SCALE_SMOOTH));
-		abc=new ImageIcon(pathImageFiles+"botonsalida.jpg").getImage();
+		abc=new ImageIcon(PathImageFiles+"botonsalida.jpg").getImage();
 		ImageIcon botonsal=new ImageIcon(abc.getScaledInstance(100,75,java.awt.Image.SCALE_SMOOTH));
 			
 			// CREACION DE LOS BOTONES

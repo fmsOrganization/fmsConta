@@ -189,22 +189,22 @@ public class CambioEmpresa implements ActionListener, Settings {
 		panelEmpresa=new JPanel();
 		panelEmpresa.setLayout(new BoxLayout(panelEmpresa,BoxLayout.Y_AXIS));
 		//panelEmpresa.setAlignmentX(CENTER_ALIGNMENT);
-		panelEmpresa.setBackground(colorfondo);
+		panelEmpresa.setBackground(ColorFondo);
 		
 		// titulo
 		JPanel north2=new JPanel();
 		north2.setLayout(new FlowLayout());
-		north2.setBackground(colorfondo);
+		north2.setBackground(ColorFondo);
 	    // cambiar el font al titulo
-	    n2.setFont(fuente1);
+	    n2.setFont(Fuente1);
 		north2.add(n2);
 		
 		// creacion del panel rejilla datos
 		JPanel panelEmpAux = new JPanel();
 		panelEmpAux.setLayout(new GridLayout(6,2));
 		//panelEmpAux.setAlignmentY(CENTER_ALIGNMENT);
-		panelEmpAux.setFont(fuente2);
-		panelEmpAux.setBackground(colorfondo);
+		panelEmpAux.setFont(Fuente2);
+		panelEmpAux.setBackground(ColorFondo);
 		      
 		// empresas
 		nameEmprs=new String[3][12];
@@ -275,7 +275,7 @@ public class CambioEmpresa implements ActionListener, Settings {
 	    
 	    // creacion del panel de botones inferior
 	    JPanel south2=new JPanel();
-	    south2.setBackground(colorfondo);
+	    south2.setBackground(ColorFondo);
 	    modificar=new JButton("Modificar");
 	    modificar.setToolTipText("guarda los datos actuales");
 	    south2.add(modificar);

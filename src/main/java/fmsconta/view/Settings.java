@@ -3,14 +3,15 @@ package fmsconta.view;
 import java.awt.Color;
 import java.awt.Font;
 
-interface Settings {
+interface Settings extends PersonalSettings{
 
-	final String pathImageFiles="src/main/java/fmsconta/pictures/";
-	final Color colorfondo=new Color(220,220,220);
-	final Color colorBlanco=new Color(255,255,255);
-	final Font fuente1=new Font("",Font.BOLD,20);
-	final Font fuente2=new Font("",Font.PLAIN,16);
-	final Font fuente3=new Font("",Font.PLAIN,12);
-	final Font fuente4=new Font("",Font.PLAIN,8);
+	final String PathImageFiles="src/main/java/fmsconta/pictures/";
+	final Color ColorFondo=new Color(220,220,220);
+	final Color ColorBlanco=new Color(255,255,255);
+	final Font Fuente1=new Font("",Font.BOLD,20);
+	final Font Fuente2=new Font("",Font.BOLD,16);
+	final Font Fuente3=new Font("",Font.PLAIN,12);
+	final Font Fuente4=new Font("",Font.PLAIN,8);
+	
 	
 }
