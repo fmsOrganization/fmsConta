@@ -8,15 +8,16 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class ContMnuMayor extends JFrame implements ActionListener, Settings {
-	
+public class ContMnuDiario extends JFrame implements ActionListener, Settings {
+
 	private static final long serialVersionUID = 1L;
-	private JPanel menuMayor;
+	private JPanel menuDiario;
 	private JPanel auxMenu;
 	private JPanel north;
 	private JPanel south;
@@ -24,6 +25,8 @@ public class ContMnuMayor extends JFrame implements ActionListener, Settings {
 	private JTextField r2;
 	private JTextField r3;
 	private JTextField r4;
+	private JTextField r5;
+	private JComboBox r6;
 	private JLabel space1=new JLabel(" ");
 	private JLabel space2=new JLabel(" ");
 	private JLabel space3=new JLabel(" ");
@@ -31,48 +34,58 @@ public class ContMnuMayor extends JFrame implements ActionListener, Settings {
 	private JButton listar;
 	private JButton cancelar;
 	
-	private ContListadoMayor listaMayor;
+	private ContListadoMayor listaDiario;
 	
 	
 	
 	/* ****************************************************************************
 	 * 
-	 * Este metodo constructor implementa el menu de impresion del Mayor contable
+	 * Este metodo constructor implementa el menu de impresion del Diario contable
 	 * 
 	 * ************************************************************************** */
 	
-	public ContMnuMayor() {
+	public ContMnuDiario() {
 		
 		
-		menuMayor=new JPanel();
-		menuMayor.setBackground(ColorFondo);
-		menuMayor.setPreferredSize(new Dimension(400,300));
-		menuMayor.setLayout(new BoxLayout(menuMayor,BoxLayout.Y_AXIS));
+		menuDiario=new JPanel();
+		menuDiario.setBackground(ColorFondo);
+		menuDiario.setPreferredSize(new Dimension(400,300));
+		menuDiario.setLayout(new BoxLayout(menuDiario,BoxLayout.Y_AXIS));
 		
 		north=new JPanel();
 		north.setBackground(ColorFondo);
 		north.setLayout(new BoxLayout(north,BoxLayout.Y_AXIS));
-		JLabel title1=new JLabel("Listado del Mayor");
+		JLabel title1=new JLabel("Listado del Libro Diario");
 		title1.setFont(Fuente1);
 		title1.setAlignmentX((float)0.5);
 		north.add(title1);
 		
 		auxMenu=new JPanel();
 		auxMenu.setBackground(ColorFondo);
-		auxMenu.setLayout(new GridLayout(4,2));
-		JLabel n1=new JLabel("Desde cuenta");
+		auxMenu.setLayout(new GridLayout(6,2));
+		JLabel n1=new JLabel("Desde número");
 		n1.setFont(Fuente3);
-		JLabel n2=new JLabel("Hasta cuenta");
+		JLabel n2=new JLabel("Hasta número");
 		n2.setFont(Fuente3);
 		JLabel n3=new JLabel("Desde fecha");
 		n3.setFont(Fuente3);
 		JLabel n4=new JLabel("Hasta fecha");
 		n4.setFont(Fuente3);
+		JLabel n5=new JLabel("Líneas por hoja");
+		n5.setFont(Fuente3);
+		JLabel n6=new JLabel("Diario Oficial");
+		n6.setFont(Fuente3);
 		
-		r1=new JTextField("10000000");
-		r2=new JTextField("79999999");
+		r1=new JTextField("1");
+		r2=new JTextField("99999999");
 		r3=new JTextField("01-01-2012");
 		r4=new JTextField("31-12-2012");
+		r5=new JTextField("29");
+		r6=new JComboBox();
+		r6.addItem("NO");
+		r6.addItem("SI");
+		
+		
 		
 		auxMenu.add(n1);
 		auxMenu.add(r1);
@@ -82,26 +95,30 @@ public class ContMnuMayor extends JFrame implements ActionListener, Settings {
 		auxMenu.add(r3);
 		auxMenu.add(n4);
 		auxMenu.add(r4);
+		auxMenu.add(n5);
+		auxMenu.add(r5);
+		auxMenu.add(n6);
+		auxMenu.add(r6);
 		
 		south=new JPanel();
 		south.setBackground(ColorFondo);
 		south.setLayout(new FlowLayout());
-		listar=new JButton("Listar Mayor");
-		listar.setToolTipText("Lista el Mayor con los parámetros seleccionados");
+		listar=new JButton("Listar Diario");
+		listar.setToolTipText("Lista el Diario con los parámetros seleccionados");
 		south.add(listar);
 		cancelar=new JButton("Cancelar");
 		cancelar.setToolTipText("Borra la pantalla");
 		south.add(cancelar);
 		
-		menuMayor.add(space1);
-		menuMayor.add(space2);
-		menuMayor.add(north);
-		menuMayor.add(space3);
-		menuMayor.add(auxMenu);
-		menuMayor.add(space4);
-		menuMayor.add(south);
+		menuDiario.add(space1);
+		menuDiario.add(space2);
+		menuDiario.add(north);
+		menuDiario.add(space3);
+		menuDiario.add(auxMenu);
+		menuDiario.add(space4);
+		menuDiario.add(south);
 		
-		menuMayor.setVisible(true);
+		menuDiario.setVisible(true);
 		
 		listar.addActionListener(this);
 		cancelar.addActionListener(this);
@@ -115,7 +132,7 @@ public class ContMnuMayor extends JFrame implements ActionListener, Settings {
 	 ******************************************************************* */
 	
 	public JPanel retorna() {
-		return menuMayor;
+		return menuDiario;
 	}
 
 	
@@ -129,26 +146,28 @@ public class ContMnuMayor extends JFrame implements ActionListener, Settings {
 		Object source=e.getSource();
 		
 		if (source==listar) {
-			menuMayor.setVisible(false);
-			listaMayor=new ContListadoMayor("EC001","Ecovitalia",this.r1.getText(),this.r2.getText(),this.r3.getText(),this.r4.getText());
-			menuMayor.remove(space1);
-			menuMayor.remove(space2);
-			menuMayor.remove(north);
-			menuMayor.remove(space3);
-			menuMayor.remove(auxMenu);
-			menuMayor.remove(space4);
-			menuMayor.remove(south);
-			menuMayor.remove(south);
+			menuDiario.setVisible(false);
+			listaDiario=new ContListadoMayor("EC001","Ecovitalia",this.r1.getText(),this.r2.getText(),this.r3.getText(),this.r4.getText());
+			menuDiario.remove(space1);
+			menuDiario.remove(space2);
+			menuDiario.remove(north);
+			menuDiario.remove(space3);
+			menuDiario.remove(auxMenu);
+			menuDiario.remove(space4);
+			menuDiario.remove(south);
+			menuDiario.remove(south);
 			
-			menuMayor.add(listaMayor.retorna());
-			menuMayor.setPreferredSize(new Dimension(850,(listaMayor.sizeComponent*20)+125));
-			menuMayor.setAlignmentY(TOP_ALIGNMENT);
-			menuMayor.setVisible(true);
+			menuDiario.add(listaDiario.retorna());
+			menuDiario.setPreferredSize(new Dimension(850,(listaDiario.sizeComponent*20)+125));
+			menuDiario.setAlignmentY(TOP_ALIGNMENT);
+			menuDiario.setVisible(true);
 		}
 		
 		if (source==cancelar) {
-			menuMayor.setVisible(false);
+			menuDiario.setVisible(false);
 		}
 		
-	} 
-}   // ***************** fin de la class ContMnuMayor
+	}   // fin del actionPerformed
+	
+
+} // ******************************** fin de la class ContMnuDiario 
