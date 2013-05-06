@@ -67,6 +67,10 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 	private CambioEmpresa changeCompany;
 	private ContListadoMayor listaMayor;
 	private ContMnuMayor menuMayor;
+	private ContMnuDiario menuDiario;
+	private ContMnuSumasSaldos menuSumas;
+	private ContMnuResultados menuResultados;
+	private ContMnuBalance menuBalance;
 	// panel de la izquierda y sus componentes
 	private JPanel panelIzq;
 	private BoxLayout vertical;
@@ -414,6 +418,11 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 		
 		if (source==combos.combo1) {
 			String loque=combos.combo1.getSelectedItem().toString();
+			// ponemos los demas combos en general
+			combos.combo2.setSelectedIndex(0);
+			combos.combo3.setSelectedIndex(0);
+			combos.combo4.setSelectedIndex(0);
+			combos.combo5.setSelectedIndex(0);
 			if (loque.equals("Cambio empresa")) {
 				// borramos el panel central
 				panelCen.setVisible(false);	
@@ -433,8 +442,13 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 		}
 		
 		if (source==combos.combo2) {
+			// ponemos los demas combos en general
+		//	combos.combo1.setSelectedIndex(0);
+			combos.combo3.setSelectedIndex(0);
+			combos.combo4.setSelectedIndex(0);
+			combos.combo5.setSelectedIndex(0);
 			String loque=combos.combo2.getSelectedItem().toString();
-			if (loque.equals("Libro mayor")) {
+			if (loque.equals("Libro Mayor")) {
 				// borramos el panel central
 				panelCen.setVisible(false);	
 				panelCen.remove(panelAuxCen);
@@ -443,15 +457,77 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 				panelAuxCen=new JPanel();
 				panelAuxCen.setBackground(ColorFondo);
 				// invocamos y mostramos el nuevo panel central
-				//listaMayor=new ContListadoMayor(datosEmpr[1],datosEmpr[2],"70000000","79000002","01-01-2012","31-01-2012");
-				//panelAuxCen.add(listaMayor.retorna());
 				menuMayor=new ContMnuMayor();
 				panelAuxCen.add(menuMayor.retorna());
 				
 				panelCen.setViewportView(panelAuxCen);
 				panelCen.getViewport().setView(panelAuxCen);
 				panelCen.setVisible(true);
-			}	
+			}
+			if (loque.equals("Libro Diario")) {
+				// borramos el panel central
+				panelCen.setVisible(false);	
+				panelCen.remove(panelAuxCen);
+				panelCen.validate();
+				// creamos un nuevo panel central
+				panelAuxCen=new JPanel();
+				panelAuxCen.setBackground(ColorFondo);
+				// invocamos y mostramos el nuevo panel central
+				menuDiario=new ContMnuDiario();
+				panelAuxCen.add(menuDiario.retorna());
+				
+				panelCen.setViewportView(panelAuxCen);
+				panelCen.getViewport().setView(panelAuxCen);
+				panelCen.setVisible(true);
+			}
+			if (loque.equals("Sumas y Saldos")) {
+				// borramos el panel central
+				panelCen.setVisible(false);	
+				panelCen.remove(panelAuxCen);
+				panelCen.validate();
+				// creamos un nuevo panel central
+				panelAuxCen=new JPanel();
+				panelAuxCen.setBackground(ColorFondo);
+				// invocamos y mostramos el nuevo panel central
+				menuSumas=new ContMnuSumasSaldos();
+				panelAuxCen.add(menuSumas.retorna());
+				
+				panelCen.setViewportView(panelAuxCen);
+				panelCen.getViewport().setView(panelAuxCen);
+				panelCen.setVisible(true);
+			}
+			if (loque.equals("Cuenta de Resultados")) {
+				// borramos el panel central
+				panelCen.setVisible(false);	
+				panelCen.remove(panelAuxCen);
+				panelCen.validate();
+				// creamos un nuevo panel central
+				panelAuxCen=new JPanel();
+				panelAuxCen.setBackground(ColorFondo);
+				// invocamos y mostramos el nuevo panel central
+				menuResultados=new ContMnuResultados();
+				panelAuxCen.add(menuResultados.retorna());
+				
+				panelCen.setViewportView(panelAuxCen);
+				panelCen.getViewport().setView(panelAuxCen);
+				panelCen.setVisible(true);
+			}
+			if (loque.equals("Balance")) {
+				// borramos el panel central
+				panelCen.setVisible(false);	
+				panelCen.remove(panelAuxCen);
+				panelCen.validate();
+				// creamos un nuevo panel central
+				panelAuxCen=new JPanel();
+				panelAuxCen.setBackground(ColorFondo);
+				// invocamos y mostramos el nuevo panel central
+				menuBalance=new ContMnuBalance();
+				panelAuxCen.add(menuBalance.retorna());
+				
+				panelCen.setViewportView(panelAuxCen);
+				panelCen.getViewport().setView(panelAuxCen);
+				panelCen.setVisible(true);
+			}
 		}
 		
 	} // fin del actionPerformed
