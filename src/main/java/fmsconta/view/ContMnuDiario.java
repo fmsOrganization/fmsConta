@@ -24,9 +24,7 @@ public class ContMnuDiario extends JFrame implements ActionListener, Settings {
 	private JTextField r1;
 	private JTextField r2;
 	private JTextField r3;
-	private JTextField r4;
-	private JTextField r5;
-	private JComboBox r6;
+	private JComboBox r4;
 	private JLabel space1=new JLabel(" ");
 	private JLabel space2=new JLabel(" ");
 	private JLabel space3=new JLabel(" ");
@@ -34,7 +32,7 @@ public class ContMnuDiario extends JFrame implements ActionListener, Settings {
 	private JButton listar;
 	private JButton cancelar;
 	
-	private ContListadoMayor listaDiario;
+	private ContListadoDiario listaDiario;
 	
 	
 	
@@ -63,27 +61,21 @@ public class ContMnuDiario extends JFrame implements ActionListener, Settings {
 		auxMenu=new JPanel();
 		auxMenu.setBackground(ColorFondo);
 		auxMenu.setLayout(new GridLayout(6,2));
-		JLabel n1=new JLabel("Desde número");
+		JLabel n1=new JLabel("Desde fecha");
 		n1.setFont(Fuente3);
-		JLabel n2=new JLabel("Hasta número");
+		JLabel n2=new JLabel("Hasta fecha");
 		n2.setFont(Fuente3);
-		JLabel n3=new JLabel("Desde fecha");
+		JLabel n3=new JLabel("Líneas por hoja");
 		n3.setFont(Fuente3);
-		JLabel n4=new JLabel("Hasta fecha");
+		JLabel n4=new JLabel("Diario Oficial");
 		n4.setFont(Fuente3);
-		JLabel n5=new JLabel("Líneas por hoja");
-		n5.setFont(Fuente3);
-		JLabel n6=new JLabel("Diario Oficial");
-		n6.setFont(Fuente3);
 		
-		r1=new JTextField("1");
-		r2=new JTextField("99999999");
-		r3=new JTextField("01-01-2012");
-		r4=new JTextField("31-12-2012");
-		r5=new JTextField("29");
-		r6=new JComboBox();
-		r6.addItem("NO");
-		r6.addItem("SI");
+		r1=new JTextField("01-01-2012");
+		r2=new JTextField("31-12-2012");
+		r3=new JTextField("29");
+		r4=new JComboBox();
+		r4.addItem("NO");
+		r4.addItem("SI");
 		
 		
 		
@@ -95,10 +87,6 @@ public class ContMnuDiario extends JFrame implements ActionListener, Settings {
 		auxMenu.add(r3);
 		auxMenu.add(n4);
 		auxMenu.add(r4);
-		auxMenu.add(n5);
-		auxMenu.add(r5);
-		auxMenu.add(n6);
-		auxMenu.add(r6);
 		
 		south=new JPanel();
 		south.setBackground(ColorFondo);
@@ -147,7 +135,7 @@ public class ContMnuDiario extends JFrame implements ActionListener, Settings {
 		
 		if (source==listar) {
 			menuDiario.setVisible(false);
-			listaDiario=new ContListadoMayor("EC001","Ecovitalia",this.r1.getText(),this.r2.getText(),this.r3.getText(),this.r4.getText());
+			listaDiario=new ContListadoDiario("EC001","Ecovitalia",this.r1.getText(),this.r2.getText(),this.r3.getText(),r4.getActionCommand());
 			menuDiario.remove(space1);
 			menuDiario.remove(space2);
 			menuDiario.remove(north);

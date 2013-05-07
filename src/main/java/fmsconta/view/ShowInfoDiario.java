@@ -2,7 +2,6 @@ package fmsconta.view;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -17,18 +16,16 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JWindow;
 import javax.swing.SwingConstants;
 
 import fmsconta.control.PrinterInfo;
 
+public class ShowInfoDiario extends JFrame implements ActionListener, Settings {
 
-public class ShowInfoMayor extends JFrame implements ActionListener, Settings {
-	
 	private JFrame auxWindow;
 	private JScrollPane panelScroll;
 	private JPanel listadoDatos;
-	private JPanel listadoMayor;
+	private JPanel listadoDiario;
 	private JLabel title1;
 	private JLabel title2;
 	private JLabel space1=new JLabel(" ");
@@ -39,17 +36,25 @@ public class ShowInfoMayor extends JFrame implements ActionListener, Settings {
 	private JButton impress;
 	private JButton fichero;
 	private JButton cerrar;
-
 	
 	
 	
-	public ShowInfoMayor() {
+	public ShowInfoDiario() {
 		// constructor
 	}
+	
+	
+	
+	/* *****************************************************************
+	 * Este constructor elabora un listado de los datos del diario
+	 * y lo hace mediante un preformato con dimensiones elaboradas
+	 * 
+	 * Recibe como parametros un string con los datos a imprimir
+	 * y los titulos de cabecera a imprimir
+	 ***************************************************************** */
+	
+	public ShowInfoDiario (String datos[][],String title1,String title2){
 		
-		
-	public ShowInfoMayor(String datos[][],String title1,String title2){
-			
 		// recupera los datos recibidos como parametros
 		
 		// Obtiene la fecha
@@ -89,10 +94,10 @@ public class ShowInfoMayor extends JFrame implements ActionListener, Settings {
 			panelScroll.setPreferredSize(new Dimension(1000,500));
 			panelScroll.setMaximumSize(new Dimension(1000,700));
 			
-			listadoMayor=new JPanel();
-			listadoMayor.setLayout(new BoxLayout(listadoMayor,BoxLayout.Y_AXIS));
-			listadoMayor.setAlignmentX(LEFT_ALIGNMENT);
-			listadoMayor.setBackground(ColorBlanco);
+			listadoDiario=new JPanel();
+			listadoDiario.setLayout(new BoxLayout(listadoDiario,BoxLayout.Y_AXIS));
+			listadoDiario.setAlignmentX(LEFT_ALIGNMENT);
+			listadoDiario.setBackground(ColorBlanco);
 			
 			// titulo
 			JPanel north1=new JPanel();
@@ -146,13 +151,13 @@ public class ShowInfoMayor extends JFrame implements ActionListener, Settings {
 				constraints.fill=GridBagConstraints.NONE;
 				constraints.anchor=GridBagConstraints.WEST;
 
-				for (int j=0;j<10;j++) {
+				for (int j=0;j<9;j++) {
 					// creamos la etiqueta y le agregamos el dato
 					lab[i][j]=new JLabel();
 					lab[i][j].setHorizontalAlignment(SwingConstants.LEFT);
 					lab[i][j].setFont(Fuente4);
 					lab[i][j].setText(datos2[i][j]);
-					if (j==7) {
+					if (j==7 || j==8) {
 						constraints.anchor=GridBagConstraints.EAST;
 					}
 					constraints.gridx=j;
@@ -163,13 +168,13 @@ public class ShowInfoMayor extends JFrame implements ActionListener, Settings {
 					
 			center1.add(listadoDatos);
 					
-			listadoMayor.add(north1);
-			listadoMayor.add(center1);
-			listadoMayor.add(south1);
+			listadoDiario.add(north1);
+			listadoDiario.add(center1);
+			listadoDiario.add(south1);
 					
-			listadoMayor.setVisible(true);
-			panelScroll.setViewportView(listadoMayor);
-			panelScroll.getViewport().setView(listadoMayor);
+			listadoDiario.setVisible(true);
+			panelScroll.setViewportView(listadoDiario);
+			panelScroll.getViewport().setView(listadoDiario);
 			auxWindow.add(panelScroll);
 			auxWindow.setVisible(true);
 			
@@ -178,20 +183,11 @@ public class ShowInfoMayor extends JFrame implements ActionListener, Settings {
 			cerrar.addActionListener(this);
 			
 	}  // fin del constructor showinfo
-
 	
 	
-	/* ******************************************************
-	 * Lectura de los botones del listado generado
-	 * 
-	 * Imprimir genera un listado de impresora
-	 * Fichero genera un fichero de texto preformateado
-	 * Cancelar cierra la pantalla
-	 *******************************************************/
-
+	
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		
 		Object source=e.getSource();
 		
 		if (source==impress) {
@@ -206,12 +202,12 @@ public class ShowInfoMayor extends JFrame implements ActionListener, Settings {
 		if (source==fichero) {
 			// si pulsa fichero se generara un fichero tipo txt
 			// con la informacion
-			String nombreFichero="mayor"+this.fecha+".txt";
+			String nombreFichero="diario"+this.fecha+".txt";
 			PrinterInfo imprime=new PrinterInfo();
-			// llamamos al metodo imprimeFichero con los datos, la longitud de los datos
-			// el nombre del fichero y la ruta, variable final de PersonalSettings
-			int longitudes[]={30,10,10,10,10,30,13,10,10,10};
-			int alineacion[]={1,1,1,1,1,1,1,2,2,2};
+			// llamamos al metodo imprimeFichero con los datos, el nombre del fichero
+			// y la ruta, variable final de PersonalSettings
+			int longitudes[]={10,10,10,10,35,40,15,12,12};
+			int alineacion[]={1,1,1,1,1,1,1,2,2};
 			if (imprime.imprimeFichero(datos2,longitudes,alineacion,nombreFichero,PathPersonalFiles)) {
 				JOptionPane.showMessageDialog(null, "Fichero de texto generado");
 			} else JOptionPane.showMessageDialog(null, "Error al generar el fichero de texto");	
@@ -224,7 +220,5 @@ public class ShowInfoMayor extends JFrame implements ActionListener, Settings {
 		}
 		
 	} // fin del actionperformed
-		
-		
-	
-} // *************** FIN DE LA CLASE SHOWINFO
+
+}

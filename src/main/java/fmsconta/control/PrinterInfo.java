@@ -70,10 +70,12 @@ public class PrinterInfo{
 	 * Este metodo contruye un fichero de texto como salida de impresion
 	 * 
 	 * Recibe como parametro el documento a imprimir como String[][]
+	 * int[] formatos con la longitud de cada uno de los campos
+	 * int[] posicion con la alineacion izq=1 o der=2 cada uno de los campos
 	 * Devuelve un TRUE/FALSE segun resultado de generacion de fichero
 	 *************************************************************************** */
 	
-	public boolean imprimeFichero (String documentoImprimible[][],String nombreFichero,String rutaFichero) {
+public boolean imprimeFichero (String documentoImprimible[][],int formatos[],int posicion[],String nombreFichero,String rutaFichero) {
 		
 		File fichero;
 		File persDir;
@@ -97,181 +99,35 @@ public class PrinterInfo{
 				String newLine="";
 				int diferencia=0;
 				//******************** FORMATEAMOS ELEMENTO POR ELEMENTO **** 
-				// eliminamos los null
-				if (documentoImprimible[i][0]==null) documentoImprimible[i][0]="";
-				// recortamos la longitud
-				if (documentoImprimible[i][0].length()>30) {
-					documentoImprimible[i][0]=documentoImprimible[i][0].substring(0,31);
-				} else if (documentoImprimible[i][0].length()<30) {
-					// si es menor que la longitud predeterminada
-					// rellenamos hasta la longitud deseada
-					diferencia=30-documentoImprimible[i][0].length();
-					documentoImprimible[i][0]="  "+documentoImprimible[i][0];
-					for (int n=2;n<diferencia;n++){
-						documentoImprimible[i][0]=documentoImprimible[i][0].concat(" ");
+				
+				for (int j=0;j<formatos.length;j++) {
+					
+					// eliminamos los null
+					if (documentoImprimible[i][j]==null) documentoImprimible[i][j]="";
+					// recortamos la longitud
+					if (documentoImprimible[i][j].length()>formatos[j]) {
+						documentoImprimible[i][j]=documentoImprimible[i][j].substring(0,formatos[j]+1);
+					} else if (documentoImprimible[i][j].length()<formatos[j]) {
+						// si es menor que la longitud predeterminada
+						// rellenamos hasta la longitud deseada
+						diferencia=formatos[j]-documentoImprimible[i][j].length();
+						documentoImprimible[i][j]="  "+documentoImprimible[i][j];
+						// lo rellenamos con espacios
+						String espacios="";
+						for (int n=0;n<diferencia;n++){
+							espacios=espacios.concat(" ");
+						}
+						// segun se alinea a izquierda=1 o derecha=2 ponemos los espacios
+						if (posicion[j]==1) {
+							documentoImprimible[i][j]=documentoImprimible[i][j].concat(espacios);
+						} else {
+							documentoImprimible[i][j]=espacios.concat(documentoImprimible[i][j]);
+						}
 					}
-				}
-				// y añadimos a la linea
-				newLine+=documentoImprimible[i][0];
-				
-				
-				// eliminamos los null
-				if (documentoImprimible[i][1]==null) documentoImprimible[i][1]="";
-				// recortamos la longitud
-				if (documentoImprimible[i][1].length()>10) {
-					documentoImprimible[i][1]=documentoImprimible[i][1].substring(0,11);
-				} else if (documentoImprimible[i][1].length()<10) {
-					// si es menor que la longitud predeterminada
-					// rellenamos hasta la longitud deseada
-					diferencia=10-documentoImprimible[i][1].length();
-					for (int n=0;n<diferencia;n++){
-						documentoImprimible[i][1]=documentoImprimible[i][1].concat(" ");
-					}
-				}
-				// y añadimos a la linea
-				newLine+=documentoImprimible[i][1]+" ";
-				
-				
-				// eliminamos los null
-				if (documentoImprimible[i][2]==null) documentoImprimible[i][2]="";
-				// recortamos la longitud
-				if (documentoImprimible[i][2].length()>10) {
-					documentoImprimible[i][2]=documentoImprimible[i][2].substring(0,11);
-				} else if (documentoImprimible[i][2].length()<10) {
-					// si es menor que la longitud predeterminada
-					// rellenamos hasta la longitud deseada
-					diferencia=10-documentoImprimible[i][2].length();
-					for (int n=0;n<diferencia;n++){
-						documentoImprimible[i][2]=documentoImprimible[i][2].concat(" ");
-					}
-				}
-				// y añadimos a la linea
-				newLine+=documentoImprimible[i][2]+" ";
-				
-				
-				// eliminamos los null
-				if (documentoImprimible[i][3]==null) documentoImprimible[i][3]="";
-				// recortamos la longitud
-				if (documentoImprimible[i][3].length()>10) {
-					documentoImprimible[i][3]=documentoImprimible[i][3].substring(0,11);
-				} else if (documentoImprimible[i][3].length()<10) {
-					// si es menor que la longitud predeterminada
-					// rellenamos hasta la longitud deseada
-					diferencia=10-documentoImprimible[i][3].length();
-					for (int n=0;n<diferencia;n++){
-						documentoImprimible[i][3]=documentoImprimible[i][3].concat(" ");
-					}
-				}
-				// y añadimos a la linea
-				newLine+=documentoImprimible[i][3]+" ";
-				
-				
-				// eliminamos los null
-				if (documentoImprimible[i][4]==null) documentoImprimible[i][4]="";
-				// recortamos la longitud
-				if (documentoImprimible[i][4].length()>10) {
-					documentoImprimible[i][4]=documentoImprimible[i][4].substring(0,11);
-				} else if (documentoImprimible[i][4].length()<10) {
-					// si es menor que la longitud predeterminada
-					// rellenamos hasta la longitud deseada
-					diferencia=10-documentoImprimible[i][4].length();
-					for (int n=0;n<diferencia;n++){
-						documentoImprimible[i][4]=documentoImprimible[i][4].concat(" ");
-					}
-				}
-				// y añadimos a la linea
-				newLine+=documentoImprimible[i][4]+" ";
-				
-				
-				// eliminamos los null
-				if (documentoImprimible[i][5]==null) documentoImprimible[i][5]="";
-				// recortamos la longitud
-				if (documentoImprimible[i][5].length()>30) {
-					documentoImprimible[i][5]=documentoImprimible[i][5].substring(0,31);
-				} else if (documentoImprimible[i][5].length()<30) {
-					// si es menor que la longitud predeterminada
-					// rellenamos hasta la longitud deseada
-					diferencia=30-documentoImprimible[i][5].length();
-					for (int n=0;n<diferencia;n++){
-						documentoImprimible[i][5]=documentoImprimible[i][5].concat(" ");
-					}
-				}
-				// y añadimos a la linea
-				newLine+=documentoImprimible[i][5]+" ";
-				
-				
-				// eliminamos los null
-				if (documentoImprimible[i][6]==null) documentoImprimible[i][6]="";
-				// recortamos la longitud
-				if (documentoImprimible[i][6].length()>13) {
-					documentoImprimible[i][6]=documentoImprimible[i][6].substring(0,14);
-				} else if (documentoImprimible[i][6].length()<13) {
-					// si es menor que la longitud predeterminada
-					// rellenamos hasta la longitud deseada
-					diferencia=13-documentoImprimible[i][6].length();
-					for (int n=0;n<diferencia;n++){
-						documentoImprimible[i][6]=documentoImprimible[i][6].concat(" ");
-					}
-				}
-				// y añadimos a la linea
-				newLine+=documentoImprimible[i][6]+" ";
-		
-
-				// eliminamos los null
-				if (documentoImprimible[i][7]==null) documentoImprimible[i][7]="";
-				// recortamos la longitud
-				if (documentoImprimible[i][7].length()>10) {
-					documentoImprimible[i][7]=documentoImprimible[i][7].substring(0,11);
-				} else if (documentoImprimible[i][7].length()<10) {
-					// si es menor que la longitud predeterminada
-					// rellenamos hasta la longitud deseada
-					diferencia=10-documentoImprimible[i][7].length();
-					String espacios="";
-					for (int n=0;n<diferencia;n++){
-						espacios=espacios.concat(" ");
-					}
-					documentoImprimible[i][7]=espacios.concat(documentoImprimible[i][7]);
-				}
-				// y añadimos a la linea
-				newLine+=documentoImprimible[i][7]+" ";
-				
-				
-				// eliminamos los null
-				if (documentoImprimible[i][8]==null) documentoImprimible[i][8]="";
-				// recortamos la longitud
-				if (documentoImprimible[i][8].length()>10) {
-					documentoImprimible[i][8]=documentoImprimible[i][8].substring(0,11);
-				} else if (documentoImprimible[i][8].length()<10) {
-					// si es menor que la longitud predeterminada
-					// rellenamos hasta la longitud deseada
-					diferencia=10-documentoImprimible[i][8].length();
-					String espacios="";
-					for (int n=0;n<diferencia;n++){
-						espacios=espacios.concat(" ");
-					}
-					documentoImprimible[i][8]=espacios.concat(documentoImprimible[i][8]);
-				}
-				// y añadimos a la linea
-				newLine+=documentoImprimible[i][8]+" ";
-				
-				
-				// eliminamos los null
-				if (documentoImprimible[i][9]==null) documentoImprimible[i][9]="";
-				// recortamos la longitud
-				if (documentoImprimible[i][9].length()>10) {
-					documentoImprimible[i][9]=documentoImprimible[i][9].substring(0,11);
-				} else if (documentoImprimible[i][9].length()<10) {
-					// si es menor que la longitud predeterminada
-					// rellenamos hasta la longitud deseada
-					diferencia=10-documentoImprimible[i][9].length();
-					String espacios="";
-					for (int n=0;n<diferencia;n++){
-						espacios=espacios.concat(" ");
-					}
-					documentoImprimible[i][9]=espacios.concat(documentoImprimible[i][9]);
-				}
-				// y añadimos a la linea
-				newLine+=documentoImprimible[i][9]+" ";
+					// y añadimos a la linea
+					newLine+=documentoImprimible[i][j];
+					
+				}		
 
 				// graba en fichero texto
 				grabFichero.println(newLine);
@@ -300,5 +156,7 @@ public class PrinterInfo{
 		
 	} // fin del metodo imprimeFichero
 	
-
-}
+	
+	
+	
+} // ************** FIN DE LA CLASS PRINTERINFO
