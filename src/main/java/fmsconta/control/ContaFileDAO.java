@@ -1,14 +1,23 @@
 package fmsconta.control;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 ;
 
 public class ContaFileDAO implements FileSystemDates {
+
+	private String lpd="Y";
+	private String cgu="Y";
+
+
 
 	public ContaFileDAO () {
 		//constructor
@@ -17,32 +26,8 @@ public class ContaFileDAO implements FileSystemDates {
 	
 	
 	  
-    /* **************************************************************
-     * Este metodo sirve para crear una conexion a la DB del usuario
-     * No recibe argumentos
-     * Si no hay problemas devuelve un objeto Connection
-     * Si hay errores devuelve null
-     ****************************************************************/
-  /*  
-    public Connection ConnectDB () {
-        
-        // CONECTOR CON LAS BASES DE DATOS
-        // DEVUELVE UN OBJETO CONNECTION SI LO CONSIGUE Y NULL SI FALLA
-        
-        try {
-        	conexionDB = DriverManager.getConnection(NameDB, UserDB, PassDB);
-        } catch (SQLException ex) {
-            System.out.println("Error conectando a la base de datos");
-            Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(null, "No conecta con Base de Datos: salga de la aplicación");
-            return null;
-        }
-        	
-          return conexionDB;
-       } // fin del metodo connectDB *******************************************
-    
-    
-*/    
+
+      
   
     
     
@@ -137,7 +122,7 @@ public class ContaFileDAO implements FileSystemDates {
     
     private String[] leeDatos(String data) {
 		    	
-    	String lectura[];//=new String[15];
+    	String lectura[];
     	
     	lectura=data.split(";");
     	
@@ -301,8 +286,6 @@ public class ContaFileDAO implements FileSystemDates {
     
     
     
-    
-   
     /* **********************************************************************************
      * este metodo sirve para leer en la tabla correspondiente los datos de la empresa
      * 
@@ -419,17 +402,25 @@ public class ContaFileDAO implements FileSystemDates {
     	
     	// comenzamos la lectura linea a linea
     	String data=null;
-    	datosUser=new String[3][12];
     	datosLectura=new String[12];
-    	int k=0;
+    	ArrayList<ArrayList<String>> arrayUser=new ArrayList<ArrayList<String>>();
+    	//datosUser=new String[3][12];
+    	
+    	//int k=0;
     	try {
 			while ((data=buff.readLine())!=null) {
 				// convertimos la lectura en array
 				datosLectura=leeDatos(data);
-				// si login y password coinciden dejamos de leer
+				// si coincide con el keyUser grabamos los datos del usuario
+				// en el arrayList
 				if (datosLectura[11].equals(keyUser)){
-					System.arraycopy(datosLectura, 0, datosUser[k], 0, datosLectura.length);
-					k++;
+					ArrayList<String> arrayAux=new ArrayList<String>();
+					for (int n=0;n<12;n++) {
+						arrayAux.add(datosLectura[n]);
+					}
+					arrayUser.add(arrayAux);
+					//System.arraycopy(datosLectura, 0, datosUser[k], 0, datosLectura.length);
+					//k++;
 				} 
 			}
 		} catch (IOException e) {
@@ -447,7 +438,14 @@ public class ContaFileDAO implements FileSystemDates {
 				e.printStackTrace();
 			}
 		}
-
+    	// creamos la matriz de retorno y copiamos datos
+    	datosUser=new String [arrayUser.size()][12];
+    	// obtenida la informacion, pasamos el arraylist
+    	// a una matriz para return de los datos
+    	for (int i=0;i<arrayUser.size();i++) {
+    		datosUser[i]=arrayUser.get(i).toArray(new String[12]);
+    	}  	
+    	
     	return datosUser;
       
     
@@ -464,8 +462,18 @@ public class ContaFileDAO implements FileSystemDates {
      * 
      * Devuelve un null si hay errores
      * Si el keyUser es correcto, devuelve un String[n][15] siendo n el num.de usuarios
+     * 
+     * PROCEDIMIENTO
+     * A) Obtenemos un array de las empresas del manager, instanciando el metodo
+     *    buscaEmpresasUsuDB
+     * B) Creamos una conexion al fichero de usuarios
+     * C) Leemos usuario a usuario
+     * D) En cada usuario hacemos un array instanciando leedatos()
+     * E) Comprobamos si en el array del usuario está registrada alguna empresa mediante
+     *    un bucle y si lo esta lo seleccionamos y lo grabamos en arrayList
+     * F) Finalizada la lectura de usuarios, pasamos el arrayList al array de retorno
      ********************************************************************************** */
-    /*
+    
     public String[][] buscaUsuariosManagerDB (String keyUser) {
          
     	// busca las empresas del manager
@@ -474,131 +482,125 @@ public class ContaFileDAO implements FileSystemDates {
     	if (empMan==null) return null;
     	
     	// crea una conexion
-    	Connection con=ConnectDB();
-    	
-    	Statement st=null;
-    	try {
-    		st = con.createStatement();
-    	} catch (SQLException ex) {
-    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
-    		// si hay algun error cerramos la conexion y return null
-    		try {
-				con.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		return null;
-    	}
+    	File fichero=null;
+    	FileReader lector=null;
+    	BufferedReader buff=null;
           
     	// preparamos un String para recuperar todos los datos de usuario
-    	// consideramos el maximo de casos posibles que son 6 usuarios
-    	String datosUser[][]=new String[6][16];
+    	// considerando la longitud de la matriz empMan (n empresas managed)
+    	// String datosUser[][]=new String[empMan.length][16];
     	
-    	ResultSet rs=null;
-    	
-    	int i=0; // contador de usuarios grabados
-    	int n=0; // contador de empresas
-    	String empbusc;
-    while (n<3 && empMan[n][1]!="") {	
-    	empbusc=empMan[n][1]; // empresa a buscar en fichero usuarios
-    	try { 
-    		// se busca a usuarios que no sean el manager y tenga como empresa la administrada
-    		rs = st.executeQuery("SELECT * FROM c_usuario WHERE keyUser!='"+keyUser+"' && " +
-    				"(emp1='"+empbusc+"' || emp2='"+empbusc+"' || emp3='"+empbusc+"')");
-    	} catch (SQLException ex) {
-    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
-    		// si hay algun error cerramos la conexion y return null
-    		try {
-				con.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		return null;
-    	} 
-       
-    
+    	// abrimos fichero, lector y buffer
     	try {
-    		while (rs.next()){ 
-    			// lee todos los datos y los transforma a String
-    			datosUser[i][0] = String.valueOf(rs.getInt(1));
-    			datosUser[i][1] = rs.getString(2);
-    			datosUser[i][2] = rs.getString(3);
-    			datosUser[i][3] = rs.getString(4);
-    			datosUser[i][4] = rs.getString(5);
-    			datosUser[i][5] = rs.getString(6);
-    			datosUser[i][6] = String.valueOf(rs.getInt(7));
-    			datosUser[i][7] = rs.getString(8);
-    			datosUser[i][8] = rs.getString(9);
-    			datosUser[i][9] = rs.getString(10);
-    			datosUser[i][10] = rs.getString(11);
-    			datosUser[i][11] = String.valueOf(rs.getInt(12));
-    			datosUser[i][12] = String.valueOf(rs.getInt(13));
-    			datosUser[i][13] = rs.getString(14);
-    			datosUser[i][14] = rs.getString(15);
-    			datosUser[i][15] = "";	// en blanco, sin uso en este metodo
-    			i++;
-    		}
-    		
-    	} catch (SQLException ex) {
-    		// si hay algun error cerramos la conexion y return null
-    		try {
-				con.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		return null;
-    	} 
-    	n++;
-    } // fin del WHILE
-    
-    	// si todo ha ido bien
-    	// cerramos la conexion y retornamos el String[]
-    	try {
-			con.close();
-		} catch (SQLException e) {
+			fichero=new File(PathDataFiles+FileUsers);
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
+			System.err.println("Error al abrir el fichero");
 			e.printStackTrace();
+			return null;
 		}
+    	try {
+			lector=new FileReader(fichero);
+			buff=new BufferedReader(lector);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.err.println("Error leyendo fichero");
+			e.printStackTrace();
+			return null;
+		}
+
+
+    	String data=null;	// lectura de linea
+    	String datosLectura[]=new String[15];	// array lectura datos usuarios
+    	ArrayList <ArrayList<String>> userSelec=new ArrayList <ArrayList<String>>();
+    	
+    	// bloque de lectura de datos
+    	try {
+			while ((data=buff.readLine())!=null) {
+				// convertimos la lectura en array
+				datosLectura=leeDatos(data);
+				// cogemos una por una las empresas del manager y...
+				for (int k=0;k<empMan.length;k++) {
+					// si alguna de las empresas coincide entonces hay que
+					// seleccionar al usuario SI NO ES EL MANAGER
+					if (((datosLectura[7].equals(empMan[k][1]))||
+							(datosLectura[8].equals(empMan[k][1]))||
+							(datosLectura[9].equals(empMan[k][1]))) && (!(empMan[k][11].equals(keyUser))) ){
+						ArrayList<String> lect=new ArrayList<String>();
+						for (int n=0;n<15;n++) {
+							lect.add(datosLectura[n]);
+						}
+						userSelec.add(lect);
+					}
+				}
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.err.println("Error leyendo el buffer del fichero");
+			e.printStackTrace();
+			return null;
+		} finally {
+			try {
+				buff.close();
+				lector.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.err.println("Error cerrando fichero");
+				e.printStackTrace();
+			}
+		}
+    	
+    	// creamos el array de retorno de datos
+    	String datosUser[][]=new String[userSelec.size()][15];
+    	// copiamos los datos del arraylist al array
+    	for (int n=0;n<userSelec.size();n++){
+    		datosUser[n]=userSelec.get(n).toArray(new String[15]);
+    	}
     	
     	return datosUser;
     
     } // fin de BuscaUsuariosManagerDB ***********************************
     
-    */
+    
     
     /* **********************************************************************************
-     * Este metodo sirve para grabar en la DDBB los datos de la empresa
+     * Este metodo sirve para grabar en el fichero los datos de la empresa
      * 
      * Recibe el key de empresa en formato String,un String[] con los datos
-     * y un muy importante String oper ("INSERT" o "UPDATE") segun corresponda
+     * y un String oper ("INSERT" o "UPDATE") que se mantiene por compatibilidad con DDBB
+     * pero no tiene utilidad
+     * 
      * Devuelve un true o false si hay errores 
      ********************************************************************************** */
-    /*
+    
     public boolean grabaEmpDB (String keyEmp, String datosEmp[], String oper) {
            
-    	// crea una conexion
-    	Connection con=ConnectDB();
+    	// crea una conexion al fichero de empresas
+    	File fichero=null;
+    	FileWriter grabador=null;
+    	BufferedWriter buff=null;
     	
-    	Statement st=null;
     	try {
-    		st = con.createStatement();
-    	} catch (SQLException ex) {
-    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
-    		// si hay algun error cerramos la conexion y return null
-    		try {
-				con.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		return false;
-    	}
+			fichero=new File(PathDataFiles+FileCompanys);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			System.err.println("Error en nombre de fichero");
+			e1.printStackTrace();
+			return false;
+		}
+    	
+    	try {
+			grabador=new FileWriter(fichero);
+			buff=new BufferedWriter(grabador);
+		} catch (IOException e1) {
+			System.err.println("Error al abrir canal de grabación");
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return false;
+		}
     	
     	// recoge los valores a grabar o actualizar
-      //  int id=(int)Integer.parseInt(datosEmp[0]); realmente es un autoincrement
+        String id=datosEmp[0];
         String key=datosEmp[1];
     	String nom=datosEmp[2];
     	String dir=datosEmp[3];
@@ -608,118 +610,202 @@ public class ContaFileDAO implements FileSystemDates {
     	String cif=datosEmp[7];
     	String ini=datosEmp[8];
     	String fin=datosEmp[9];
-    	int act=(int)Integer.parseInt(datosEmp[10]);
+    	String act=datosEmp[10];
     	String man=datosEmp[11];
     	
-    	int rs=0;
-    	try {   
-    		if (oper.equals("UPDATE")) {
-    			rs = st.executeUpdate("UPDATE c_empresas SET keyempresa='"+key+"', " +
-    				"nombre='"+nom+"', direccion='"+dir+"', localidad='"+loc+"', provincia='"+pro+"'," +
-    				" codpostal='"+cpo+"', cif='"+cif+"', fechainicio='"+ini+"',fechafin='"+fin+"'," +
-    						" activa='"+act+"',keymanager='"+man+"' WHERE keyempresa='"+keyEmp+"' LIMIT 1");
-    		} else if (oper.equals("INSERT")) {
-    			rs = st.executeUpdate("INSERT c_empresas SET keyempresa='"+key+"', " +
-        				"nombre='"+nom+"', direccion='"+dir+"', localidad='"+loc+"', provincia='"+pro+"'," +
-        				" codpostal='"+cpo+"', cif='"+cif+"', fechainicio='"+ini+"',fechafin='"+fin+"'," +
-        						" activa='"+act+"',keymanager='"+man+"'");
-    		} else System.err.println("No se recibió orden de Update o Insert. Operación no efectuada ");
-    			
-    	} catch (SQLException ex) {
-    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
-    		// si hay algun error cerramos la conexion y return null
-    		try {
-				con.close();
-			} catch (SQLException e) {
+    	// se compone un String para grabar de una vez todos los campos
+    	// separados por punto y coma
+    	String rs;
+    	rs = id+";"+key+";"+nom+";"+dir+";"+loc+";"+pro+";"+cpo+";"+cif+";"+ini+";"+fin+";"+act+";"+man;
+    		
+    	try {
+			buff.write(rs);
+			// se inserta una marca de linea para separar cada grabacion
+			buff.newLine();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			System.err.println("Error al grabar los datos de empresa");
+			e1.printStackTrace();
+			return false;
+		} finally {
+			try {
+				buff.flush();
+				buff.close();
+				grabador.close();
+			} catch (IOException e) {
+				System.err.println("Error en el proceso de cerrar grabación");	
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-    		return false;
-    	} 
-
-    	// si todo ha ido bien
-    	// cerramos la conexion y retornamos el String[]
-    	try {
-			con.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
 		}
-    	
+
+    	// si todo ha ido bien retornamos true
     	return true;
     
     }  // fin de grabaEmpDB ***********************************
     
-    */
+    
     
     /* ********************************************************************
-     * este metodo sirve para grabar en la tabla del usuario
+     * este metodo sirve para grabar en la tabla del usuario manager
      * la empresa que acaba de crear
      * 
-     * Recibe como argumentos el keyUser y el KeyEmpr y no devuelve nada
+     * Recibe como argumentos el keyUser y el KeyEmpr y la posicion a grabar
+     * Devuelve TRUE o FALSE como resultado de la operacion
+     * 
+     * PROCEDIMIENTO:
+     * A) Abrimos el fichero a modificar
+     * B) Comenzamos la lectura del fichero linea a linea, y vamos almacenando
+     *    la informacion en un ArrayList
+     * C) Cuando llegamos al usuario keyUser, modificamos la informacion de
+     *    empresa, grabandola en el sitio adecuado [8]o[9]
+     * D) Terminamos de leer el fichero y de almacenar en ArrayList
+     * E) Abrimos el fichero para escritura
+     * F) Grabamos el contenido del ArrayList
      ********************************************************************** */
-    /*
-    public void grabaEmpresaUsu (String keyUser, String keyEmpr, int position) {
-           
+
+    
+    public boolean grabaEmpresaUsu (String keyUser, String keyEmpr, int position) {     
+                
+
     	// crea una conexion
-    	Connection con=ConnectDB();
+    	File fichero=null;
+    	FileReader lector=null;
+    	BufferedReader buff=null;
+    	// crea el string[] auxiliar de lectura
+    	String datosLectura[]=new String[15];
+    	// crea el arrayList acumulador de la informacion del fichero
+    	ArrayList<ArrayList<String>> fichUsu= new ArrayList<ArrayList<String>>();
     	
-    	Statement st=null;
+    	// abrimos una conexion con el fichero
     	try {
-    		st = con.createStatement();
-    	} catch (SQLException ex) {
-    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
-    		// si hay algun error cerramos la conexion y return null
-    		try {
-				con.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}
-    	
-    	// recoge los valores a grabar o actualizar
+			fichero=new File(PathDataFiles+FileUsers);
 
-    	int rs=0;
-    	
-    	try {
-    		if (position==8) {
-    			rs = st.executeUpdate("UPDATE c_usuario SET emp2='"+keyEmpr+"' WHERE keyuser='"+keyUser+"' LIMIT 1");
-    		} else rs = st.executeUpdate("UPDATE c_usuario SET emp3='"+keyEmpr+"' WHERE keyuser='"+keyUser+"' LIMIT 1");
-    			
-    	} catch (SQLException ex) {
-    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
-    		// si hay algun error cerramos la conexion y return null
-    		try {
-				con.close();
-			} catch (SQLException e) {
+	    	try {
+	    		// abrimos lecturas
+				lector=new FileReader(fichero);
+				buff=new BufferedReader(lector);
+			} catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.err.println("Error leyendo fichero");
+				e1.printStackTrace();
+				return false;
 			}
-    	} 
-
-    	// si todo ha ido bien
-    	// cerramos la conexion y retornamos el String[]
-    	try {
-			con.close();
-		} catch (SQLException e) {
+	    	
+	    	// comenzamos la lectura linea a linea
+	    	String data=null;
+	    	datosLectura=null;
+	    	while ((data=buff.readLine())!=null) {
+	    		// convertimos la lectura en array
+	    		datosLectura=leeDatos(data);
+	    		// si el keyUser coincide dejamos de leer
+	    		if (datosLectura[1].equals(keyUser)){
+	    			// modificacion del dato
+	    			//  grabamos el dato emp en el array
+	    			if (position==8) {
+	    				datosLectura[8]=keyEmpr;
+	    			} else {
+	    				datosLectura[9]=keyEmpr;
+	    			}
+	    		}
+	    		// pasamos la info al array de grabacion
+	    		ArrayList<String> fichAcum= new ArrayList<String>();
+	    		for (int n=0;n<datosLectura.length;n++){
+	    			fichAcum.add(datosLectura[n]);
+	    		}
+	    		fichUsu.add(fichAcum);
+	    	}
+	    	
+		} catch (Exception e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("Fichero no encontrado");
+			e1.printStackTrace();
+			return false;
+			
+		} finally {
+			
+			try {
+				buff.close();
+				lector.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.err.println("Error cerrando el fichero");
+				e.printStackTrace();
+			}
 		}
+
+    	// **** ENTRAMOS EN LA FASE DE GRABACION
+    	
+    	// crea una conexion
+    	FileWriter grabador=null;
+    	BufferedWriter rebuff=null;
+
+    	
+    	// abrimos una conexion con el fichero
+    	try {
+			fichero=new File(PathDataFiles+FileUsers);
+
+	    	try {
+	    		// abrimos lecturas
+				grabador=new FileWriter(fichero);
+				rebuff=new BufferedWriter(grabador);
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				System.err.println("Error abriendo canal de grabación de fichero");
+				e1.printStackTrace();
+				return false;
+			}
+	    	
+	    	// comenzamos la grabacion linea a linea
+	    	for (int n=0;n<fichUsu.size();n++) {
+	    		// pasamos la info al array de grabacion
+	    		// grabamos convirtiendo el array en String
+	    		try {
+					rebuff.write(fichUsu.get(n).toArray(new String[15]).toString());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					System.err.println("Error copiando información al fichero");
+					e.printStackTrace();
+					rebuff.close();
+					grabador.close();
+					return false;
+				}
+	    	}
+	    	
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			System.err.println("Fichero no encontrado");
+			e1.printStackTrace();
+			return false;
+			
+		} finally {
+			
+			try {
+				rebuff.flush();
+				rebuff.close();
+				grabador.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.err.println("Error cerrando el fichero");
+				e.printStackTrace();
+			}
+		}
+    	
+    	
+        return true; 
     
     }  // fin de grabaEmpresaUsu ***********************************
     
-    */
+    
     
     /* **********************************************************************************
      * este metodo sirve para grabar en la DDBB la aceptación de la LPD y de las CGU
      * 
      * Recibe como argumento el login y el password y no devuelve nada 
      ********************************************************************************** */
-    /*
+    
     public void grabaCGULPD (String login, String pass) {
-           
+   /*        
     	// crea una conexion
     	Connection con=ConnectDB();
     	
@@ -765,17 +851,17 @@ public class ContaFileDAO implements FileSystemDates {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    
+    */
     }  // fin de grabaCGULPD ***********************************
      
-   */
+   
     
     /* *************************************************************
      * Este metodo comprueba si la lpd y las cgu estaban aceptadas
      * ambas han obtenido el valor en idExist()
      * retorna true si cumplen y false si no cumplen 
      *************************************************************** */
-    /*
+    
     public boolean cumpleCGULPD() {
     	
     	if ((this.cgu.equals("Y"))&&(this.lpd.equals("Y"))) {
@@ -785,107 +871,95 @@ public class ContaFileDAO implements FileSystemDates {
     	return false;
     }
     
-    */
+   
     
     /* **********************************************************************************
-     * Este metodo sirve para grabar en la DDBB los datos del usuario
+     * Este metodo sirve para grabar en el fichero los datos del usuario
      * 
      * Recibe como parametros un array con los datos de usuario
-     * un muy importante String oper ("INSERT" o "UPDATE") segun corresponda
+     * un String oper ("INSERT" o "UPDATE") que se mantiene por compatibilidad con DDBB
+     * pero no tiene utilidad
      * la categoria del usuario  siendo 1=manager, etc
      * 
      * Devuelve un true o false si hay errores 
      ********************************************************************************** */
-    /*
+    
     public boolean grabaUsuDB (String datosUsu[], String oper, int categoria) {
-           
-    	// crea una conexion
-    	Connection con=ConnectDB();
+        
+    	// crea una conexion al fichero de usuarios
+    	File fichero=null;
+    	FileWriter grabador=null;
+    	BufferedWriter buff=null;
     	
-    	Statement st=null;
     	try {
-    		st = con.createStatement();
-    	} catch (SQLException ex) {
-    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
-    		// si hay algun error cerramos la conexion y return null
-    		try {
-				con.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		return false;
-    	}
-    	
-    	// recoge los valores a grabar o actualizar
-      //  int id=(int)Integer.parseInt(datosUsu[0]); realmente es un autoincrement
-        String key=datosUsu[1];
-    	String nom=datosUsu[2];
-    	String log=datosUsu[3];
-    	String pas=datosUsu[4];
-    	String ema=datosUsu[5];
-    	int cat;
-    	if (datosUsu[6].equals("") || datosUsu[6]==null) {
-    		cat=0;
-    	} else cat=(int) Integer.parseInt(datosUsu[6]);
-    	String em1=datosUsu[7];
-    	String em2=datosUsu[8];
-    	String em3=datosUsu[9];
-    	String sel=datosUsu[10];
-    	int fec;
-    	if (datosUsu[11].equals("") || datosUsu[11]==null) {
-    		fec=0;
-    	} else  fec=(int) Integer.parseInt(datosUsu[11]);
-    	int act;
-    	if (datosUsu[12].equals("") || datosUsu[12]==null) {
-    		act=0;
-    	} else  act=(int) Integer.parseInt(datosUsu[12]);
-    	String lpd=datosUsu[13];
-    	String cgu=datosUsu[14];
-    	
-    	int rs=0;
-    	try {   
-    		if (oper.equals("UPDATE")) {
-    			rs = st.executeUpdate("UPDATE c_usuario SET keyuser='"+key+"', " +
-    				"nombre='"+nom+"', usuario='"+log+"', password='"+pas+"', email='"+ema+"'," +
-    				" categoria='"+cat+"', emp1='"+em1+"', emp2='"+em2+"',emp3='"+em3+"'," +
-    				" empselec='"+sel+"', yearselec='"+fec+"', activo='"+act+"',lpd='"+lpd+"'," +
-    						" cgu='"+cgu+"' WHERE keyuser='"+key+"' LIMIT 1");
-    		} else if (oper.equals("INSERT")) {
-    			rs = st.executeUpdate("INSERT c_usuario SET keyuser='"+key+"', " +
-        				"nombre='"+nom+"', usuario='"+log+"', password='"+pas+"', email='"+ema+"'," +
-        				" categoria='"+cat+"', emp1='"+em1+"', emp2='"+em2+"',emp3='"+em3+"'," +
-        				" empselec='"+sel+"', yearselec='"+fec+"', activo='"+act+"',lpd='"+lpd+"'," +
-        						" cgu='"+cgu+"' ");
-    		} else System.err.println("No se recibió orden de Update o Insert. Operación no efectuada ");
-    			
-    	} catch (SQLException ex) {
-    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
-    		// si hay algun error cerramos la conexion y return null
-    		try {
-				con.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		return false;
-    	} 
-
-    	// si todo ha ido bien
-    	// cerramos la conexion y retornamos el String[]
-    	try {
-			con.close();
-		} catch (SQLException e) {
+			fichero=new File(PathDataFiles+FileUsers);
+		} catch (Exception e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("Error en nombre de fichero");
+			e1.printStackTrace();
 			return false;
 		}
     	
+    	try {
+			grabador=new FileWriter(fichero,true);
+			buff=new BufferedWriter(grabador);
+		} catch (IOException e1) {
+			System.err.println("Error al abrir canal de grabación");
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return false;
+		}
+
+    	// recoge los valores a grabar o actualizar
+        String id="1"; 
+        String key=datosUsu[1];
+      	String nom=datosUsu[2];
+      	String log=datosUsu[3];
+      	String pas=datosUsu[4];
+      	String ema=datosUsu[5];
+      	String cat=datosUsu[6];
+      	String em1=datosUsu[7];
+      	String em2=datosUsu[8];
+      	String em3=datosUsu[9];
+      	String sel=datosUsu[10];
+      	String fec=datosUsu[11];
+      	String act=datosUsu[12];
+      	String lpd=datosUsu[13];
+      	String cgu=datosUsu[14];
+    	
+    	// se compone un String para grabar de una vez todos los campos
+    	// separados por punto y coma
+    	String rs;
+    	rs = id+";"+key+";"+nom+";"+log+";"+pas+";"+ema+";"+cat+";"+em1+";"+em2+";"+em3+
+    			";"+sel+";"+fec+";"+act+";"+lpd+";"+cgu;
+    		
+    	try {
+			buff.write(rs);
+			// se inserta una marca de linea para separar cada grabacion
+			buff.newLine();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			System.err.println("Error al grabar los datos de usuario");
+			e1.printStackTrace();
+			return false;
+		} finally {
+			try {
+				buff.flush();
+				buff.close();
+				grabador.close();
+			} catch (IOException e) {
+				System.err.println("Error en el proceso de cerrar grabación");	
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+    	// si todo ha ido bien retornamos true
     	return true;
     
     }  // fin de grabaUsuDB ***********************************
     
-    */
+    
     
     /* ***************************************************************
      * Este metodo sirve para comprobar en la tabla correspondiente 
@@ -966,82 +1040,80 @@ public class ContaFileDAO implements FileSystemDates {
      * Devuelve un null si hay errores
      * Si el keyEmp es correcto, devuelve un String[3] con nombres
      ********************************************************************************** */
-    /*
+    
     public String[] showNamesCompDB (String user[]) {
            
     	// crea una conexion
-    	Connection con=ConnectDB();
-    	
-    	Statement st=null;
-    	try {
-    		st = con.createStatement();
-    	} catch (SQLException ex) {
-    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
-    		// si hay algun error cerramos la conexion y return null
-    		try {
-				con.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		return null;
-    	}
+    	File fichero=null;
+    	FileReader lector=null;
+    	BufferedReader buff=null;
           
     	// cogemos los keyEmpr del array del usuario
     	String emp1=user[7];
     	String emp2=user[8];
     	String emp3=user[9];
-    	// preparamos un String para devolver la informacion solicitada
-    	String nameEmpr[]=new String[3];
     	
-    	ResultSet rs=null; 
-    	try {   
-    		rs = st.executeQuery("SELECT * FROM c_empresas WHERE keyempresa='"+emp1+"' || keyempresa='"+emp2+"' || keyempresa='"+emp3+"'");
-    	} catch (SQLException ex) {
-    		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
-    		// si hay algun error cerramos la conexion y return null
-    		try {
-				con.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		return null;
-    	} 
-       
-    
+    	ArrayList<String>nombres=new ArrayList<String>();
+    	
+    	// abrimos una conexion con el fichero
     	try {
-    		int n=0;
-    		while (rs.next()){ 
-    			// lee todos los nombres y los transforma a String
-    			nameEmpr[n] = rs.getString(3);
-    			n++;
-    		}
-    		
-    	} catch (SQLException ex) {
-    		// si hay algun error cerramos la conexion y return null
-    		try {
-				con.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		return null;
-    	} 
+			fichero=new File(PathDataFiles+FileCompanys);
 
-    	// si todo ha ido bien
-    	// cerramos la conexion y retornamos el String[]
-    	try {
-			con.close();
-		} catch (SQLException e) {
+	    	try {
+	    		// abrimos lecturas
+				lector=new FileReader(fichero);
+				buff=new BufferedReader(lector);
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				System.err.println("Error leyendo fichero");
+				e1.printStackTrace();
+				return null;
+			}
+	    	
+	    	// comenzamos la lectura linea a linea
+	    	String data=null;
+	    	String datosLectura[]=null;
+	    	
+	    	
+	    	while ((data=buff.readLine())!=null) {
+	    		// convertimos la lectura en array
+	    		datosLectura=leeDatos(data);
+	    		// si el key de empresa es igual a algun keyempr del usuario
+	    		if ((datosLectura[1].equals(emp1))||(datosLectura[1].equals(emp2))||(datosLectura[1].equals(emp3))){
+	    			// grabamos el nombre en el arrayList
+	    			nombres.add(datosLectura[2]);
+	    		} 
+	    	}
+	    	
+		} catch (Exception e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("Fichero no encontrado");
+			e1.printStackTrace();
+			return null;
+			
+		} finally {
+			
+			try {
+				buff.close();
+				lector.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.err.println("Error cerrando el fichero");
+				e.printStackTrace();
+				return null;
+			}
 		}
+    	
+    	// preparamos un String para devolver la informacion solicitada
+    	String nameEmpr[]=new String[nombres.size()];
+    	for (int n=0;n<nombres.size();n++){
+    		nameEmpr[n]=nombres.get(n);
+    	}
     	
     	return nameEmpr;
     
     } // fin de showNamesCompDB ***********************************
-    */
+    
     
     
     /* ***************************************************************
@@ -1055,9 +1127,9 @@ public class ContaFileDAO implements FileSystemDates {
      * Devuelve un boolean como respuesta
      * borrado = TRUE ; no borrado = FALSE
     ****************************************************************** */
- /*   
+  
     public boolean eraseCompany (String keyEmp) {
-        
+    	 /*    
         //  este metodo comprueba el key y devuelve true o false
             
     	// crea una conexion
@@ -1168,11 +1240,13 @@ public class ContaFileDAO implements FileSystemDates {
     				e.printStackTrace();
     				return false;
     			}
+    			
+    			*/
         return true;
         
     } // fin de eraseCompany ***********************************
     
-    */
+    
     
     /* **************************************************************************************
      * Metodo que lee los datos del diario para conformar el mayor solicitado
@@ -1193,7 +1267,7 @@ public class ContaFileDAO implements FileSystemDates {
      * D) Se transforma el ArrayList en un array[n][10] para devolver la informacion
      * 
      **************************************************************************************** */
-    /*
+    
     public String[][] leeMayor(String keyEmp,String cuentaIni,String cuentaFin,String fechaIni,String fechaFin) {   	
     	
     	// creamos el arrayList bidimensional 	
@@ -1201,47 +1275,97 @@ public class ContaFileDAO implements FileSystemDates {
     	// leemos las variables filtro - modificamos la fecha a formato date
     	String fec1=fechaIni.substring(6)+fechaIni.substring(2, 6)+fechaIni.substring(0, 2);
     	String fec2=fechaFin.substring(6)+fechaFin.substring(2, 6)+fechaFin.substring(0, 2);
-    	String cta1=cuentaIni;
-    	String cta2=cuentaFin;
+    	int cta1=(int)Integer.parseInt(cuentaIni);
+    	int cta2=(int)Integer.parseInt(cuentaFin);
     	
     	// primero componemos dinamicamente el nombre del fichero diario
     	// del cual leeremos los datos
     	String anno=fec1.substring(2, 4);
-    	String fichero="c_"+keyEmp+anno+"diario";
-    	
-
-
+    	String nomFichero="c_"+keyEmp+anno+"diario";
     	
     	// para obtener el nombre de las cuentas contables
     	// instanciamos el metodo getNamesCtas
     	// y recibimos un array con los numeros y nombres de cuentas
-    	String namesCta[][]=getNamesCtas(keyEmp,cta1,cta2);
+    	String namesCta[][]=getNamesCtas(keyEmp,cuentaIni,cuentaFin);
     	
     	if (namesCta==null) {
     		System.err.println("NO HAY NOMBRES PARA LEER");
     	}
+    	   	
+    	// crea una conexion con el fichero de diario empresa
+    	File fichero=null;
+    	FileReader lector=null;
+    	BufferedReader buff=null;
     	
+    	ArrayList<ArrayList<String>>asientos=new ArrayList<ArrayList<String>>();
     	
-    	// instanciamos una conexion
-    	Connection con= ConnectDB();
-    	// creamos un objeto statement
-    	Statement st=null;
+    	// abrimos una conexion con el fichero
     	try {
-			st=con.createStatement();
-		} catch (SQLException e) {
+			fichero=new File(PathDataFiles+nomFichero);
+
+	    	try {
+	    		// abrimos lecturas
+				lector=new FileReader(fichero);
+				buff=new BufferedReader(lector);
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				System.err.println("Error leyendo fichero");
+				e1.printStackTrace();
+				return null;
+			}
+	    	
+	    	// comenzamos la lectura linea a linea
+	    	String data=null;
+	    	String datosLectura[]=null;
+	    	int c1;
+	    	
+	    	while ((data=buff.readLine())!=null) {
+	    		// convertimos la lectura en array
+	    		datosLectura=leeDatos(data);
+	    		c1=(int)Integer.parseInt(datosLectura[3]);
+	    		// comparamos si los numeros de cuenta y el rango de fechas 
+	    		// son los buscados
+	    		if ((c1>=cta1)||(c1<=cta2)||(datosLectura[2].equals(fec1))||(datosLectura[2].equals(fec2))) {
+	    			// grabamos el asiento en un arrayList
+	    			ArrayList<String>asiento=new ArrayList<String>();
+	    			for (int i=0;i<datosLectura.length;i++) {
+	    				asiento.add(datosLectura[i]);
+	    			}
+	    			// grabamos el asiento en el arrayList de asientos
+	    			asientos.add(asiento);
+	    		} 
+	    	}
+	    	
+		} catch (Exception e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("Fichero no encontrado");
+			e1.printStackTrace();
+			return null;
+			
+		} finally {
+			
+			try {
+				buff.close();
+				lector.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.err.println("Error cerrando el fichero");
+				e.printStackTrace();
+				return null;
+			}
 		}
-    	// creamos un objeto resulset para recoger los datos
-    	ResultSet rs=null;
     	
-    	try {
-			rs=st.executeQuery("SELECT * FROM "+fichero+" WHERE fecha>='"+fec1+"' && fecha<='"+fec2+"' && cuenta>='"+cta1+"' && cuenta<='"+cta2+"' ORDER BY cuenta,fecha,numasto,numapunte ");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Error intentando select en fichero "+fichero);
-			e.printStackTrace();
-		}
+    	String mayor[][]=new String[asientos.size()][10];
+    	for (int k=0;k<asientos.size();k++){
+    		mayor[k]=asientos.get(k).toArray(new String[10]);
+    	}
+    	
+    	// creamos un objeto OrdenaAsientos y le pasamos
+    	// la matriz que contiene los apuntes contables
+    	OrdenaAsientos ordena=new OrdenaAsientos(mayor);
+    	// ejecutamos el metodo de reordenacion
+    	// nos devuelve un listado ordenado por cuentas y fechas
+    	mayor=ordena.reordenaMayor();
     	
     	// crea los distintos string[] para cada cuenta
     	// toda cuenta auxiliar tiene dos lineas de cabecera
@@ -1260,8 +1384,7 @@ public class ContaFileDAO implements FileSystemDates {
     	cabecera1[3]=fec1;
     	cabecera1[4]="Hasta: ";
     	cabecera1[5]=fec2;
-    	
-    	
+    	    	
     	cabecera2[0]="";
     	cabecera2[1]="Asiento";
     	cabecera2[2]="Apunte";
@@ -1272,7 +1395,6 @@ public class ContaFileDAO implements FileSystemDates {
     	cabecera2[7]="Debe";
     	cabecera2[8]="Haber";
     	cabecera2[9]="Saldo";
-    	
     	
     	context[6]="____________";
     	context[7]="____________";
@@ -1286,7 +1408,7 @@ public class ContaFileDAO implements FileSystemDates {
     	int n=0;	// MOVIMIENTOS LEIDOS
     	int c=0;	// NOMBRE DE CUENTAS LEIDOS
     	
-    	try {
+    	
     		String cuentaOld=""; 			// guarda la cuenta leida ultima
     		float sumasdebe=0;				// aqui acumula sumas al debe
     		float sumashaber=0;				// aqui acumula sumas al haber
@@ -1323,16 +1445,16 @@ public class ContaFileDAO implements FileSystemDates {
     		datosLeidos.get(n).add(cabecera2[8]);
     		datosLeidos.get(n).add(cabecera2[9]);
     		
-			while(rs.next()) {
+			for (int k=0;k<mayor.length;k++) {
 				
 				//******** AQUI SE LEE UN MOVIMIENTO Y ALMACENA EN MATRIZ
-				datos[0]=String.valueOf(rs.getInt(1));
-				datos[1]=String.valueOf(rs.getInt(2));
-				datos[2]=String.valueOf(rs.getDate(3));
-				datos[3]=rs.getString(5);
-				datos[4]=rs.getString(6);
-				datos[5]=rs.getString(7);
-				datos[9]=rs.getString(4);
+				datos[0]=mayor[k][0];
+				datos[1]=mayor[k][1];
+				datos[2]=mayor[k][2];
+				datos[3]=mayor[k][4];
+				datos[4]=mayor[k][5];
+				datos[5]=mayor[k][6];
+				datos[9]=mayor[k][3];
 				// si fuera el primer movimiento debe cambiar
 				// la variable de control cuentaOld
 				if (cuentaOld.isEmpty()) cuentaOld=datos[9];
@@ -1343,20 +1465,20 @@ public class ContaFileDAO implements FileSystemDates {
 					// leido, entonces lo integra en la misma cuenta
 					
 					// acumulacion de saldos
-					if (rs.getString(8).equals("1")){
+					if (mayor[k][7].equals("1")){
 						// es un movimiento al debe
-						datos[6]=dosdecimales(rs.getString(9));
+						datos[6]=dosdecimales(mayor[k][8]);
 						datos[7]=dosdecimales("0");
 						// lo suma al saldo
-						sumasdebe+=(float)Float.parseFloat(rs.getString(9));
-						acumula+=(float)Float.parseFloat(rs.getString(9));
+						sumasdebe+=(float)Float.parseFloat(mayor[k][8]);
+						acumula+=(float)Float.parseFloat(mayor[k][8]);
 					} else {
 						// es un movimiento al haber
 						datos[6]=dosdecimales("0");
-						datos[7]=dosdecimales(rs.getString(9));
+						datos[7]=dosdecimales(mayor[k][8]);
 						// lo resta del saldo
-						sumashaber+=(float)Float.parseFloat(rs.getString(9));
-						acumula-=(float)Float.parseFloat(rs.getString(9));
+						sumashaber+=(float)Float.parseFloat(mayor[k][8]);
+						acumula-=(float)Float.parseFloat(mayor[k][8]);
 					}
 					datos[8]=dosdecimales(String.valueOf(acumula));
 				
@@ -1392,20 +1514,20 @@ public class ContaFileDAO implements FileSystemDates {
 					acumula=0;
 					
 					// acumulacion de los nuevos saldos
-					if (rs.getString(8).equals("1")){
+					if (mayor[k][7].equals("1")){
 						// es un movimiento al debe
-						datos[6]=dosdecimales(rs.getString(9));
+						datos[6]=dosdecimales(mayor[k][8]);
 						datos[7]=dosdecimales("0");
 						// lo suma al saldo
-						sumasdebe=(float)Float.parseFloat(rs.getString(9));
-						acumula=(float)Float.parseFloat(rs.getString(9));
+						sumasdebe=(float)Float.parseFloat(mayor[k][8]);
+						acumula=(float)Float.parseFloat(mayor[k][8]);
 					} else {
 						// es un movimiento al haber
 						datos[6]=dosdecimales("0");
-						datos[7]=dosdecimales(rs.getString(9));
+						datos[7]=dosdecimales(mayor[k][8]);
 						// lo resta del saldo
-						sumashaber=(float)Float.parseFloat(rs.getString(9));
-						acumula=-(float)Float.parseFloat(rs.getString(9));
+						sumashaber=(float)Float.parseFloat(mayor[k][8]);
+						acumula=-(float)Float.parseFloat(mayor[k][8]);
 					}
 					datos[8]=dosdecimales(String.valueOf(acumula));
 					
@@ -1500,7 +1622,7 @@ public class ContaFileDAO implements FileSystemDates {
 				}
 				
 				
-			} // fin del while
+			} // fin del FOR
 			
 			// hay que grabar la ultima cuenta
 			// cuando cambia de cuenta guarda los acumulados
@@ -1547,12 +1669,7 @@ public class ContaFileDAO implements FileSystemDates {
     		datosLeidos.get(n).add(sumas2[6]);
     		datosLeidos.get(n).add(sumas2[7]);
     		datosLeidos.get(n).add(sumas2[8]);
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
- 
+			 
     	// en el final, se transforma el arrayList en un array[n][10]
     	String lectura[][]=new String[datosLeidos.size()][10];
     	
@@ -1564,7 +1681,7 @@ public class ContaFileDAO implements FileSystemDates {
     	
     } // *************** fin del metodo leeMayor
 
-*/
+
 
     /* ************************************************************************
      * Este metodo devuelve un array con los numeros y nombres de las cuentas
@@ -1683,7 +1800,7 @@ public class ContaFileDAO implements FileSystemDates {
     	/*
     	int p1=Math.round((float)Float.parseFloat(cantidad)*100);
     	float p2=(float)p1/100;
-    	System.out.println("Numeros: "+p1+" * "+p2);
+    	System.err.println("Numeros: "+p1+" * "+p2);
     	*/
     	String nuevoNumero="0";
     	
@@ -1753,12 +1870,151 @@ public class ContaFileDAO implements FileSystemDates {
     		nuevoNumero=cantidad+",00";
     		
     	}
-    		
-    	
+    			
     	return nuevoNumero;
-    }
+    	
+    } // fin del metodo dosdecimales
   
-	
+    
+	public String[][] leeDiario (String keyEmpresa,String nombreCompany,String fechaInicial,String fechaFinal,String lineas) {
+		// void
+		return null;
+	}
+    
+    
+    
+    /* ************************************************************************
+     *  CLASE INTERNA ORDENAASIENTOS
+     *  
+     *  Esta clase se diseña para implementar comparator
+     *  
+     *  El objetivo de esta clase es recibir un String[][] con movimientos
+     *  contables y reordenarlos según los distintos metodos
+     *  
+     *  EL metodo reordenaMayor realiza una ordenacion por cuenta y fecha de la
+     *  matriz recibida
+     *  
+     *  El metodo reordenaAsientos realiza una ordenacion por numero de asiento
+     *  y fecha de la matriz recibida
+     *  
+     ************************************************************************** */
+    
+    
+    
+	public class OrdenaAsientos implements Comparator{
+		
+		private String asientos[][];
+		
+		
+		public OrdenaAsientos(String movimientos[][]) {
+			
+			this.asientos=movimientos;
+			
+		} // fin del constructor
+		
+		
+		
+		/* *******************************************************************
+		 *  Este metodo reordena el mayor por cuenta y fecha
+		 *  
+		 *  No recibe parametros, utiliza la variable String[][] private
+		 *  de clase para operar con ella
+		 *  Invoca el metodo compare con 3(cuenta) y 2(fecha)
+		 *  Devuelve la matriz ordenada
+		 ********************************************************************/
+		
+		public String[][] reordenaMayor() {
+			
+			String buff[];
+			for (int i=1;i<asientos.length;i++) {
+				for (int j=0;j<i;j++){
+					if (compare(asientos[j],asientos[j+1],3,2)>0){
+						buff=asientos[j];
+						asientos[j]=asientos[j+1];
+						asientos[j+1]=buff;
+					}
+				}
+			}			
+			
+			return asientos;
+			
+		} // fin del metodo reordenaMayor
+
+		
+
+		/* *******************************************************************
+		 *  Este metodo reordena el diario por cuenta y fecha
+		 *  
+		 *  No recibe parametros, utiliza la variable String[][] private
+		 *  de clase para operar con ella
+		 *  Invoca el metodo compare con 0(asiento) y 2(fecha)
+		 *  Devuelve la matriz ordenada
+		 ********************************************************************/
+		
+		public String[][] reordenaAsientos() {
+			
+			String buff[];
+			for (int i=1;i<asientos.length;i++) {
+				for (int j=0;j<i;j++){
+					if (compare(asientos[j],asientos[j+1],0,2)>0){
+						buff=asientos[j];
+						asientos[j]=asientos[j+1];
+						asientos[j+1]=buff;
+					}
+				}
+			}			
+			
+			return asientos;
+			
+		} // fin del metodo reordenaAsientos
+		
+		
+		
+		/* ***************************************************************************
+		 * El metodo compare va a comparar dos int que vienen envueltos
+		 * en un String[].
+		 * Si son iguales compara dos Strings
+		 * 
+		 * Se utiliza para ordenar mayores (por cuenta y fecha)
+		 * y diarios (por asiento y fecha)
+		 * 
+		 * Recibe como parametros los dos String[] a comparar,
+		 * int n1 es la posicion del int a comparar y n2 la del String a comparar
+		 * 
+		 * Devuelve el 0=igual -1=menor 1=mayor y por lo tanto reordena
+		 ************************************************************************ **/
+		
+		public int compare(String o1[], String o2[], int n1, int n2) {
+			// compara dos integers y si lo son
+			// compara dos strings
+			int cta1=(int)Integer.parseInt(o1[n1]);
+			int cta2=(int)Integer.parseInt(o2[n1]);
+			
+			if (cta1==cta2) {
+				if (o1[n2].equals(o2[n2])) {
+					// si son igual cuenta y fecha
+					return 0;
+				} else if (0<(o1[n2].compareTo(o2[n2]))) {
+					// es fecha posterior, cambiar
+					return 1;
+				} return -1; // es fecha anterior
+			}
+			
+			if (cta1>cta2) {
+				// es una cuenta mayor, cambiar
+				return 1;
+			} else return -1; //es una cuenta menor
+			
+		} // fin del metodo compare Strings
+
+		
+		
+		public int compare(Object o1, Object o2) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+		
+	} // ******************* fin de la clase interna ordenaAsientos
 	
 	
 	
