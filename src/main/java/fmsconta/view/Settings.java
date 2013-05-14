@@ -13,5 +13,8 @@ interface Settings extends PersonalSettings{
 	final Font Fuente3=new Font("",Font.PLAIN,12);
 	final Font Fuente4=new Font("",Font.PLAIN,8);
 	
+	final int LongAuxiliares=8;
+	final int LongMinima=7;
+	final int LongMaxima=9;
 	
 }
