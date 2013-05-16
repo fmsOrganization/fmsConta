@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import fmsconta.control.ContaDAO;
+import fmsconta.control.Fmsconta1;
 
 public class ContListadoSyS extends JFrame implements ActionListener,Settings  {
 		
@@ -42,7 +43,7 @@ public class ContListadoSyS extends JFrame implements ActionListener,Settings  {
 	 ************************************************************ */
 	
 	protected ContListadoSyS(String keyEmpresa, String nombreCompany,String ctaInicial,
-			String ctaFinal, String fechaInicial, String fechaFinal) {
+			String ctaFinal, String fechaInicial, String fechaFinal, boolean nivel3) {
 		
 		sumasSaldos=new JPanel();
 		sumasSaldos.setLayout(new BoxLayout(sumasSaldos,BoxLayout.Y_AXIS));
@@ -77,7 +78,7 @@ public class ContListadoSyS extends JFrame implements ActionListener,Settings  {
 		ContaDAO dao=new ContaDAO();
 		// obtenemos un array[n][10] compuesto y ordenado
 		// para imprimir directamente, segun los datos facilitados
-		datos2=dao.leeSumasySaldos(keyEmpresa, ctaInicial, ctaFinal, fechaInicial,fechaFinal);
+		datos2=dao.leeSumasySaldos(keyEmpresa, ctaInicial, ctaFinal, fechaInicial,fechaFinal,nivel3);
 
 		// mostraremos la informacion en JLabels dinamicos
 		JLabel[][] lab=new JLabel[datos2.length][7];
@@ -111,6 +112,7 @@ public class ContListadoSyS extends JFrame implements ActionListener,Settings  {
 			}
 			
 		}
+		
 		sizeComponent=(lab.length);
 		
 		center1.add(listadoDatos);

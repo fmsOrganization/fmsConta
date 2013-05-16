@@ -5,12 +5,16 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
+
+import fmsconta.view.PantallaPrincipal;
 
 
 
@@ -1343,9 +1347,6 @@ public class ContaDAO implements SystemDates{
     	String anno=fec1.substring(2, 4);
     	String fichero="c_"+keyEmp+anno+"diario";
     	
-
-
-    	
     	// para obtener el nombre de las cuentas contables
     	// instanciamos el metodo getNamesCtas
     	// y recibimos un array con los numeros y nombres de cuentas
@@ -1780,11 +1781,24 @@ public class ContaDAO implements SystemDates{
      ************************************************************************* */
     
     private String dosdecimales(String cantidad) {
-    /*
-    	int p1=Math.round((float)Float.parseFloat(cantidad)*100);
+    
+    	// creamos la variable de retorno
+    	String nuevoNumero="0,00";
+    	
+    	// redondeamos el numero a dos decimales matematicos
+    	float p1=Math.round((float)Float.parseFloat(cantidad)*100);
     	float p2=(float)p1/100;
-    	System.out.println("Numeros: "+p1+" * "+p2);
-    	*/
+    	
+    	// tomaos el set de formato de numeros italiano, semejante al español
+    	NumberFormat nf=NumberFormat.getInstance(Locale.ITALIAN);
+    	// indicamos que queremos siempre el mismo numero de decimales
+    	nf.setMinimumFractionDigits(2);
+    	nf.setMaximumFractionDigits(2);
+    	// devolvemos el numero formateado 
+    	nuevoNumero=nf.format(p2);
+    	
+    	
+    	/*
     	String nuevoNumero="0";
     	
     	// primero comprobamos si tiene el separador de decimal
@@ -1842,6 +1856,12 @@ public class ContaDAO implements SystemDates{
     			cadena1=String.valueOf(entera);
     		}
     		
+    		// finalmente, ponemos el punto de miles a la parte entera
+    		int longCadena=cadena1.length();
+    		if (cadena1.length()>9) {
+    			cadena1=cadena1.substring(0, 3)+"."+cadena1.substring(3,6)+"."+cadena1.substring(3,6);
+    		}
+    		
     		// componemos el numero uniendo la parte entera y la decimal
     		nuevoNumero=cadena1+cadena2;
     		
@@ -1853,7 +1873,7 @@ public class ContaDAO implements SystemDates{
     		nuevoNumero=cantidad+",00";
     		
     	}
-    		
+    		*/
     	
     	return nuevoNumero;
     }
@@ -2278,10 +2298,1109 @@ public class ContaDAO implements SystemDates{
     
     
     
+    /* **************************************************************************************
+     * Metodo que lee los datos del diario para conformar el balance de sumas y saldos
+     * 
+     * Recibe como parametros el key de la empresa, la cuenta inicial y la cuenta final
+     * a listar, y el intervalo de fecha inicial y final
+     * 
+     * Devuelve un Array[n][6] con un listado ya confeccionado con cabeceras y sumatorios
+     * 
+     * PROCEDIMIENTO:
+     * A) Con los datos recibidos se componen los datos de la busqueda a realizar
+     *    se compone el fichero del diario de la empresa correspondiente, se preparan los
+     *    filtros para la busqueda y se hace un SELECT en la DDBB
+     * B) Se preparan las cabeceras y los finales que se imprimiran con cada cuenta
+     * C) Se leen y componen en el formato adecuado de salida los distintos movimientos
+     *    de cada cuenta. Hay que tener muy en cuenta el caso de el cambio de cuenta para
+     *    el tema de acumulados y cabeceras 
+     * D) Se transforma el ArrayList en un array[n][10] para devolver la informacion
+     * 
+     **************************************************************************************** */
+    
+    public String[][] leeSumasySaldos(String keyEmp,String cuentaIni,String cuentaFin,String fechaIni,String fechaFin, boolean nivel3) {   	
+    	
+    	// creamos el arrayList bidimensional 	
+    	ArrayList<ArrayList<String>> datosLeidos=new ArrayList<ArrayList<String>>();
+    	// leemos las variables filtro - modificamos la fecha a formato date
+    	String fec1=fechaIni.substring(6)+fechaIni.substring(2, 6)+fechaIni.substring(0, 2);
+    	String fec2=fechaFin.substring(6)+fechaFin.substring(2, 6)+fechaFin.substring(0, 2);
+    	String cta1=cuentaIni;
+    	String cta2=cuentaFin;
+    	
+    	// primero componemos dinamicamente el nombre del fichero diario
+    	// del cual leeremos los datos
+    	String anno=fec1.substring(2, 4);
+    	String fichero="c_"+keyEmp+anno+"diario";
+
+    	
+    	// para obtener el nombre de las cuentas contables
+    	// instanciamos el metodo getNamesCtas
+    	// y recibimos un array con los numeros y nombres de cuentas
+
+    	// se modifica el primer parametro para que coja tambien
+    	// la cuenta de mayor
+    	String namesCta[][]=getNamesCtas(keyEmp,cta1.substring(0, 3),cta2);
+    	
+    	if (namesCta==null) {
+    		System.err.println("NO HAY NOMBRES PARA LEER");
+    	}
+    	
+    	
+    	// instanciamos una conexion
+    	Connection con= ConnectDB();
+    	// creamos un objeto statement
+    	Statement st=null;
+    	try {
+			st=con.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	// creamos un objeto resulset para recoger los datos
+    	ResultSet rs=null;
+    	
+    	try {
+			rs=st.executeQuery("SELECT * FROM "+fichero+" WHERE fecha>='"+fec1+"' && fecha<='"+fec2+"' && cuenta>='"+cta1+"' && cuenta<='"+cta2+"' ORDER BY cuenta,fecha,numasto,numapunte ");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			System.err.println("Error intentando select en fichero "+fichero);
+			e.printStackTrace();
+		}
+
+    	// si han elegido cuentas de nivel 3, se procede a leer
+    	// las cuentas a nivel 3
+    	String ctasNivel3[][] = null;
+    	if (nivel3) {
+    		//recibimos un array con sumas y saldos a nivel 3
+    		ctasNivel3=leeSumasySaldosNivel3(rs,namesCta);
+    		System.out.println("longitud "+ctasNivel3.length);
+    	}
+    	
+    	// crea los distintos string[] para cada cuenta
+    	// toda cuenta auxiliar tiene dos lineas de cabecera
+    	// n lineas de datos
+    	// y finalmente tres lineas de cierre de cuenta
+    	String cabecera1[]=new String[6];
+    	String cabecera2[]=new String[6];
+    	String cabecera3[]=new String[6];
+    	String datos[]=new String[6];
+    	String sumas1[]=new String[6];
+    	String sumas2[]=new String[6];
+    	
+    	// dando formato a datos prefijados de los String
+    	cabecera1[0]="Fecha: "+PantallaPrincipal.Today;
+    	cabecera1[1]="Empresa: "+PantallaPrincipal.Company;
+    	cabecera1[2]=" ";
+    	cabecera1[3]=" ";
+    	cabecera1[4]=" ";
+    	cabecera1[5]=" ";
+    	
+    	cabecera2[0]="";
+    	cabecera2[1]="Balance de Sumas y Saldos";
+    	cabecera2[2]="Desde: ";
+    	cabecera2[3]=fechaIni;
+    	cabecera2[4]="Hasta: ";
+    	cabecera2[5]=fechaFin;
+    	
+    	cabecera3[0]="Cuenta";
+    	cabecera3[1]="Descripción";
+    	cabecera3[2]="Sumas Debe";
+    	cabecera3[3]="Sumas Haber";
+    	cabecera3[4]="Saldos Debe";
+    	cabecera3[5]="Saldos Haber";
+
+    	sumas1[0]=" ";
+    	sumas1[1]="     SUMAS TOTALES........ ";
+    	sumas1[2]=" ";
+    	sumas1[3]=" ";
+    	sumas1[4]=" ";
+    	sumas1[5]=" ";
+    	
+    	sumas2[0]=" ";
+    	sumas2[1]=" ";
+    	sumas2[2]=" ";
+    	sumas2[3]=" ";
+    	sumas2[4]="Diferencia";
+    	sumas2[5]=" ";
+    	
+    	
+    	int n=0;	// MOVIMIENTOS LEIDOS
+    	int c=0;	// NUMERO DE CUENTAS LEIDAS
+    
+		String cuentaOld=""; 			// guarda la cuenta leida ultima
+		float acumuladoDebe=0;			// aqui acumula sumas al debe del balance
+		float acumuladoHaber=0;			// aqui acumula sumas al haber del balance
+		float saldosDebe=0;				// aqui acumula saldos acumulados debe del balance
+		float saldosHaber=0;			// aqui acumula saldos acumulados haber del balance
+		float sumasdebe=0;				// aqui acumula sumas al debe de cada cuenta
+		float sumashaber=0;				// aqui acumula sumas al haber de cada cuenta
+		float acumula=0;				// aqui acumula los saldos de cada cuenta
+		
+		int counterNivel3=0;			// contador del nivel 3
+    	
+    	try {
+    		
+    		// graba la primera cabecera y empieza
+    		datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(cabecera1[0]);
+    		datosLeidos.get(n).add(cabecera1[1]);
+    		datosLeidos.get(n).add(cabecera1[2]);
+    		datosLeidos.get(n).add(cabecera1[3]);
+    		datosLeidos.get(n).add(cabecera1[4]);
+    		datosLeidos.get(n).add(cabecera1[5]);	
+    		n++;
+    		datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(cabecera2[0]);
+    		datosLeidos.get(n).add(cabecera2[1]);
+    		datosLeidos.get(n).add(cabecera2[2]);
+    		datosLeidos.get(n).add(cabecera2[3]);
+    		datosLeidos.get(n).add(cabecera2[4]);
+    		datosLeidos.get(n).add(cabecera2[5]);
+    		n++;
+    		datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(cabecera3[0]);
+    		datosLeidos.get(n).add(cabecera3[1]);
+    		datosLeidos.get(n).add(cabecera3[2]);
+    		datosLeidos.get(n).add(cabecera3[3]);
+    		datosLeidos.get(n).add(cabecera3[4]);
+    		datosLeidos.get(n).add(cabecera3[5]);
+    		
+    		// devolvemos el punto del rs al punto inicial
+    		rs.beforeFirst();
+			while(rs.next()) {
+				
+				//******** AQUI SE LEE UN MOVIMIENTO Y ALMACENA EN MATRIZ
+				datos[0]=rs.getString(4);
+				// si fuera el primer movimiento debe cambiar
+				// la variable de control cuentaOld
+				if (cuentaOld.isEmpty()||cuentaOld.equals("")) cuentaOld=datos[0];
+								
+				if ((cuentaOld.equals(datos[0]))){ 
+					// si el movimiento leido es de la misma cuenta que el anterior movimiento
+					// leido, entonces lo integra en la misma cuenta
+					
+					// acumulacion de saldos
+					if (rs.getString(8).equals("1")){
+						// es un movimiento al debe;
+						// lo suma al saldo
+						sumasdebe+=(float)Float.parseFloat(rs.getString(9));
+						//acumula+=(float)Float.parseFloat(rs.getString(9));
+					} else {
+						// es un movimiento al haber
+						// lo resta del saldo
+						sumashaber+=(float)Float.parseFloat(rs.getString(9));
+					//	acumula-=(float)Float.parseFloat(rs.getString(9));
+					}
+				
+
+				} else {
+				
+					// si la cuenta no coincide con la cuenta del movimiento anterior
+					// se cambia el control (cuentaOld), se cierra la cuenta y se 
+					// imprime la linea del balance
+						
+					// antes de nada, comprobamos si tenemos que copiar la cuenta 
+					// de nivel 3 en el arrayList
+					
+					if (nivel3) {
+						System.out.println("num "+counterNivel3+"**"+ctasNivel3[counterNivel3][0]+"**");
+						if ((ctasNivel3[counterNivel3][0].substring(0, 3)).equals(cuentaOld.substring(0, 3))) {
+							// esto funciona porque las cuentas de nivel 3 
+							// estan por orden de numero al igual que las ctas auxiliares
+							n++;
+							datosLeidos.add(new ArrayList<String>());
+				    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][0]+"****");
+				    		datosLeidos.get(n).add("****"+ctasNivel3[counterNivel3][1]);
+				    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][2]+" **");
+				    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][3]+" **");
+				    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][4]+" **");
+				    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][5]+" **");
+				    		counterNivel3++;
+				    		//if (counterNivel3>=ctasNivel3.length) counterNivel3=ctasNivel3.length-1;
+						}
+					}
+					
+					
+		    		// si el encontramos el numero de la cuenta en el 
+		    		// array de nombres, le ponemos nombre a la cuenta
+		    		c=0;
+		    		while ( c < namesCta.length) {
+			    		if (namesCta[c][0].equals(cuentaOld)) {
+			    			datos[1]=namesCta[c][1];
+			    			break;
+			    		}
+		    			c++;
+		    		}
+						
+					// cuando cambia de cuenta guarda los acumulados
+					datos[2]=dosdecimales(String.valueOf(sumasdebe));
+					datos[3]=dosdecimales(String.valueOf(sumashaber));
+					acumula=(sumasdebe-sumashaber);
+					if (acumula>0) {
+						datos[4]=dosdecimales(String.valueOf(acumula));
+						datos[5]="0,00";
+						saldosDebe+=acumula;
+					} else {
+						datos[4]="0,00";
+						datos[5]=dosdecimales(String.valueOf(-acumula));
+						saldosHaber+=(-acumula);
+					}
+								
+					// operaciones sobre acumulados
+					acumuladoDebe+=sumasdebe;
+					acumuladoHaber+=sumashaber;
+					sumasdebe=0;
+					sumashaber=0;				
+					acumula=0;
+
+					// imprime la linea
+					n++;
+					datosLeidos.add(new ArrayList<String>());
+		    		datosLeidos.get(n).add(cuentaOld);
+		    		datosLeidos.get(n).add(datos[1]);
+		    		datosLeidos.get(n).add(datos[2]);
+		    		datosLeidos.get(n).add(datos[3]);
+		    		datosLeidos.get(n).add(datos[4]);
+		    		datosLeidos.get(n).add(datos[5]);
+
+					// cambia el cuentaOld
+					cuentaOld=datos[0];
+					
+					// y ahora guardamos la nueva informacion
+					// acumulacion de saldos
+					if (rs.getString(8).equals("1")){
+						// es un movimiento al debe;
+						// lo suma al saldo
+						sumasdebe+=(float)Float.parseFloat(rs.getString(9));
+
+					} else {
+						// es un movimiento al haber
+						// lo resta del saldo
+						sumashaber+=(float)Float.parseFloat(rs.getString(9));
+
+					}
+				}
+		
+			} // fin del while
+			
+			// hay que grabar la ultima cuenta
+			// cuando cambia de cuenta guarda los acumulados
+			// cambia el cuentaOld
+			cuentaOld=datos[0];
+			
+			if (nivel3 && counterNivel3!=ctasNivel3.length) {
+				System.out.println("num "+counterNivel3+"**"+ctasNivel3[counterNivel3][0]+"**");
+				if ((ctasNivel3[counterNivel3][0].substring(0, 3)).equals(cuentaOld.substring(0, 3))) {
+					// esto funciona porque las cuentas de nivel 3 
+					// estan por orden de numero al igual que las ctas auxiliares
+					n++;
+					datosLeidos.add(new ArrayList<String>());
+		    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][0]+"****");
+		    		datosLeidos.get(n).add("****"+ctasNivel3[counterNivel3][1]);
+		    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][2]+" **");
+		    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][3]+" **");
+		    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][4]+" **");
+		    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][5]+" **");
+
+				}
+			}
+
+				
+			// cuando cambia de cuenta guarda los acumulados
+			datos[2]=dosdecimales(String.valueOf(sumasdebe));
+			datos[3]=dosdecimales(String.valueOf(sumashaber));
+			acumula=(sumasdebe-sumashaber);
+			if (acumula>0) {
+				datos[4]=dosdecimales(String.valueOf(acumula));
+				datos[5]="0,00";
+				saldosDebe+=acumula;
+			} else {
+				datos[5]=dosdecimales(String.valueOf(-acumula));
+				datos[4]="0,00";
+				saldosHaber+=(-acumula);
+			}
+			
+			// operaciones sobre acumulados
+			acumuladoDebe+=sumasdebe;
+			acumuladoHaber+=sumashaber;
+			
+			sumasdebe=0;
+			sumashaber=0;				
+			acumula=0;
+
+    		// si el encontramos el numero de la cuenta en el 
+    		// array de nombres, le ponemos nombre a la cuenta
+    		c=0;
+    		while ( c < namesCta.length) {
+	    		if (namesCta[c][0].equals(datos[0])) {
+	    			datos[1]=namesCta[c][1];
+	    			break;
+	    		}
+    			c++;
+    		}
+
+			// imprime la ultima linea
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(datos[0]);
+    		datosLeidos.get(n).add(datos[1]);
+    		datosLeidos.get(n).add(datos[2]);
+    		datosLeidos.get(n).add(datos[3]);
+    		datosLeidos.get(n).add(datos[4]);
+    		datosLeidos.get(n).add(datos[5]);		
+			
+    		// preparamos info
+    		sumas1[2]=dosdecimales(String.valueOf(acumuladoDebe));
+    		sumas1[3]=dosdecimales(String.valueOf(acumuladoHaber));
+    		sumas1[4]=dosdecimales(String.valueOf(saldosDebe));
+    		sumas1[5]=dosdecimales(String.valueOf(saldosHaber));
+			// añade los acumulados al array final
+    		n++;
+    		datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas1[0]);
+    		datosLeidos.get(n).add(sumas1[1]);
+    		datosLeidos.get(n).add(sumas1[2]);
+    		datosLeidos.get(n).add(sumas1[3]);
+    		datosLeidos.get(n).add(sumas1[4]);
+    		datosLeidos.get(n).add(sumas1[5]);
+    		// preparamos info
+    		
+    		sumas2[5]=dosdecimales(String.valueOf(-(saldosHaber-saldosDebe)));
+    		// añade los acumulados al array final
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas2[0]);
+    		datosLeidos.get(n).add(sumas2[1]);
+    		datosLeidos.get(n).add(sumas2[2]);
+    		datosLeidos.get(n).add(sumas2[3]);
+    		datosLeidos.get(n).add(sumas2[4]);
+    		datosLeidos.get(n).add(sumas2[5]);
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+ 
+    	// en el final, se transforma el arrayList en un array[n][10]
+    	String lectura[][]=new String[datosLeidos.size()][6];
+    	
+    	for (int i=0;i<datosLeidos.size();i++) {
+    		lectura[i]=datosLeidos.get(i).toArray(new String[6]);
+    	}
+    	// se devuelve el array con la informacion a listar
+    	return lectura;
+    	
+    } //  fin del metodo leeSumasySaldos
     
     
     
+    /* **************************************************************************************
+     * Metodo que lee los datos del diario para conformar el balance de sumas y saldos
+     * 
+     * Recibe como parametros el key de la empresa, la cuenta inicial y la cuenta final
+     * a listar, y el intervalo de fecha inicial y final
+     * 
+     * Devuelve un Array[n][6] con un listado ya confeccionado con cabeceras y sumatorios
+     * 
+     * PROCEDIMIENTO:
+     * A) Con los datos recibidos se componen los datos de la busqueda a realizar
+     *    se compone el fichero del diario de la empresa correspondiente, se preparan los
+     *    filtros para la busqueda y se hace un SELECT en la DDBB
+     * B) Se preparan las cabeceras y los finales que se imprimiran con cada cuenta
+     * C) Se leen y componen en el formato adecuado de salida los distintos movimientos
+     *    de cada cuenta. Hay que tener muy en cuenta el caso de el cambio de cuenta para
+     *    el tema de acumulados y cabeceras 
+     * D) Se transforma el ArrayList en un array[n][10] para devolver la informacion
+     * 
+     **************************************************************************************** */
     
+    public String[][] leeSumasySaldosNivel3(ResultSet rs,String namesCta[][]) {   	
+    	
+    	// creamos el arrayList bidimensional 	
+    	ArrayList<ArrayList<String>> datosNivel3=new ArrayList<ArrayList<String>>();
+    	
+    	// crea los distintos string[] para cada cuenta
+    	// toda cuenta auxiliar tiene dos lineas de cabecera
+    	// n lineas de datos
+    	// y finalmente tres lineas de cierre de cuenta
+
+    	String cnivel3[]=new String[6];
+    	
+    	cnivel3[0]="0";
+    	cnivel3[1]="0";
+    	cnivel3[2]="0";
+    	cnivel3[3]="0";
+    	cnivel3[4]="0";
+    	cnivel3[5]="0";
+    	
+    	
+    	int n=0;	// MOVIMIENTOS LEIDOS
+    	int c=0;	// NUMERO DE CUENTAS LEIDAS
+    
+		String cuentaNew="";			// guarda la cuenta auxiliar leida nueva
+		String cuentaOld3=""; 			// guarda la cuenta leida ultima
+		
+		float acumula=0;				// aqui acumula los saldos de cada cuenta
+		float saldosDebe3=0;			// aqui acumula saldos acumulados debe del balance nivel 3
+		float saldosHaber3=0;			// aqui acumula saldos acumulados haber del balance nivel 3
+		float sumasDebe3=0;				// aqui acumula sumas al debe de cada cuenta nivel 3
+		float sumasHaber3=0;			// aqui acumula sumas al haber de cada cuenta nivel 3
+    	
+    	try {
+    		
+			while(rs.next()) {
+				
+				//******** AQUI SE LEE UN MOVIMIENTO Y ALMACENA EN MATRIZ
+				cuentaNew=rs.getString(4).substring(0, 3);
+				// si fuera el primer movimiento debe cambiar
+				// la variable de control cuentaOld
+				if (cuentaOld3.isEmpty()||cuentaOld3.equals("")) {
+					cuentaOld3=cuentaNew;
+				}
+								
+				if ((cuentaOld3.equals(cuentaNew))){ 
+					// si el movimiento leido es de la misma cuenta que el anterior movimiento
+					// leido, entonces lo integra en la misma cuenta
+					
+					// acumulacion de saldos
+					if (rs.getString(8).equals("1")){
+						// es un movimiento al debe;
+						// lo suma al saldo
+						sumasDebe3+=(float)Float.parseFloat(rs.getString(9));
+					} else {
+						// es un movimiento al haber
+						// lo resta del saldo
+						sumasHaber3+=(float)Float.parseFloat(rs.getString(9));
+					}
+				
+
+				} else {
+				
+					// si la cuenta no coincide con la cuenta del movimiento anterior
+					// se cambia el control (cuentaOld), se cierra la cuenta y se 
+					// imprime la linea del balance
+						
+		    		// si el encontramos el numero de la cuenta en el 
+		    		// array de nombres, le ponemos nombre a la cuenta
+		    		c=0;
+		    		while ( c < namesCta.length) {
+			    		if (namesCta[c][0].equals(cuentaOld3)) {
+			    			System.out.println(namesCta[c][0]+namesCta[c][1]);
+			    			cnivel3[1]=namesCta[c][1];
+			    			break;
+			    		}
+		    			c++;
+		    		}
+						
+					// cuando cambia de cuenta guarda los acumulados
+					acumula=(sumasDebe3-sumasHaber3);
+					if (acumula>0) {
+						saldosDebe3=acumula;
+					} else {
+						saldosHaber3=-acumula;
+					}
+					
+					cnivel3[0]=String.valueOf(cuentaOld3);
+					cnivel3[2]=dosdecimales(String.valueOf(sumasDebe3));
+					cnivel3[3]=dosdecimales(String.valueOf(sumasHaber3));
+					cnivel3[4]=dosdecimales(String.valueOf(saldosDebe3));
+					cnivel3[5]=dosdecimales(String.valueOf(saldosHaber3));
+						
+					// imprime la linea			
+					datosNivel3.add(new ArrayList<String>());
+			    	datosNivel3.get(n).add(cnivel3[0]);
+			    	datosNivel3.get(n).add(cnivel3[1]);
+			    	datosNivel3.get(n).add(cnivel3[2]);
+			    	datosNivel3.get(n).add(cnivel3[3]);
+			    	datosNivel3.get(n).add(cnivel3[4]);
+			    	datosNivel3.get(n).add(cnivel3[5]);
+			    	n++;
+					
+					// operaciones sobre acumulados				
+					acumula=0;
+					sumasDebe3=0;
+					sumasHaber3=0;
+					saldosDebe3=0;
+					saldosHaber3=0;
+
+					// cambia el cuentaOld
+					cuentaOld3=cuentaNew;
+					
+					// y ahora guardamos la nueva informacion
+					// acumulacion de saldos
+					if (rs.getString(8).equals("1")){
+						// es un movimiento al debe;
+						// lo suma al saldo
+						sumasDebe3+=(float)Float.parseFloat(rs.getString(9));
+					} else {
+						// es un movimiento al haber
+						// lo resta del saldo
+						sumasHaber3+=(float)Float.parseFloat(rs.getString(9));
+					}
+				}							
+			} // fin del while
+			
+			// hay que grabar la ultima cuenta
+			// cuando cambia de cuenta guarda los acumulados
+
+			// si el encontramos el numero de la cuenta en el 
+    		// array de nombres, le ponemos nombre a la cuenta
+    		c=0;
+    		while ( c < namesCta.length) {
+	    		if (namesCta[c][0].equals(cuentaOld3)) {
+	    			cnivel3[1]=namesCta[c][1];
+	    			break;
+	    		}
+    			c++;
+    		}
+				
+			// cuando cambia de cuenta guarda los acumulados
+			acumula=(sumasDebe3-sumasHaber3);
+			if (acumula>0) {
+				saldosDebe3=acumula;
+			} else {
+				saldosHaber3=-acumula;
+			}
+			
+			cnivel3[0]=String.valueOf(cuentaOld3);
+			cnivel3[2]=dosdecimales(String.valueOf(sumasDebe3));
+			cnivel3[3]=dosdecimales(String.valueOf(sumasHaber3));
+			cnivel3[4]=dosdecimales(String.valueOf(saldosDebe3));
+			cnivel3[5]=dosdecimales(String.valueOf(saldosHaber3));
+				
+			// imprime la linea			
+			datosNivel3.add(new ArrayList<String>());
+	    	datosNivel3.get(n).add(cnivel3[0]);
+	    	datosNivel3.get(n).add(cnivel3[1]);
+	    	datosNivel3.get(n).add(cnivel3[2]);
+	    	datosNivel3.get(n).add(cnivel3[3]);
+	    	datosNivel3.get(n).add(cnivel3[4]);
+	    	datosNivel3.get(n).add(cnivel3[5]);
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+ 
+    	// en el final, se transforma el arrayList en un array[n][6]
+    	String lectura[][]=new String[datosNivel3.size()][6];
+    	
+    	for (int i=0;i<datosNivel3.size();i++) {
+    		lectura[i]=datosNivel3.get(i).toArray(new String[6]);
+    	}
+    	// se devuelve el array con la informacion a listar
+    	return lectura;
+    	
+    } //  fin del metodo leeSumasySaldosNivel3
+    
+    
+    
+    /* **************************************************************************************
+     * Metodo que lee los datos del diario para conformar el balance de sumas y saldos
+     * 
+     * Recibe como parametros el key de la empresa, la cuenta inicial y la cuenta final
+     * a listar, y el intervalo de fecha inicial y final
+     * 
+     * Devuelve un Array[n][6] con un listado ya confeccionado con cabeceras y sumatorios
+     * 
+     * PROCEDIMIENTO:
+     * A) Con los datos recibidos se componen los datos de la busqueda a realizar
+     *    se compone el fichero del diario de la empresa correspondiente, se preparan los
+     *    filtros para la busqueda y se hace un SELECT en la DDBB
+     * B) Se preparan las cabeceras y los finales que se imprimiran con cada cuenta
+     * C) Se leen y componen en el formato adecuado de salida los distintos movimientos
+     *    de cada cuenta. Hay que tener muy en cuenta el caso de el cambio de cuenta para
+     *    el tema de acumulados y cabeceras 
+     * D) Se transforma el ArrayList en un array[n][10] para devolver la informacion
+     * 
+     **************************************************************************************** */
+    
+    public String[][] leeResultados(String keyEmp,String fechaIni, String fechaFin) {   	
+    	
+    	// creamos el arrayList bidimensional 	
+    	ArrayList<ArrayList<String>> datosLeidos=new ArrayList<ArrayList<String>>();
+    	// leemos las variables filtro - modificamos la fecha a formato date
+    	String fec1=fechaIni.substring(6)+fechaIni.substring(2, 6)+fechaIni.substring(0, 2);
+    	String fec2=fechaFin.substring(6)+fechaFin.substring(2, 6)+fechaFin.substring(0, 2);
+    	// asignamos manualmente los límites de cuentas de resultados
+    	String cta1="600";
+    	String cta2="799999999";
+    	
+    	// primero componemos dinamicamente el nombre del fichero diario
+    	// del cual leeremos los datos
+    	String anno=fec1.substring(2, 4);
+    	String fichero="c_"+keyEmp+anno+"diario";
+
+    	
+    	// para obtener el nombre de las cuentas contables
+    	// instanciamos el metodo getNamesCtas
+    	// y recibimos un array con los numeros y nombres de cuentas
+
+    	// se modifica el primer parametro para que coja tambien
+    	// la cuenta de mayor
+    	String namesCta[][]=getNamesCtas(keyEmp,cta1.substring(0, 3),cta2);
+    	
+    	if (namesCta==null) {
+    		System.err.println("NO HAY NOMBRES PARA LEER");
+    	}
+    	
+    	
+    	// instanciamos una conexion
+    	Connection con= ConnectDB();
+    	// creamos un objeto statement
+    	Statement st=null;
+    	try {
+			st=con.createStatement();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	// creamos un objeto resulset para recoger los datos
+    	ResultSet rs=null;
+    	
+    	try {
+			rs=st.executeQuery("SELECT * FROM "+fichero+" WHERE fecha>='"+fec1+"' && fecha<='"+fec2+"' && cuenta>='"+cta1+"' && cuenta<='"+cta2+"' ORDER BY cuenta,fecha,numasto,numapunte ");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			System.err.println("Error intentando select en fichero "+fichero);
+			e.printStackTrace();
+		}
+
+    	// La cuenta de resultado se ejecuta con cuentas de nivel 3
+    	// las cuentas a nivel 3
+    	String ctasNivel3[][] = null;
+    	//recibimos un array con sumas y saldos a nivel 3
+    	ctasNivel3=leeSumasySaldosNivel3(rs,namesCta);
+    
+    	
+    	// crea los distintos string[] para cada cuenta
+    	// toda cuenta auxiliar tiene cinco lineas de cabecera
+    	// n lineas de datos
+    	String cabecera1[]=new String[5];
+    	String cabecera2[]=new String[5];
+    	String cabecera3[]=new String[5];
+    	String cabecera4[]=new String[5];
+    	String cabecera5[]=new String[5];
+    	
+    	String sumas1[]=new String[5];
+    	String sumas2[]=new String[5];
+    	String sumas3[]=new String[5];
+    	String sumas4[]=new String[5];
+    	String sumas5[]=new String[5];
+    	String sumas6[]=new String[5];
+    	String sumas7[]=new String[5];
+    	String sumas8[]=new String[5];
+    	String sumas9[]=new String[5];
+    	String sumas10[]=new String[5];
+    	String sumas11[]=new String[5];
+    	String sumas12[]=new String[5];
+    	String sumas13[]=new String[5];
+    	String sumas14[]=new String[5];
+    	String sumas15[]=new String[5];
+    	String sumas16[]=new String[5];
+    	String sumas17[]=new String[5];
+    	String sumas18[]=new String[5];
+    	
+    	String sumasA[]=new String[5];
+    	String sumasB[]=new String[5];
+    	String sumasC[]=new String[5];
+    	String sumasD[]=new String[5];
+    	
+    	// dando formato a datos prefijados de los String
+    	cabecera1[0]="Fecha: "+PantallaPrincipal.Today;
+    	cabecera1[1]="Empresa: "+PantallaPrincipal.Company;
+    	cabecera1[2]=" ";
+    	cabecera1[3]=" ";
+    	cabecera1[4]=" ";
+    	
+    	cabecera2[0]="";
+    	cabecera2[1]="CUENTA DE PÉRDIDAS Y GANANCIAS PYMES EJERCICIO "+PantallaPrincipal.Year;
+    	cabecera2[2]=" ";
+    	cabecera2[3]=" ";
+    	cabecera2[4]=" ";
+    	
+    	cabecera3[0]=" ";
+    	cabecera3[1]=" ";
+    	cabecera3[2]=" ";
+    	cabecera3[3]=" ";
+    	cabecera3[4]=" ";
+
+    	cabecera4[0]="Nº CUENTAS";
+    	cabecera4[1]=" ";
+    	cabecera4[2]="AÑO "+PantallaPrincipal.Year;
+    	cabecera4[3]="AÑO "+String.valueOf((int)Integer.parseInt(PantallaPrincipal.Year)-1);
+    	cabecera4[4]=" ";
+    	
+    	cabecera5[0]=" ";
+    	cabecera5[1]=" ";
+    	cabecera5[2]=" ";
+    	cabecera5[3]=" ";
+    	cabecera5[4]=" ";
+    	
+    	sumas1[0]=" ";
+    	sumas1[1]=" 1. Importe neto de la cifra de negocio";
+    	sumas1[2]=" ";
+    	sumas1[3]=" ";
+    	sumas1[4]=" ";
+    	
+    	sumas2[0]=" 2. Variación existencias prod. terminados o curso";
+    	sumas2[1]=" ";
+    	sumas2[2]=" ";
+    	sumas2[3]=" ";
+    	sumas2[4]=" ";
+
+    	sumas3[0]=" ";
+    	sumas3[1]=" 3. Trabajos realizados para su activo";
+    	sumas3[2]=" ";
+    	sumas3[3]=" ";
+    	sumas3[4]=" ";
+    	
+    	sumas4[0]=" ";
+    	sumas4[1]=" 4. Aprovisionamientos";
+    	sumas4[2]=" ";
+    	sumas4[3]=" ";
+    	sumas4[4]=" ";
+    	
+    	sumas5[0]=" ";
+    	sumas5[1]=" 5. Otros ingresos de explotación ";
+    	sumas5[2]=" ";
+    	sumas5[3]=" ";
+    	sumas5[4]=" ";
+    	
+    	sumas6[0]=" ";
+    	sumas6[1]=" 6. Gastos de personal ";
+    	sumas6[2]=" ";
+    	sumas6[3]=" ";
+    	sumas6[4]=" ";
+    	
+    	sumas7[0]=" ";
+    	sumas7[1]=" 7. Otros gastos de explotación ";
+    	sumas7[2]=" ";
+    	sumas7[3]=" ";
+    	sumas7[4]=" ";
+    	
+    	sumas8[0]=" ";
+    	sumas8[1]=" 8. Amortización del inmovilizado ";
+    	sumas8[2]=" ";
+    	sumas8[3]=" ";
+    	sumas8[4]=" ";
+    	
+    	sumas9[0]=" ";
+    	sumas9[1]=" 9. Imputación subvenciones inmov. no financiero ";
+    	sumas9[2]=" ";
+    	sumas9[3]=" ";
+    	sumas9[4]=" ";
+    	
+    	sumas10[0]=" ";
+    	sumas10[1]="10. Excesos de provisiones ";
+    	sumas10[2]=" ";
+    	sumas10[3]=" ";
+    	sumas10[4]=" ";
+    	
+    	sumas11[0]=" ";
+    	sumas11[1]="11. Deterioro rsdo. por enajenación inmovilizado ";
+    	sumas11[2]=" ";
+    	sumas11[3]=" ";
+    	sumas11[4]=" ";
+    	
+    	sumas12[0]=" ";
+    	sumas12[1]="12. Otros resultados ";
+    	sumas12[2]=" ";
+    	sumas12[3]=" ";
+    	sumas12[4]=" ";
+    	
+    	sumas13[0]=" ";
+    	sumas13[1]="13. Ingresos financieros ";
+    	sumas13[2]=" ";
+    	sumas13[3]=" ";
+    	sumas13[4]=" ";
+    	
+    	sumas14[0]=" ";
+    	sumas14[1]="14. Gastos financieros ";
+    	sumas14[2]=" ";
+    	sumas14[3]=" ";
+    	sumas14[4]=" ";
+    	
+    	sumas15[0]=" ";
+    	sumas15[1]="15. Variación valor razonable instr. financieros ";
+    	sumas15[2]=" ";
+    	sumas15[3]=" ";
+    	sumas15[4]=" ";
+    	
+    	sumas16[0]=" ";
+    	sumas16[1]="16. Diferencias de cambio ";
+    	sumas16[2]=" ";
+    	sumas16[3]=" ";
+    	sumas16[4]=" ";
+    	
+    	sumas17[0]=" ";
+    	sumas17[1]="17. Deterioro y resultado enajenación instr.financieros ";
+    	sumas17[2]=" ";
+    	sumas17[3]=" ";
+    	sumas17[4]=" ";
+    	
+    	sumas18[0]=" ";
+    	sumas18[1]="18. Impuesto sobre beneficios ";
+    	sumas18[2]=" ";
+    	sumas18[3]=" ";
+    	sumas18[4]=" ";
+ 
+    	sumasA[0]=" ";
+    	sumasA[1]="A) RESULTADO DE EXPLOTACION";
+    	sumasA[2]=" ";
+    	sumasA[3]=" ";
+    	sumasA[4]=" ";
+    	
+    	sumasB[0]=" ";
+    	sumasB[1]="B) RESULTADO FINANCIERO";
+    	sumasB[2]=" ";
+    	sumasB[3]=" ";
+    	sumasB[4]=" ";
+    	
+    	sumasC[0]=" ";
+    	sumasC[1]="C) RESULTADO ANTES DE IMPUESTOS";
+    	sumasC[2]=" ";
+    	sumasC[3]=" ";
+    	sumasC[4]=" ";
+    	
+    	sumasD[0]=" ";
+    	sumasD[1]="D) RESULTADO DEL EJERCICIO";
+    	sumasD[2]=" ";
+    	sumasD[3]=" ";
+    	sumasD[4]=" ";
+    	
+    	
+    	int n=0;	// MOVIMIENTOS LEIDOS
+    
+
+    	
+    	try {
+    		
+
+    		
+    		// devolvemos el punto del rs al punto inicial
+    		rs.beforeFirst();
+			while(rs.next()) {
+				
+
+		
+			} // fin del while
+			
+			
+    		// grabamos las cabeceras
+    		datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(cabecera1[0]);
+    		datosLeidos.get(n).add(cabecera1[1]);
+    		datosLeidos.get(n).add(cabecera1[2]);
+    		datosLeidos.get(n).add(cabecera1[3]);
+    		datosLeidos.get(n).add(cabecera1[4]);	
+    		n++;
+    		datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(cabecera2[0]);
+    		datosLeidos.get(n).add(cabecera2[1]);
+    		datosLeidos.get(n).add(cabecera2[2]);
+    		datosLeidos.get(n).add(cabecera2[3]);
+    		datosLeidos.get(n).add(cabecera2[4]);
+    		n++;
+    		datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(cabecera3[0]);
+    		datosLeidos.get(n).add(cabecera3[1]);
+    		datosLeidos.get(n).add(cabecera3[2]);
+    		datosLeidos.get(n).add(cabecera3[3]);
+    		datosLeidos.get(n).add(cabecera3[4]);
+    		n++;
+    		datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(cabecera4[0]);
+    		datosLeidos.get(n).add(cabecera4[1]);
+    		datosLeidos.get(n).add(cabecera4[2]);
+    		datosLeidos.get(n).add(cabecera4[3]);
+    		datosLeidos.get(n).add(cabecera4[4]);
+    		n++;
+    		datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(cabecera5[0]);
+    		datosLeidos.get(n).add(cabecera5[1]);
+    		datosLeidos.get(n).add(cabecera5[2]);
+    		datosLeidos.get(n).add(cabecera5[3]);
+    		datosLeidos.get(n).add(cabecera5[4]);
+			
+    		// grabamos las lineas
+    		n++;
+    		datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas1[0]);
+    		datosLeidos.get(n).add(sumas1[1]);
+    		datosLeidos.get(n).add(sumas1[2]);
+    		datosLeidos.get(n).add(sumas1[3]);
+    		datosLeidos.get(n).add(sumas1[4]);
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas2[0]);
+    		datosLeidos.get(n).add(sumas2[1]);
+    		datosLeidos.get(n).add(sumas2[2]);
+    		datosLeidos.get(n).add(sumas2[3]);
+    		datosLeidos.get(n).add(sumas2[4]);
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas3[0]);
+    		datosLeidos.get(n).add(sumas3[1]);
+    		datosLeidos.get(n).add(sumas3[2]);
+    		datosLeidos.get(n).add(sumas3[3]);
+    		datosLeidos.get(n).add(sumas3[4]);
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas4[0]);
+    		datosLeidos.get(n).add(sumas4[1]);
+    		datosLeidos.get(n).add(sumas4[2]);
+    		datosLeidos.get(n).add(sumas4[3]);
+    		datosLeidos.get(n).add(sumas4[4]);
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas5[0]);
+    		datosLeidos.get(n).add(sumas5[1]);
+    		datosLeidos.get(n).add(sumas5[2]);
+    		datosLeidos.get(n).add(sumas5[3]);
+    		datosLeidos.get(n).add(sumas5[4]);
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas6[0]);
+    		datosLeidos.get(n).add(sumas6[1]);
+    		datosLeidos.get(n).add(sumas6[2]);
+    		datosLeidos.get(n).add(sumas6[3]);
+    		datosLeidos.get(n).add(sumas6[4]);
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas7[0]);
+    		datosLeidos.get(n).add(sumas7[1]);
+    		datosLeidos.get(n).add(sumas7[2]);
+    		datosLeidos.get(n).add(sumas7[3]);
+    		datosLeidos.get(n).add(sumas7[4]);
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas8[0]);
+    		datosLeidos.get(n).add(sumas8[1]);
+    		datosLeidos.get(n).add(sumas8[2]);
+    		datosLeidos.get(n).add(sumas8[3]);
+    		datosLeidos.get(n).add(sumas8[4]);
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas9[0]);
+    		datosLeidos.get(n).add(sumas9[1]);
+    		datosLeidos.get(n).add(sumas9[2]);
+    		datosLeidos.get(n).add(sumas9[3]);
+    		datosLeidos.get(n).add(sumas9[4]);
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas10[0]);
+    		datosLeidos.get(n).add(sumas10[1]);
+    		datosLeidos.get(n).add(sumas10[2]);
+    		datosLeidos.get(n).add(sumas10[3]);
+    		datosLeidos.get(n).add(sumas10[4]);
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas11[0]);
+    		datosLeidos.get(n).add(sumas11[1]);
+    		datosLeidos.get(n).add(sumas11[2]);
+    		datosLeidos.get(n).add(sumas11[3]);
+    		datosLeidos.get(n).add(sumas11[4]);
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas12[0]);
+    		datosLeidos.get(n).add(sumas12[1]);
+    		datosLeidos.get(n).add(sumas12[2]);
+    		datosLeidos.get(n).add(sumas12[3]);
+    		datosLeidos.get(n).add(sumas12[4]);
+    		
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumasA[0]);
+    		datosLeidos.get(n).add(sumasA[1]);
+    		datosLeidos.get(n).add(sumasA[2]);
+    		datosLeidos.get(n).add(sumasA[3]);
+    		datosLeidos.get(n).add(sumasA[4]);
+    		
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas13[0]);
+    		datosLeidos.get(n).add(sumas13[1]);
+    		datosLeidos.get(n).add(sumas13[2]);
+    		datosLeidos.get(n).add(sumas13[3]);
+    		datosLeidos.get(n).add(sumas13[4]);
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas14[0]);
+    		datosLeidos.get(n).add(sumas14[1]);
+    		datosLeidos.get(n).add(sumas14[2]);
+    		datosLeidos.get(n).add(sumas14[3]);
+    		datosLeidos.get(n).add(sumas14[4]);
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas15[0]);
+    		datosLeidos.get(n).add(sumas15[1]);
+    		datosLeidos.get(n).add(sumas15[2]);
+    		datosLeidos.get(n).add(sumas15[3]);
+    		datosLeidos.get(n).add(sumas15[4]);
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas16[0]);
+    		datosLeidos.get(n).add(sumas16[1]);
+    		datosLeidos.get(n).add(sumas16[2]);
+    		datosLeidos.get(n).add(sumas16[3]);
+    		datosLeidos.get(n).add(sumas16[4]);
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas17[0]);
+    		datosLeidos.get(n).add(sumas17[1]);
+    		datosLeidos.get(n).add(sumas17[2]);
+    		datosLeidos.get(n).add(sumas17[3]);
+    		datosLeidos.get(n).add(sumas17[4]);
+    		
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumasB[0]);
+    		datosLeidos.get(n).add(sumasB[1]);
+    		datosLeidos.get(n).add(sumasB[2]);
+    		datosLeidos.get(n).add(sumasB[3]);
+    		datosLeidos.get(n).add(sumasB[4]);
+    		
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumasC[0]);
+    		datosLeidos.get(n).add(sumasC[1]);
+    		datosLeidos.get(n).add(sumasC[2]);
+    		datosLeidos.get(n).add(sumasC[3]);
+    		datosLeidos.get(n).add(sumasC[4]);
+    		
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumas18[0]);
+    		datosLeidos.get(n).add(sumas18[1]);
+    		datosLeidos.get(n).add(sumas18[2]);
+    		datosLeidos.get(n).add(sumas18[3]);
+    		datosLeidos.get(n).add(sumas18[4]);
+    		
+			n++;
+			datosLeidos.add(new ArrayList<String>());
+    		datosLeidos.get(n).add(sumasD[0]);
+    		datosLeidos.get(n).add(sumasD[1]);
+    		datosLeidos.get(n).add(sumasD[2]);
+    		datosLeidos.get(n).add(sumasD[3]);
+    		datosLeidos.get(n).add(sumasD[4]);
+    		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+ 
+    	// en el final, se transforma el arrayList en un array[n][10]
+    	String lectura[][]=new String[datosLeidos.size()][6];
+    	
+    	for (int i=0;i<datosLeidos.size();i++) {
+    		lectura[i]=datosLeidos.get(i).toArray(new String[6]);
+    	}
+    	// se devuelve el array con la informacion a listar
+    	return lectura;
+    	
+    } //  fin del metodo leeResultados
     
     
     

@@ -11,6 +11,8 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -30,14 +32,16 @@ import fmsconta.control.ContaDAO;
 public class PantallaPrincipal extends JFrame implements ActionListener, Settings {
 	
 	
+	public static String Today;		// fecha
+	public static String Company;		// nombre de la compañia (info pantalla)
+	public static String Year;			// año de operaciones (info pantalla)
+	public static String User;			// key del user para DDBB
+	
 	// matrices de retorno de DDBB
 	private String datosUser[]=new String[15];
 	private String datosEmpr[]=new String[12];
 	// variables de id y DDBB
-	private String company="";			// nombre de la compañia (info pantalla)
-	private String year="";				// año de operaciones (info pantalla)
 	private String nameUser="";			// nombre del usuario (info pantalla)
-	private String keyUser="";			// key del user para DDBB
 	private String keyEmpr="";			// key de la empresa para DDBB
 	private boolean isManager=false;	// es manager (true) o usuario (false)
 	
@@ -96,7 +100,7 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 	
 	public PantallaPrincipal () {
 		
-		//BUILDER
+		//constructor
 	}
 	
 	public PantallaPrincipal (JFrame mainW, String title, String login, String password) {
@@ -106,11 +110,11 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 		this.loginUser=login;
 		this.passUser=password;
 		
-		//BUILDER
+		//constructor
 	}
 	
 	/* *****************************************************************************
-	 *  Este metodo builder muestra la pantalla principal
+	 *  Este metodo  muestra la pantalla principal
 	 *  Asimismo lee en la DDBB los datos del usuario y los datos de la empresa
 	 *  actual en la que esta trabajando.
 	 *  Deja informacion del keyUser y keyEmpr (keys de sus respectivos ficheros)
@@ -120,6 +124,13 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 	
 	public void controlCenter (){
 			
+		// Obtiene la fecha actual
+		Calendar dat=Calendar.getInstance();
+		int aa=dat.get(Calendar.YEAR);
+		int mm=dat.get(Calendar.MONTH);
+		int dd=dat.get(Calendar.DATE);
+		Today=String.valueOf(dd)+"-"+String.valueOf(mm)+"-"+String.valueOf(aa);
+		
 			// instanciamos el pool de conexiones ContaDAO
 			ContaDAO newUserConta=new ContaDAO();
 
@@ -139,9 +150,9 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 					System.exit(0);
 				} else {
 					this.nameUser=datosUser[2];	// nombre del user (info)
-					company=datosEmpr[2];	// compañia de trabajo (info)
-					year=datosUser[11];		// año de trabajo (info)
-					keyUser=datosUser[1]; 	// key del user
+					Company=datosEmpr[2];	// compañia de trabajo (info)
+					Year=datosUser[11];		// año de trabajo (info)
+					User=datosUser[1]; 	// key del user
 					keyEmpr=datosEmpr[1]; 	// key de la empresa
 					if (datosEmpr[11].equals(datosUser[1])) isManager=true;	//si es el manager true
 				}
@@ -198,7 +209,7 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 		panelTitle=new JPanel();
 		horizontal1=new GridLayout(1,2,10,5);
 		panelTitle.setLayout(horizontal1);
-		nombreEmpresa=new JLabel(company+" - "+year,SwingConstants.CENTER);
+		nombreEmpresa=new JLabel(Company+" - "+Year,SwingConstants.CENTER);
 		nombreUsuario=new JLabel("usuario: "+nameUser,SwingConstants.CENTER);
 			// CREAMOS LOS COLORES DE FONDO Y DE LOS TIPOS DE LETRA
 		panelTitle.setBackground(ColorFondo);
@@ -346,7 +357,7 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 		combos.combo1.addActionListener(this);
 		combos.combo2.addActionListener(this);
 
-	} //fin del builder
+	} //fin del constructor
 	
 	
 	
