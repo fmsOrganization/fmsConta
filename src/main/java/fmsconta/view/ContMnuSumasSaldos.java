@@ -29,7 +29,6 @@ public class ContMnuSumasSaldos extends JFrame implements ActionListener, Settin
 	private JTextField r4;
 	private JTextField r5;
 	private JCheckBox r6;
-	private JCheckBox r7;
 	private JLabel space1=new JLabel(" ");
 	private JLabel space2=new JLabel(" ");
 	private JLabel space3=new JLabel(" ");
@@ -66,7 +65,7 @@ public class ContMnuSumasSaldos extends JFrame implements ActionListener, Settin
 		
 		auxMenu=new JPanel();
 		auxMenu.setBackground(ColorFondo);
-		auxMenu.setLayout(new GridLayout(7,2));
+		auxMenu.setLayout(new GridLayout(6,2));
 		JLabel n1=new JLabel("Desde cuenta");
 		n1.setFont(Fuente3);
 		JLabel n2=new JLabel("Hasta cuenta");
@@ -79,8 +78,7 @@ public class ContMnuSumasSaldos extends JFrame implements ActionListener, Settin
 		n5.setFont(Fuente3);
 		JLabel n6=new JLabel("Cuentas nivel 3");
 		n6.setFont(Fuente3);
-		JLabel n7=new JLabel("Solo con saldo");
-		n7.setFont(Fuente3);
+
 		
 		r1=new JTextField("10000000");
 		r2=new JTextField("79999999");
@@ -89,8 +87,7 @@ public class ContMnuSumasSaldos extends JFrame implements ActionListener, Settin
 		r5=new JTextField("8");
 		r6=new JCheckBox();
 		r6.setBackground(ColorFondo);
-		r7=new JCheckBox();
-		r7.setBackground(ColorFondo);
+
 		
 		auxMenu.add(n1);
 		auxMenu.add(r1);
@@ -104,8 +101,6 @@ public class ContMnuSumasSaldos extends JFrame implements ActionListener, Settin
 		auxMenu.add(r5);
 		auxMenu.add(n6);
 		auxMenu.add(r6);
-		auxMenu.add(n7);
-		auxMenu.add(r7);
 		
 		south=new JPanel();
 		south.setBackground(ColorFondo);
@@ -129,6 +124,7 @@ public class ContMnuSumasSaldos extends JFrame implements ActionListener, Settin
 		
 		listar.addActionListener(this);
 		cancelar.addActionListener(this);
+		r6.addActionListener(this);
 		
 	}
 	
@@ -156,8 +152,9 @@ public class ContMnuSumasSaldos extends JFrame implements ActionListener, Settin
 					
 			if (compruebaErrores()) {
 				// no habiendo errores
+				boolean nivel3=r6.isSelected();
 				menuSumas.setVisible(false);
-				listaSumas=new ContListadoSyS("EC001","Ecovitalia",this.r1.getText(),this.r2.getText(),this.r3.getText(),this.r4.getText());
+				listaSumas=new ContListadoSyS("EC001",PantallaPrincipal.Company,this.r1.getText(),this.r2.getText(),this.r3.getText(),this.r4.getText(),nivel3);
 				menuSumas.remove(space1);
 				menuSumas.remove(space2);
 				menuSumas.remove(north);
@@ -179,6 +176,13 @@ public class ContMnuSumasSaldos extends JFrame implements ActionListener, Settin
 		if (source==cancelar) {
 			menuSumas.setVisible(false);
 		}
+		
+		if (source==r6) {
+			if (r6.isSelected()) {
+				r6.setSelected(true);
+			}
+		}
+
 		
 	} // fin del ActionLister
 	

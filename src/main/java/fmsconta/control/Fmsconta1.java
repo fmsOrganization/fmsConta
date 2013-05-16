@@ -7,6 +7,7 @@ import fmsconta.view.*;
 public class Fmsconta1 extends JFrame {
 
 	
+	
 	public Fmsconta1() {
 		// builder
 	}
@@ -17,6 +18,7 @@ public class Fmsconta1 extends JFrame {
 		final String version="fmsConta 2.0 Beta";
 		String nameUser;
 		String passUser;
+		
 		
 		// CONFIGURACION ASPECTO DE PANELES PLATAFORMA MEZCLA JAVA
 		try {
@@ -57,7 +59,8 @@ public class Fmsconta1 extends JFrame {
 			
 			// accede a la pantalla principal
 			// la operativa contable se realiza aqui
-			initWindow.setLocation(0, 0);
+			//initWindow.setLocation(0, 0);
+			initWindow.setBounds(0, 0, MAXIMIZED_HORIZ,MAXIMIZED_VERT);
 			PantallaPrincipal ventanaMain=new PantallaPrincipal(initWindow,version,nameUser,passUser);
 			
 			ventanaMain.controlCenter();
