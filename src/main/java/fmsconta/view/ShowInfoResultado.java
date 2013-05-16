@@ -20,7 +20,7 @@ import javax.swing.SwingConstants;
 
 import fmsconta.control.PrinterInfo;
 
-public class ShowInfoSyS  extends JFrame implements ActionListener, Settings {
+public class ShowInfoResultado  extends JFrame implements ActionListener, Settings {
 
 	private JFrame auxWindow;
 	private JScrollPane panelScroll;
@@ -40,12 +40,12 @@ public class ShowInfoSyS  extends JFrame implements ActionListener, Settings {
 	
 	
 	
-	public ShowInfoSyS () {
+	public ShowInfoResultado () {
 		// constructor
 	}
 		
 		
-	public ShowInfoSyS (String datos[][],String title1,String title2){
+	public ShowInfoResultado (String datos[][],String title1,String title2){
 			
 		// recupera los datos recibidos como parametros
 		
@@ -74,7 +74,7 @@ public class ShowInfoSyS  extends JFrame implements ActionListener, Settings {
 		this.datos2=datos;
 		
 			// creamos primero el marco de la ventana auxiliar
-			auxWindow=new JFrame("Listado de Balance de Sumas y Saldos");
+			auxWindow=new JFrame("Listado de la Cuenta de Resultados");
 			auxWindow.setMinimumSize(new Dimension(700,500));
 			auxWindow.setPreferredSize(new Dimension(1000,700));
 			auxWindow.setMaximumSize(new Dimension(1000,700));
@@ -125,7 +125,7 @@ public class ShowInfoSyS  extends JFrame implements ActionListener, Settings {
 		    south1.add(cerrar);
 			
 			// mostraremos la informacion en JLabels dinamicos
-			JLabel[][] lab=new JLabel[datos2.length][7];
+			JLabel[][] lab=new JLabel[datos2.length][6];
 								
 			listadoDatos=new JPanel();
 			listadoDatos.setLayout(new GridBagLayout());
@@ -143,7 +143,7 @@ public class ShowInfoSyS  extends JFrame implements ActionListener, Settings {
 				constraints.fill=GridBagConstraints.NONE;
 				constraints.anchor=GridBagConstraints.WEST;
 
-				for (int j=0;j<6;j++) {
+				for (int j=0;j<5;j++) {
 					// creamos la etiqueta y le agregamos el dato
 					lab[i][j]=new JLabel();
 					lab[i][j].setHorizontalAlignment(SwingConstants.LEFT);
@@ -188,8 +188,7 @@ public class ShowInfoSyS  extends JFrame implements ActionListener, Settings {
 	
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		
-		Object source=e.getSource();
+Object source=e.getSource();
 		
 		if (source==impress) {
 			// si pulsa imprimir crea un objeto de tipo PrinterInfo
@@ -203,12 +202,12 @@ public class ShowInfoSyS  extends JFrame implements ActionListener, Settings {
 		if (source==fichero) {
 			// si pulsa fichero se generara un fichero tipo txt
 			// con la informacion
-			String nombreFichero="balancesumas"+this.fecha+".txt";
+			String nombreFichero="Resultado"+this.fecha+".txt";
 			PrinterInfo imprime=new PrinterInfo();
 			// llamamos al metodo imprimeFichero con los datos, la longitud de los datos
 			// el nombre del fichero y la ruta, variable final de PersonalSettings
-			int longitudes[]={15,40,15,15,15,15};
-			int alineacion[]={1,1,2,2,2,2};
+			int longitudes[]={12,50,12,15,15};
+			int alineacion[]={1,1,2,2,2};
 			if (imprime.imprimeFichero(datos2,longitudes,alineacion,nombreFichero,PathPersonalFiles)) {
 				JOptionPane.showMessageDialog(null, "Fichero de texto generado");
 			} else JOptionPane.showMessageDialog(null, "Error al generar el fichero de texto");	
@@ -222,4 +221,4 @@ public class ShowInfoSyS  extends JFrame implements ActionListener, Settings {
 		
 	} // fin del metodo actionListener
 
-} // *************** FIN DE LA CLASS SHOWINFOSYS
+} // ****************** FIN DE LA CLASS SHOWINFORESULTADO

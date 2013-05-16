@@ -46,7 +46,7 @@ public class ContaDAO implements SystemDates{
         try {
         	conexionDB = DriverManager.getConnection(NameDB, UserDB, PassDB);
         } catch (SQLException ex) {
-            System.out.println("Error conectando a la base de datos");
+            System.err.println("Error conectando a la base de datos");
             Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(null, "No conecta con Base de Datos: salga de la aplicación");
             return null;
@@ -1374,7 +1374,7 @@ public class ContaDAO implements SystemDates{
 			rs=st.executeQuery("SELECT * FROM "+fichero+" WHERE fecha>='"+fec1+"' && fecha<='"+fec2+"' && cuenta>='"+cta1+"' && cuenta<='"+cta2+"' ORDER BY cuenta,fecha,numasto,numapunte ");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			System.out.println("Error intentando select en fichero "+fichero);
+			System.err.println("Error intentando select en fichero "+fichero);
 			e.printStackTrace();
 		}
     	
@@ -2374,7 +2374,6 @@ public class ContaDAO implements SystemDates{
     	if (nivel3) {
     		//recibimos un array con sumas y saldos a nivel 3
     		ctasNivel3=leeSumasySaldosNivel3(rs,namesCta);
-    		System.out.println("longitud "+ctasNivel3.length);
     	}
     	
     	// crea los distintos string[] para cada cuenta
@@ -2504,7 +2503,6 @@ public class ContaDAO implements SystemDates{
 					// de nivel 3 en el arrayList
 					
 					if (nivel3) {
-						System.out.println("num "+counterNivel3+"**"+ctasNivel3[counterNivel3][0]+"**");
 						if ((ctasNivel3[counterNivel3][0].substring(0, 3)).equals(cuentaOld.substring(0, 3))) {
 							// esto funciona porque las cuentas de nivel 3 
 							// estan por orden de numero al igual que las ctas auxiliares
@@ -2512,10 +2510,10 @@ public class ContaDAO implements SystemDates{
 							datosLeidos.add(new ArrayList<String>());
 				    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][0]+"****");
 				    		datosLeidos.get(n).add("****"+ctasNivel3[counterNivel3][1]);
-				    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][2]+" **");
-				    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][3]+" **");
-				    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][4]+" **");
-				    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][5]+" **");
+				    		datosLeidos.get(n).add(dosdecimales(ctasNivel3[counterNivel3][2])+" **");
+				    		datosLeidos.get(n).add(dosdecimales(ctasNivel3[counterNivel3][3])+" **");
+				    		datosLeidos.get(n).add(dosdecimales(ctasNivel3[counterNivel3][4])+" **");
+				    		datosLeidos.get(n).add(dosdecimales(ctasNivel3[counterNivel3][5])+" **");
 				    		counterNivel3++;
 				    		//if (counterNivel3>=ctasNivel3.length) counterNivel3=ctasNivel3.length-1;
 						}
@@ -2590,7 +2588,6 @@ public class ContaDAO implements SystemDates{
 			cuentaOld=datos[0];
 			
 			if (nivel3 && counterNivel3!=ctasNivel3.length) {
-				System.out.println("num "+counterNivel3+"**"+ctasNivel3[counterNivel3][0]+"**");
 				if ((ctasNivel3[counterNivel3][0].substring(0, 3)).equals(cuentaOld.substring(0, 3))) {
 					// esto funciona porque las cuentas de nivel 3 
 					// estan por orden de numero al igual que las ctas auxiliares
@@ -2598,10 +2595,10 @@ public class ContaDAO implements SystemDates{
 					datosLeidos.add(new ArrayList<String>());
 		    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][0]+"****");
 		    		datosLeidos.get(n).add("****"+ctasNivel3[counterNivel3][1]);
-		    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][2]+" **");
-		    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][3]+" **");
-		    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][4]+" **");
-		    		datosLeidos.get(n).add(ctasNivel3[counterNivel3][5]+" **");
+		    		datosLeidos.get(n).add(dosdecimales(ctasNivel3[counterNivel3][2])+" **");
+		    		datosLeidos.get(n).add(dosdecimales(ctasNivel3[counterNivel3][3])+" **");
+		    		datosLeidos.get(n).add(dosdecimales(ctasNivel3[counterNivel3][4])+" **");
+		    		datosLeidos.get(n).add(dosdecimales(ctasNivel3[counterNivel3][5])+" **");
 
 				}
 			}
@@ -2786,7 +2783,6 @@ public class ContaDAO implements SystemDates{
 		    		c=0;
 		    		while ( c < namesCta.length) {
 			    		if (namesCta[c][0].equals(cuentaOld3)) {
-			    			System.out.println(namesCta[c][0]+namesCta[c][1]);
 			    			cnivel3[1]=namesCta[c][1];
 			    			break;
 			    		}
@@ -2802,10 +2798,10 @@ public class ContaDAO implements SystemDates{
 					}
 					
 					cnivel3[0]=String.valueOf(cuentaOld3);
-					cnivel3[2]=dosdecimales(String.valueOf(sumasDebe3));
-					cnivel3[3]=dosdecimales(String.valueOf(sumasHaber3));
-					cnivel3[4]=dosdecimales(String.valueOf(saldosDebe3));
-					cnivel3[5]=dosdecimales(String.valueOf(saldosHaber3));
+					cnivel3[2]=String.valueOf(sumasDebe3);
+					cnivel3[3]=String.valueOf(sumasHaber3);
+					cnivel3[4]=String.valueOf(saldosDebe3);
+					cnivel3[5]=String.valueOf(saldosHaber3);
 						
 					// imprime la linea			
 					datosNivel3.add(new ArrayList<String>());
@@ -2864,10 +2860,10 @@ public class ContaDAO implements SystemDates{
 			}
 			
 			cnivel3[0]=String.valueOf(cuentaOld3);
-			cnivel3[2]=dosdecimales(String.valueOf(sumasDebe3));
-			cnivel3[3]=dosdecimales(String.valueOf(sumasHaber3));
-			cnivel3[4]=dosdecimales(String.valueOf(saldosDebe3));
-			cnivel3[5]=dosdecimales(String.valueOf(saldosHaber3));
+			cnivel3[2]=String.valueOf(sumasDebe3);
+			cnivel3[3]=String.valueOf(sumasHaber3);
+			cnivel3[4]=String.valueOf(saldosDebe3);
+			cnivel3[5]=String.valueOf(saldosHaber3);
 				
 			// imprime la linea			
 			datosNivel3.add(new ArrayList<String>());
@@ -2916,13 +2912,16 @@ public class ContaDAO implements SystemDates{
      * 
      **************************************************************************************** */
     
-    public String[][] leeResultados(String keyEmp,String fechaIni, String fechaFin) {   	
+    public String[][] leeResultado(String keyEmp,String fechaIni, String fechaFin) {   	
     	
     	// creamos el arrayList bidimensional 	
     	ArrayList<ArrayList<String>> datosLeidos=new ArrayList<ArrayList<String>>();
     	// leemos las variables filtro - modificamos la fecha a formato date
     	String fec1=fechaIni.substring(6)+fechaIni.substring(2, 6)+fechaIni.substring(0, 2);
     	String fec2=fechaFin.substring(6)+fechaFin.substring(2, 6)+fechaFin.substring(0, 2);
+    	// asignamos la fecha del año anterior
+    	String fec1Ant=String.valueOf((int)Integer.parseInt(fechaIni.substring(6))-1)+fechaIni.substring(2, 6)+fechaIni.substring(0, 2);
+    	String fec2Ant=String.valueOf((int)Integer.parseInt(fechaFin.substring(6))-1)+fechaFin.substring(2, 6)+fechaFin.substring(0, 2);
     	// asignamos manualmente los límites de cuentas de resultados
     	String cta1="600";
     	String cta2="799999999";
@@ -2930,8 +2929,9 @@ public class ContaDAO implements SystemDates{
     	// primero componemos dinamicamente el nombre del fichero diario
     	// del cual leeremos los datos
     	String anno=fec1.substring(2, 4);
+    	String annoAnt=String.valueOf((int)Integer.parseInt(anno)-1);
     	String fichero="c_"+keyEmp+anno+"diario";
-
+    	String ficheroAnt="c_"+keyEmp+annoAnt+"diario";
     	
     	// para obtener el nombre de las cuentas contables
     	// instanciamos el metodo getNamesCtas
@@ -2939,7 +2939,7 @@ public class ContaDAO implements SystemDates{
 
     	// se modifica el primer parametro para que coja tambien
     	// la cuenta de mayor
-    	String namesCta[][]=getNamesCtas(keyEmp,cta1.substring(0, 3),cta2);
+    	String namesCta[][]=getNamesCtas(keyEmp,"100","112");
     	
     	if (namesCta==null) {
     		System.err.println("NO HAY NOMBRES PARA LEER");
@@ -2958,21 +2958,21 @@ public class ContaDAO implements SystemDates{
 		}
     	// creamos un objeto resulset para recoger los datos
     	ResultSet rs=null;
+    	ResultSet rsAnt=null;
     	
     	try {
 			rs=st.executeQuery("SELECT * FROM "+fichero+" WHERE fecha>='"+fec1+"' && fecha<='"+fec2+"' && cuenta>='"+cta1+"' && cuenta<='"+cta2+"' ORDER BY cuenta,fecha,numasto,numapunte ");
-		} catch (SQLException e) {
+    	} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			System.err.println("Error intentando select en fichero "+fichero);
 			e.printStackTrace();
 		}
-
     	// La cuenta de resultado se ejecuta con cuentas de nivel 3
     	// las cuentas a nivel 3
     	String ctasNivel3[][] = null;
     	//recibimos un array con sumas y saldos a nivel 3
     	ctasNivel3=leeSumasySaldosNivel3(rs,namesCta);
-    
+    	
     	
     	// crea los distintos string[] para cada cuenta
     	// toda cuenta auxiliar tiene cinco lineas de cabecera
@@ -3028,9 +3028,9 @@ public class ContaDAO implements SystemDates{
 
     	cabecera4[0]="Nº CUENTAS";
     	cabecera4[1]=" ";
-    	cabecera4[2]="AÑO "+PantallaPrincipal.Year;
-    	cabecera4[3]="AÑO "+String.valueOf((int)Integer.parseInt(PantallaPrincipal.Year)-1);
-    	cabecera4[4]=" ";
+    	cabecera4[2]=" NOTA ";
+    	cabecera4[3]="AÑO "+PantallaPrincipal.Year;
+    	cabecera4[4]="AÑO "+String.valueOf((int)Integer.parseInt(PantallaPrincipal.Year)-1);
     	
     	cabecera5[0]=" ";
     	cabecera5[1]=" ";
@@ -3044,8 +3044,8 @@ public class ContaDAO implements SystemDates{
     	sumas1[3]=" ";
     	sumas1[4]=" ";
     	
-    	sumas2[0]=" 2. Variación existencias prod. terminados o curso";
-    	sumas2[1]=" ";
+    	sumas2[0]=" ";
+    	sumas2[1]=" 2. Variación existencias prod. terminados o curso";
     	sumas2[2]=" ";
     	sumas2[3]=" ";
     	sumas2[4]=" ";
@@ -3147,255 +3147,588 @@ public class ContaDAO implements SystemDates{
     	sumas18[4]=" ";
  
     	sumasA[0]=" ";
-    	sumasA[1]="A) RESULTADO DE EXPLOTACION";
+    	sumasA[1]="     A) RESULTADO DE EXPLOTACION";
     	sumasA[2]=" ";
     	sumasA[3]=" ";
     	sumasA[4]=" ";
     	
     	sumasB[0]=" ";
-    	sumasB[1]="B) RESULTADO FINANCIERO";
+    	sumasB[1]="     B) RESULTADO FINANCIERO";
     	sumasB[2]=" ";
     	sumasB[3]=" ";
     	sumasB[4]=" ";
     	
     	sumasC[0]=" ";
-    	sumasC[1]="C) RESULTADO ANTES DE IMPUESTOS";
+    	sumasC[1]="     C) RESULTADO ANTES DE IMPUESTOS";
     	sumasC[2]=" ";
     	sumasC[3]=" ";
     	sumasC[4]=" ";
     	
     	sumasD[0]=" ";
-    	sumasD[1]="D) RESULTADO DEL EJERCICIO";
+    	sumasD[1]="     D) RESULTADO DEL EJERCICIO";
     	sumasD[2]=" ";
     	sumasD[3]=" ";
     	sumasD[4]=" ";
     	
     	
-    	int n=0;	// MOVIMIENTOS LEIDOS
+    	// zona de lectura del array de cuentas de nivel 3
+    	// y acumulacion en los arrays de mostrar datos
     
+    	float sum1=0, sum2=0, sum3=0, sum4=0, sum5=0, sum6=0;
+    	float sum7=0, sum8=0, sum9=0, sum10=0, sum11=0, sum12=0;
+    	float sum13=0, sum14=0, sum15=0, sum16=0, sum17=0;
+    	float sum18=0;
 
     	
+    	int cuenta=0;
+    	
+    	// leemos las cuentas del año actual
+    	
+    	for (int k=0;k<ctasNivel3.length;k++) {  		
+    		
+    		cuenta=(int)Integer.parseInt(ctasNivel3[k][0]);
+
+    		if (cuenta>=700 && cuenta<=709) {
+    			sum1+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum1-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta>=710 && cuenta<=719) {
+    			sum2+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum2-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta>=730 && cuenta<=739) {
+    			sum3+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum3-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta>=600 && cuenta<=619) {
+    			sum4+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum4-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==693 || cuenta==793) {
+    			sum4+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum4-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta>=750 && cuenta<=759) {
+    			sum5+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum5-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==740 || cuenta==747) {
+    			sum5+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum5-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta>=640 && cuenta<=649) {
+    			sum6+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum6-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta>=620 && cuenta<=629) {
+    			sum7+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum7-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==631 || cuenta==634 || cuenta==636 ) {
+    			sum7+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum7-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==639 || cuenta==694 || cuenta==695 || cuenta==794) {
+    			sum7+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum7-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta>=650 && cuenta<=659) {
+    			sum7+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum7-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta>=680 && cuenta<=689) {
+    			sum8+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum8-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==746) {
+    			sum9+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum9-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==795) {
+    			sum10+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum10-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta>=670 && cuenta<=677) {
+    			sum11+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum11-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta>=770 && cuenta<=777) {
+    			sum11+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum11-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==690 || cuenta==691 || cuenta==692) {
+    			sum11+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum11-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==790 || cuenta==791 || cuenta==792) {
+    			sum11+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum11-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==678 || cuenta==778) {
+    			sum12+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum12-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==760 || cuenta==761 || cuenta==762 || cuenta==769) {
+    			sum13+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum13-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==660 || cuenta==661 || cuenta==662) {
+    			sum14+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum14-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==664 || cuenta==665 || cuenta==669) {
+    			sum14+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum14-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==663 || cuenta==763) {
+    			sum15+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum15-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==668 || cuenta==768) {
+    			sum16+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum16-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==666 || cuenta==667 || cuenta==673 || cuenta==675) {
+    			sum17+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum17-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==696 || cuenta==697 || cuenta==698 || cuenta==699) {
+    			sum17+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum17-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==766 || cuenta==773 || cuenta==775) {
+    			sum17+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum17-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==796 || cuenta==797 || cuenta==798 || cuenta==799) {
+    			sum17+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum17-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    		if (cuenta==630 || cuenta==633 || cuenta==638) {
+    			sum18+=(float)Float.parseFloat(ctasNivel3[k][5]);
+    			sum18-=(float)Float.parseFloat(ctasNivel3[k][4]);
+    		}
+    
+    	}
+			
+    	// realizamos los sumatorios de los totales
+    	float totA=sum1+sum2+sum3+sum4+sum5+sum6+sum7+sum8+sum9+sum10+sum11+sum12;
+    	float totB=sum13+sum14+sum15+sum16+sum17;
+    	float totC=totA+totB;
+    	float totD=totC+sum18;
+    	
+    	// rellenamos las matrices de presentacion de datos
+    	sumas1[3]=dosdecimales(String.valueOf(sum1));
+    	sumas2[3]=dosdecimales(String.valueOf(sum2));
+    	sumas3[3]=dosdecimales(String.valueOf(sum3));
+    	sumas4[3]=dosdecimales(String.valueOf(sum4));
+    	sumas5[3]=dosdecimales(String.valueOf(sum5));
+    	sumas6[3]=dosdecimales(String.valueOf(sum6));
+    	sumas7[3]=dosdecimales(String.valueOf(sum7));
+    	sumas8[3]=dosdecimales(String.valueOf(sum8));
+    	sumas9[3]=dosdecimales(String.valueOf(sum9));
+    	sumas10[3]=dosdecimales(String.valueOf(sum10));
+    	sumas11[3]=dosdecimales(String.valueOf(sum11));
+    	sumas12[3]=dosdecimales(String.valueOf(sum12));
+    	sumasA[3]=dosdecimales(String.valueOf(totA));
+    	sumas13[3]=dosdecimales(String.valueOf(sum13));
+    	sumas14[3]=dosdecimales(String.valueOf(sum14));
+    	sumas15[3]=dosdecimales(String.valueOf(sum15));
+    	sumas16[3]=dosdecimales(String.valueOf(sum16));
+    	sumas17[3]=dosdecimales(String.valueOf(sum17));
+    	sumasB[3]=dosdecimales(String.valueOf(totB));
+    	sumasC[3]=dosdecimales(String.valueOf(totC));
+    	sumas18[3]=dosdecimales(String.valueOf(sum18));
+    	sumasD[3]=dosdecimales(String.valueOf(totD));
+    	
+    	
+    	// leemos el año anterior 
+    	// el año anterior tiene una limitacion de numero de asiento porque los ultimos 5 asientos estan reservados
+    	// para las operaciones de cierre del ejercicio
     	try {
-    		
-
-    		
-    		// devolvemos el punto del rs al punto inicial
-    		rs.beforeFirst();
-			while(rs.next()) {
-				
-
-		
-			} // fin del while
-			
-			
-    		// grabamos las cabeceras
-    		datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(cabecera1[0]);
-    		datosLeidos.get(n).add(cabecera1[1]);
-    		datosLeidos.get(n).add(cabecera1[2]);
-    		datosLeidos.get(n).add(cabecera1[3]);
-    		datosLeidos.get(n).add(cabecera1[4]);	
-    		n++;
-    		datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(cabecera2[0]);
-    		datosLeidos.get(n).add(cabecera2[1]);
-    		datosLeidos.get(n).add(cabecera2[2]);
-    		datosLeidos.get(n).add(cabecera2[3]);
-    		datosLeidos.get(n).add(cabecera2[4]);
-    		n++;
-    		datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(cabecera3[0]);
-    		datosLeidos.get(n).add(cabecera3[1]);
-    		datosLeidos.get(n).add(cabecera3[2]);
-    		datosLeidos.get(n).add(cabecera3[3]);
-    		datosLeidos.get(n).add(cabecera3[4]);
-    		n++;
-    		datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(cabecera4[0]);
-    		datosLeidos.get(n).add(cabecera4[1]);
-    		datosLeidos.get(n).add(cabecera4[2]);
-    		datosLeidos.get(n).add(cabecera4[3]);
-    		datosLeidos.get(n).add(cabecera4[4]);
-    		n++;
-    		datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(cabecera5[0]);
-    		datosLeidos.get(n).add(cabecera5[1]);
-    		datosLeidos.get(n).add(cabecera5[2]);
-    		datosLeidos.get(n).add(cabecera5[3]);
-    		datosLeidos.get(n).add(cabecera5[4]);
-			
-    		// grabamos las lineas
-    		n++;
-    		datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas1[0]);
-    		datosLeidos.get(n).add(sumas1[1]);
-    		datosLeidos.get(n).add(sumas1[2]);
-    		datosLeidos.get(n).add(sumas1[3]);
-    		datosLeidos.get(n).add(sumas1[4]);
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas2[0]);
-    		datosLeidos.get(n).add(sumas2[1]);
-    		datosLeidos.get(n).add(sumas2[2]);
-    		datosLeidos.get(n).add(sumas2[3]);
-    		datosLeidos.get(n).add(sumas2[4]);
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas3[0]);
-    		datosLeidos.get(n).add(sumas3[1]);
-    		datosLeidos.get(n).add(sumas3[2]);
-    		datosLeidos.get(n).add(sumas3[3]);
-    		datosLeidos.get(n).add(sumas3[4]);
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas4[0]);
-    		datosLeidos.get(n).add(sumas4[1]);
-    		datosLeidos.get(n).add(sumas4[2]);
-    		datosLeidos.get(n).add(sumas4[3]);
-    		datosLeidos.get(n).add(sumas4[4]);
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas5[0]);
-    		datosLeidos.get(n).add(sumas5[1]);
-    		datosLeidos.get(n).add(sumas5[2]);
-    		datosLeidos.get(n).add(sumas5[3]);
-    		datosLeidos.get(n).add(sumas5[4]);
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas6[0]);
-    		datosLeidos.get(n).add(sumas6[1]);
-    		datosLeidos.get(n).add(sumas6[2]);
-    		datosLeidos.get(n).add(sumas6[3]);
-    		datosLeidos.get(n).add(sumas6[4]);
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas7[0]);
-    		datosLeidos.get(n).add(sumas7[1]);
-    		datosLeidos.get(n).add(sumas7[2]);
-    		datosLeidos.get(n).add(sumas7[3]);
-    		datosLeidos.get(n).add(sumas7[4]);
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas8[0]);
-    		datosLeidos.get(n).add(sumas8[1]);
-    		datosLeidos.get(n).add(sumas8[2]);
-    		datosLeidos.get(n).add(sumas8[3]);
-    		datosLeidos.get(n).add(sumas8[4]);
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas9[0]);
-    		datosLeidos.get(n).add(sumas9[1]);
-    		datosLeidos.get(n).add(sumas9[2]);
-    		datosLeidos.get(n).add(sumas9[3]);
-    		datosLeidos.get(n).add(sumas9[4]);
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas10[0]);
-    		datosLeidos.get(n).add(sumas10[1]);
-    		datosLeidos.get(n).add(sumas10[2]);
-    		datosLeidos.get(n).add(sumas10[3]);
-    		datosLeidos.get(n).add(sumas10[4]);
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas11[0]);
-    		datosLeidos.get(n).add(sumas11[1]);
-    		datosLeidos.get(n).add(sumas11[2]);
-    		datosLeidos.get(n).add(sumas11[3]);
-    		datosLeidos.get(n).add(sumas11[4]);
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas12[0]);
-    		datosLeidos.get(n).add(sumas12[1]);
-    		datosLeidos.get(n).add(sumas12[2]);
-    		datosLeidos.get(n).add(sumas12[3]);
-    		datosLeidos.get(n).add(sumas12[4]);
-    		
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumasA[0]);
-    		datosLeidos.get(n).add(sumasA[1]);
-    		datosLeidos.get(n).add(sumasA[2]);
-    		datosLeidos.get(n).add(sumasA[3]);
-    		datosLeidos.get(n).add(sumasA[4]);
-    		
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas13[0]);
-    		datosLeidos.get(n).add(sumas13[1]);
-    		datosLeidos.get(n).add(sumas13[2]);
-    		datosLeidos.get(n).add(sumas13[3]);
-    		datosLeidos.get(n).add(sumas13[4]);
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas14[0]);
-    		datosLeidos.get(n).add(sumas14[1]);
-    		datosLeidos.get(n).add(sumas14[2]);
-    		datosLeidos.get(n).add(sumas14[3]);
-    		datosLeidos.get(n).add(sumas14[4]);
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas15[0]);
-    		datosLeidos.get(n).add(sumas15[1]);
-    		datosLeidos.get(n).add(sumas15[2]);
-    		datosLeidos.get(n).add(sumas15[3]);
-    		datosLeidos.get(n).add(sumas15[4]);
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas16[0]);
-    		datosLeidos.get(n).add(sumas16[1]);
-    		datosLeidos.get(n).add(sumas16[2]);
-    		datosLeidos.get(n).add(sumas16[3]);
-    		datosLeidos.get(n).add(sumas16[4]);
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas17[0]);
-    		datosLeidos.get(n).add(sumas17[1]);
-    		datosLeidos.get(n).add(sumas17[2]);
-    		datosLeidos.get(n).add(sumas17[3]);
-    		datosLeidos.get(n).add(sumas17[4]);
-    		
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumasB[0]);
-    		datosLeidos.get(n).add(sumasB[1]);
-    		datosLeidos.get(n).add(sumasB[2]);
-    		datosLeidos.get(n).add(sumasB[3]);
-    		datosLeidos.get(n).add(sumasB[4]);
-    		
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumasC[0]);
-    		datosLeidos.get(n).add(sumasC[1]);
-    		datosLeidos.get(n).add(sumasC[2]);
-    		datosLeidos.get(n).add(sumasC[3]);
-    		datosLeidos.get(n).add(sumasC[4]);
-    		
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumas18[0]);
-    		datosLeidos.get(n).add(sumas18[1]);
-    		datosLeidos.get(n).add(sumas18[2]);
-    		datosLeidos.get(n).add(sumas18[3]);
-    		datosLeidos.get(n).add(sumas18[4]);
-    		
-			n++;
-			datosLeidos.add(new ArrayList<String>());
-    		datosLeidos.get(n).add(sumasD[0]);
-    		datosLeidos.get(n).add(sumasD[1]);
-    		datosLeidos.get(n).add(sumasD[2]);
-    		datosLeidos.get(n).add(sumasD[3]);
-    		datosLeidos.get(n).add(sumasD[4]);
-    		
-		} catch (SQLException e) {
+			rsAnt=st.executeQuery("SELECT * FROM "+ficheroAnt+" WHERE fecha>='"+fec1Ant+"' && fecha<='"+fec2Ant+"' " +
+				"&& cuenta>='"+cta1+"' && cuenta<='"+cta2+"' && numasto<'9996' ORDER BY cuenta,fecha,numasto,numapunte ");
+    	} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			System.err.println("Error intentando select en fichero "+ficheroAnt);
 			e.printStackTrace();
 		}
+    	// La cuenta de resultado se ejecuta con cuentas de nivel 3
+    	// las cuentas a nivel 3 del año anterior
+    	String ctasNivel3Ant[][] = null;
+    	//recibimos un array con sumas y saldos a nivel 3
+    	ctasNivel3Ant=leeSumasySaldosNivel3(rsAnt,namesCta);
+
+    	
+    	// ponemos a cero las variables
+    	
+    	sum1=0; sum2=0; sum3=0; sum4=0; sum5=0; sum6=0;
+    	sum7=0; sum8=0; sum9=0; sum10=0; sum11=0; sum12=0;
+    	sum13=0; sum14=0; sum15=0; sum16=0; sum17=0;
+    	sum18=0;
+    	
+    	for (int k=0;k<ctasNivel3Ant.length;k++) {  		
+    		
+    		cuenta=(int)Integer.parseInt(ctasNivel3Ant[k][0]);
+    		
+    		if (cuenta>=700 && cuenta<=709) {
+    			sum1+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum1-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta>=710 && cuenta<=719) {
+    			sum2+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum2-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta>=730 && cuenta<=739) {
+    			sum3+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum3-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta>=600 && cuenta<=619) {
+    			sum4+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum4-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==693 || cuenta==793) {
+    			sum4+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum4-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta>=750 && cuenta<=759) {
+    			sum5+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum5-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==740 || cuenta==747) {
+    			sum5+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum5-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta>=640 && cuenta<=649) {
+    			sum6+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum6-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta>=620 && cuenta<=629) {
+    			sum7+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum7-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==631 || cuenta==634 || cuenta==636 ) {
+    			sum7+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum7-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==639 || cuenta==694 || cuenta==695 || cuenta==794) {
+    			sum7+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum7-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta>=650 && cuenta<=659) {
+    			sum7+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum7-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta>=680 && cuenta<=689) {
+    			sum8+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum8-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==746) {
+    			sum9+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum9-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==795) {
+    			sum10+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum10-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta>=670 && cuenta<=677) {
+    			sum11+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum11-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta>=770 && cuenta<=777) {
+    			sum11+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum11-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==690 || cuenta==691 || cuenta==692) {
+    			sum11+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum11-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==790 || cuenta==791 || cuenta==792) {
+    			sum11+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum11-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==678 || cuenta==778) {
+    			sum12+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum12-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==760 || cuenta==761 || cuenta==762 || cuenta==769) {
+    			sum13+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum13-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==660 || cuenta==661 || cuenta==662) {
+    			sum14+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum14-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==664 || cuenta==665 || cuenta==669) {
+    			sum14+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum14-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==663 || cuenta==763) {
+    			sum15+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum15-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==668 || cuenta==768) {
+    			sum16+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum16-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==666 || cuenta==667 || cuenta==673 || cuenta==675) {
+    			sum17+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum17-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==696 || cuenta==697 || cuenta==698 || cuenta==699) {
+    			sum17+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum17-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==766 || cuenta==773 || cuenta==775) {
+    			sum17+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum17-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==796 || cuenta==797 || cuenta==798 || cuenta==799) {
+    			sum17+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum17-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    		if (cuenta==630 || cuenta==633 || cuenta==638) {
+    			sum18+=(float)Float.parseFloat(ctasNivel3Ant[k][5]);
+    			sum18-=(float)Float.parseFloat(ctasNivel3Ant[k][4]);
+    		}
+    
+    	}
+    	
+    	// realizamos los sumatorios de los totales
+    	totA=sum1+sum2+sum3+sum4+sum5+sum6+sum7+sum8+sum9+sum10+sum11+sum12;
+    	totB=sum13+sum14+sum15+sum16+sum17;
+    	totC=totA+totB;
+    	totD=totC+sum18;
+    	
+    	// rellenamos las matrices de presentacion de datos
+    	sumas1[4]=dosdecimales(String.valueOf(sum1));
+    	sumas2[4]=dosdecimales(String.valueOf(sum2));
+    	sumas3[4]=dosdecimales(String.valueOf(sum3));
+    	sumas4[4]=dosdecimales(String.valueOf(sum4));
+    	sumas5[4]=dosdecimales(String.valueOf(sum5));
+    	sumas6[4]=dosdecimales(String.valueOf(sum6));
+    	sumas7[4]=dosdecimales(String.valueOf(sum7));
+    	sumas8[4]=dosdecimales(String.valueOf(sum8));
+    	sumas9[4]=dosdecimales(String.valueOf(sum9));
+    	sumas10[4]=dosdecimales(String.valueOf(sum10));
+    	sumas11[4]=dosdecimales(String.valueOf(sum11));
+    	sumas12[4]=dosdecimales(String.valueOf(sum12));
+    	sumasA[4]=dosdecimales(String.valueOf(totA));
+    	sumas13[4]=dosdecimales(String.valueOf(sum13));
+    	sumas14[4]=dosdecimales(String.valueOf(sum14));
+    	sumas15[4]=dosdecimales(String.valueOf(sum15));
+    	sumas16[4]=dosdecimales(String.valueOf(sum16));
+    	sumas17[4]=dosdecimales(String.valueOf(sum17));
+    	sumasB[4]=dosdecimales(String.valueOf(totB));
+    	sumasC[4]=dosdecimales(String.valueOf(totC));
+    	sumas18[4]=dosdecimales(String.valueOf(sum18));
+    	sumasD[4]=dosdecimales(String.valueOf(totD));
+    	
+    	
+		// grabamos las cabeceras
+    	int n=0;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(cabecera1[0]);
+		datosLeidos.get(n).add(cabecera1[1]);
+		datosLeidos.get(n).add(cabecera1[2]);
+		datosLeidos.get(n).add(cabecera1[3]);
+		datosLeidos.get(n).add(cabecera1[4]);	
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(cabecera2[0]);
+		datosLeidos.get(n).add(cabecera2[1]);
+		datosLeidos.get(n).add(cabecera2[2]);
+		datosLeidos.get(n).add(cabecera2[3]);
+		datosLeidos.get(n).add(cabecera2[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(cabecera3[0]);
+		datosLeidos.get(n).add(cabecera3[1]);
+		datosLeidos.get(n).add(cabecera3[2]);
+		datosLeidos.get(n).add(cabecera3[3]);
+		datosLeidos.get(n).add(cabecera3[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(cabecera4[0]);
+		datosLeidos.get(n).add(cabecera4[1]);
+		datosLeidos.get(n).add(cabecera4[2]);
+		datosLeidos.get(n).add(cabecera4[3]);
+		datosLeidos.get(n).add(cabecera4[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(cabecera5[0]);
+		datosLeidos.get(n).add(cabecera5[1]);
+		datosLeidos.get(n).add(cabecera5[2]);
+		datosLeidos.get(n).add(cabecera5[3]);
+		datosLeidos.get(n).add(cabecera5[4]);
+		
+		// grabamos las lineas
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas1[0]);
+		datosLeidos.get(n).add(sumas1[1]);
+		datosLeidos.get(n).add(sumas1[2]);
+		datosLeidos.get(n).add(sumas1[3]);
+		datosLeidos.get(n).add(sumas1[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas2[0]);
+		datosLeidos.get(n).add(sumas2[1]);
+		datosLeidos.get(n).add(sumas2[2]);
+		datosLeidos.get(n).add(sumas2[3]);
+		datosLeidos.get(n).add(sumas2[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas3[0]);
+		datosLeidos.get(n).add(sumas3[1]);
+		datosLeidos.get(n).add(sumas3[2]);
+		datosLeidos.get(n).add(sumas3[3]);
+		datosLeidos.get(n).add(sumas3[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas4[0]);
+		datosLeidos.get(n).add(sumas4[1]);
+		datosLeidos.get(n).add(sumas4[2]);
+		datosLeidos.get(n).add(sumas4[3]);
+		datosLeidos.get(n).add(sumas4[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas5[0]);
+		datosLeidos.get(n).add(sumas5[1]);
+		datosLeidos.get(n).add(sumas5[2]);
+		datosLeidos.get(n).add(sumas5[3]);
+		datosLeidos.get(n).add(sumas5[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas6[0]);
+		datosLeidos.get(n).add(sumas6[1]);
+		datosLeidos.get(n).add(sumas6[2]);
+		datosLeidos.get(n).add(sumas6[3]);
+		datosLeidos.get(n).add(sumas6[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas7[0]);
+		datosLeidos.get(n).add(sumas7[1]);
+		datosLeidos.get(n).add(sumas7[2]);
+		datosLeidos.get(n).add(sumas7[3]);
+		datosLeidos.get(n).add(sumas7[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas8[0]);
+		datosLeidos.get(n).add(sumas8[1]);
+		datosLeidos.get(n).add(sumas8[2]);
+		datosLeidos.get(n).add(sumas8[3]);
+		datosLeidos.get(n).add(sumas8[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas9[0]);
+		datosLeidos.get(n).add(sumas9[1]);
+		datosLeidos.get(n).add(sumas9[2]);
+		datosLeidos.get(n).add(sumas9[3]);
+		datosLeidos.get(n).add(sumas9[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas10[0]);
+		datosLeidos.get(n).add(sumas10[1]);
+		datosLeidos.get(n).add(sumas10[2]);
+		datosLeidos.get(n).add(sumas10[3]);
+		datosLeidos.get(n).add(sumas10[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas11[0]);
+		datosLeidos.get(n).add(sumas11[1]);
+		datosLeidos.get(n).add(sumas11[2]);
+		datosLeidos.get(n).add(sumas11[3]);
+		datosLeidos.get(n).add(sumas11[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas12[0]);
+		datosLeidos.get(n).add(sumas12[1]);
+		datosLeidos.get(n).add(sumas12[2]);
+		datosLeidos.get(n).add(sumas12[3]);
+		datosLeidos.get(n).add(sumas12[4]);
+		
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumasA[0]);
+		datosLeidos.get(n).add(sumasA[1]);
+		datosLeidos.get(n).add(sumasA[2]);
+		datosLeidos.get(n).add(sumasA[3]);
+		datosLeidos.get(n).add(sumasA[4]);
+		
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas13[0]);
+		datosLeidos.get(n).add(sumas13[1]);
+		datosLeidos.get(n).add(sumas13[2]);
+		datosLeidos.get(n).add(sumas13[3]);
+		datosLeidos.get(n).add(sumas13[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas14[0]);
+		datosLeidos.get(n).add(sumas14[1]);
+		datosLeidos.get(n).add(sumas14[2]);
+		datosLeidos.get(n).add(sumas14[3]);
+		datosLeidos.get(n).add(sumas14[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas15[0]);
+		datosLeidos.get(n).add(sumas15[1]);
+		datosLeidos.get(n).add(sumas15[2]);
+		datosLeidos.get(n).add(sumas15[3]);
+		datosLeidos.get(n).add(sumas15[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas16[0]);
+		datosLeidos.get(n).add(sumas16[1]);
+		datosLeidos.get(n).add(sumas16[2]);
+		datosLeidos.get(n).add(sumas16[3]);
+		datosLeidos.get(n).add(sumas16[4]);
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas17[0]);
+		datosLeidos.get(n).add(sumas17[1]);
+		datosLeidos.get(n).add(sumas17[2]);
+		datosLeidos.get(n).add(sumas17[3]);
+		datosLeidos.get(n).add(sumas17[4]);
+		
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumasB[0]);
+		datosLeidos.get(n).add(sumasB[1]);
+		datosLeidos.get(n).add(sumasB[2]);
+		datosLeidos.get(n).add(sumasB[3]);
+		datosLeidos.get(n).add(sumasB[4]);
+		
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumasC[0]);
+		datosLeidos.get(n).add(sumasC[1]);
+		datosLeidos.get(n).add(sumasC[2]);
+		datosLeidos.get(n).add(sumasC[3]);
+		datosLeidos.get(n).add(sumasC[4]);
+		
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumas18[0]);
+		datosLeidos.get(n).add(sumas18[1]);
+		datosLeidos.get(n).add(sumas18[2]);
+		datosLeidos.get(n).add(sumas18[3]);
+		datosLeidos.get(n).add(sumas18[4]);
+		
+		n++;
+		datosLeidos.add(new ArrayList<String>());
+		datosLeidos.get(n).add(sumasD[0]);
+		datosLeidos.get(n).add(sumasD[1]);
+		datosLeidos.get(n).add(sumasD[2]);
+		datosLeidos.get(n).add(sumasD[3]);
+		datosLeidos.get(n).add(sumasD[4]);
  
     	// en el final, se transforma el arrayList en un array[n][10]
-    	String lectura[][]=new String[datosLeidos.size()][6];
+    	String lectura[][]=new String[datosLeidos.size()][5];
     	
     	for (int i=0;i<datosLeidos.size();i++) {
-    		lectura[i]=datosLeidos.get(i).toArray(new String[6]);
+    		lectura[i]=datosLeidos.get(i).toArray(new String[5]);
     	}
     	// se devuelve el array con la informacion a listar
     	return lectura;
