@@ -31,7 +31,7 @@ public class ContMnuResultados implements ActionListener, Settings {
 	private JButton listar;
 	private JButton cancelar;
 	
-	//private ContListadoRsdos listaResultados;
+	private ContListadoResultado listaResultados;
 	
 	
 	
@@ -129,9 +129,9 @@ public class ContMnuResultados implements ActionListener, Settings {
 						
 			if (compruebaErrores()) {
 				// no habiendo errores
-				/*
+				
 				menuResultados.setVisible(false);
-				listaResultados=new ContListadoSyS("EC001","Ecovitalia",this.r1.getText(),this.r2.getText(),this.r3.getText(),this.r4.getText());
+				listaResultados=new ContListadoResultado("EC001","Ecovitalia",this.r1.getText(),this.r2.getText());
 				menuResultados.remove(space1);
 				menuResultados.remove(space2);
 				menuResultados.remove(north);
@@ -143,9 +143,9 @@ public class ContMnuResultados implements ActionListener, Settings {
 
 				menuResultados.add(listaResultados.retorna());
 				menuResultados.setPreferredSize(new Dimension(850,(listaResultados.sizeComponent*20)+125));
-				menuResultados.setAlignmentY(TOP_ALIGNMENT);
+			//	menuResultados.setAlignmentY(TOP_ALIGNMENT);
 				menuResultados.setVisible(true);
-				*/
+				
 				
 			}
 

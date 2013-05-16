@@ -84,7 +84,8 @@ public class ContMnuSumasSaldos extends JFrame implements ActionListener, Settin
 		r2=new JTextField("79999999");
 		r3=new JTextField("01-01-2012");
 		r4=new JTextField("31-12-2012");
-		r5=new JTextField("8");
+		r5=new JTextField(String.valueOf(LongAuxiliares));
+		r5.setEditable(false);
 		r6=new JCheckBox();
 		r6.setBackground(ColorFondo);
 
