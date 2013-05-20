@@ -163,6 +163,8 @@ public class ContMnuMayor extends JFrame implements ActionListener, Settings {
 	
 	/* ****************************************************************************
 	 * Este metodo realiza la comprobacion de errores en introduccion formulario
+	 * Comprueba que la longitud de cuentas auxiliares es igual al LongAuxiliares
+	 * Instancia el metodo compruebaFecha para verificar la fecha
 	 * 
 	 * No recibe parametros
 	 * Devuelve TRUE/FALSE segun este correcto o incorrecto el formulario

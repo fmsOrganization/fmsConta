@@ -108,6 +108,7 @@ public class CompanyFiles implements SystemDates{
         String fich5="c_"+this.keyEmpresa+yearAct+"ivaclie";
         String fich6="c_"+this.keyEmpresa+yearAct+"ivaprov";
         String fich7="c_"+this.keyEmpresa+"vtos";
+        String fich8="c_"+this.keyEmpresa+"impt";
         
         // crea los ficheros
         try {
@@ -162,6 +163,12 @@ public class CompanyFiles implements SystemDates{
         			"tipo VARCHAR( 1 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL, impvto DECIMAL( 10, 2 ) NOT NULL, " +
         			"fechavto DATE NOT NULL, sit VARCHAR( 1 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL, " +
         			"numapunte INT NOT NULL, banco VARCHAR( 9 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL)");
+        	// FICHERO DE IMPUESTOS
+        	rs = st.executeUpdate("CREATE TABLE IF NOT EXISTS "+fich8+" (clase VARCHAR( 1 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL," +
+        			"tipo DECIMAL( 2, 2 ) NOT NULL, " +
+        			" nombre VARCHAR( 40 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL, " +
+        			"destino VARCHAR( 1 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL, " +
+        			"marca VARCHAR( 1 ) CHARACTER SET latin1 COLLATE latin1_spanish_ci NOT NULL )");
         	
         } catch (SQLException ex) {
         		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);

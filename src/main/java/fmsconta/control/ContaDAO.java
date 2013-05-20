@@ -3737,4 +3737,100 @@ public class ContaDAO implements SystemDates{
     
     
     
+    /* **********************************************************
+     * Este metodo lee los settings de una empresa 
+     * 
+     * Recibe como parametro el keyempr
+     * Devuelve un String con los datos del fichero settings
+     *********************************************************** */
+    
+    public String[][] leeSettings(String keyEmpr) {
+
+    	// construye el nombre del fichero a buscar
+    	String fichero="c_"+keyEmpr+"impt";
+        
+        	// crea una conexion
+        	Connection con=ConnectDB();
+        	
+        	Statement st=null;
+        	try {
+        		st = con.createStatement();
+        	} catch (SQLException ex) {
+        		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+        		// si hay algun error cerramos la conexion y return null
+        		try {
+    				con.close();
+    			} catch (SQLException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+        		return null;
+        	}
+              
+        	
+        	ResultSet rs=null; 
+        	try {   
+        		rs = st.executeQuery("SELECT * FROM "+fichero+" ORDER BY clase,destino,marca");
+        	} catch (SQLException ex) {
+        		Logger.getLogger(ContaDAO.class.getName()).log(Level.SEVERE, null, ex);
+        		// si hay algun error cerramos la conexion y return null
+        		try {
+    				con.close();
+    			} catch (SQLException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+        		return null;
+        	} 
+           
+        	ArrayList<ArrayList<String>> datosgen=new ArrayList<ArrayList<String>>();
+        	
+        	try {
+        		
+        		while (rs.next()){
+        			ArrayList<String> datos=new ArrayList<String>();
+        			// lee todos los datos y los transforma a String
+        			datos.add(String.valueOf(rs.getInt(1)));
+        			datos.add(rs.getString(2));
+        			datos.add(dosdecimales(String.valueOf(rs.getFloat(3))));
+        			datos.add(rs.getString(4));
+        			datos.add(rs.getString(5));
+        			datos.add(rs.getString(6));
+        			datosgen.add(datos);
+        		}
+        		
+        	} catch (SQLException ex) {
+        		// si hay algun error cerramos la conexion y return null
+        		try {
+    				con.close();
+    			} catch (SQLException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+        		return null;
+        	} 
+
+        	// si todo ha ido bien
+        	// cerramos la conexion y retornamos el String[]
+        	try {
+    			con.close();
+    		} catch (SQLException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
+        	
+        	// creamos el array de devolucion informacion
+        	String settings[][]=new String[datosgen.size()][6];
+        	// grabamos la info en el array
+        	for (int k=0;k<datosgen.size();k++) {
+        		
+        		settings[k]=datosgen.get(k).toArray(new String[6]);
+        		
+        	}
+        	
+        	return settings;
+ 
+    }
+    
+    
 } // ********************************************************* FIN CLASE CONTADAO
