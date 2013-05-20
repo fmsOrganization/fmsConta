@@ -69,12 +69,14 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 	private CombosSuperior combos;
 	private BoxLayout horizontal2;
 	private CambioEmpresa changeCompany;
+	private ContSettings changeSettings;
 	private ContListadoMayor listaMayor;
 	private ContMnuMayor menuMayor;
 	private ContMnuDiario menuDiario;
 	private ContMnuSumasSaldos menuSumas;
 	private ContMnuResultados menuResultados;
 	private ContMnuBalance menuBalance;
+	
 	// panel de la izquierda y sus componentes
 	private JPanel panelIzq;
 	private BoxLayout vertical;
@@ -356,6 +358,9 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 		botonesFijos.salida.addActionListener(this);
 		combos.combo1.addActionListener(this);
 		combos.combo2.addActionListener(this);
+		combos.combo3.addActionListener(this);
+		combos.combo4.addActionListener(this);
+		combos.combo5.addActionListener(this);
 
 	} //fin del constructor
 	
@@ -407,16 +412,16 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 		
 		if (source == botonesFijos.faqs) {
 			panelCen.setVisible(false);	
-			JOptionPane.showMessageDialog(null, "faqs pulsada");
+			JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
 		}
 		if (source == botonesFijos.boe) {
-			panelCen.setVisible(true);	
-			JOptionPane.showMessageDialog(null, "BOE pulsada");
+			panelCen.setVisible(false);	
+			JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
 		}
 		if (source == botonesFijos.copseg) {
 			panelCen.setVisible(false);	
 			refresh();
-			JOptionPane.showMessageDialog(null, "Copia seguridad pulsada");
+			JOptionPane.showMessageDialog(null, "Pantalla refrescada - Cambios efectuados");
 		}
 		if (source == botonesFijos.salida) {
 			panelCen.setVisible(false);	
@@ -429,11 +434,6 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 		
 		if (source==combos.combo1) {
 			String loque=combos.combo1.getSelectedItem().toString();
-			// ponemos los demas combos en general
-			combos.combo2.setSelectedIndex(0);
-			combos.combo3.setSelectedIndex(0);
-			combos.combo4.setSelectedIndex(0);
-			combos.combo5.setSelectedIndex(0);
 			if (loque.equals("Cambio empresa")) {
 				// borramos el panel central
 				panelCen.setVisible(false);	
@@ -450,14 +450,34 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 				panelCen.getViewport().setView(panelAuxCen);
 				panelCen.setVisible(true);
 			}	
-		}
+			if (loque.equals("Alta apertura")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("Fin ejercicio")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("Settings")) {
+				// borramos el panel central
+				panelCen.setVisible(false);	
+				panelCen.remove(panelAuxCen);
+				panelCen.validate();
+				// creamos un nuevo panel central
+				panelAuxCen=new JPanel();
+				panelAuxCen.setBackground(ColorFondo);
+				// invocamos y mostramos el nuevo panel central
+				changeSettings=new ContSettings(datosEmpr,datosUser);
+				panelAuxCen.add(changeSettings.retorna());
+				//panelCen.add(panelAuxCen);
+				panelCen.setViewportView(panelAuxCen);
+				panelCen.getViewport().setView(panelAuxCen);
+				panelCen.setVisible(true);
+			}
+		} // fin combo1
 		
 		if (source==combos.combo2) {
 			// ponemos los demas combos en general
-		//	combos.combo1.setSelectedIndex(0);
-			combos.combo3.setSelectedIndex(0);
-			combos.combo4.setSelectedIndex(0);
-			combos.combo5.setSelectedIndex(0);
 			String loque=combos.combo2.getSelectedItem().toString();
 			if (loque.equals("Libro Mayor")) {
 				// borramos el panel central
@@ -539,11 +559,116 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 				panelCen.getViewport().setView(panelAuxCen);
 				panelCen.setVisible(true);
 			}
-		}
+			if (loque.equals("Cambios patrimonio")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+		} // fin combo2
+		
+		if (source==combos.combo3) {
+			String loque=combos.combo3.getSelectedItem().toString();
+
+			if (loque.equals("Asientos")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("Cuentas")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("Enlaces")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+		} // fin combo3
+		
+		
+		if (source==combos.combo4) {
+			String loque=combos.combo4.getSelectedItem().toString();
+
+			if (loque.equals("Cuentas clientes")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("Listado clientes")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("Grabación facturas")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("Modificación facturas")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("Borrado facturas")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("Listado facturas")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("IVA emitidas")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("Previsiones")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+		} // fin combo4
+		
+		if (source==combos.combo5) {
+			String loque=combos.combo5.getSelectedItem().toString();
+
+			if (loque.equals("Cuentas proveedores")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("Listado proveedores")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("Grabación facturas")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("Modificación facturas")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("Borrado facturas")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("Listado facturas")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("IVA recibidas")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+			if (loque.equals("Previsiones")) {
+				panelCen.setVisible(false);	
+				JOptionPane.showMessageDialog(null, "Menú temporalmente deshabilitado");
+			}
+		} // fin combo5
+		
 		
 	} // fin del actionPerformed
 	
 	
+	
+	/* ************************************************************************
+	 * Metodo que refresca la pantalla
+	 * Para ello oculta y dispose la pantalla principal lo que hace un reseteo
+	 * Luego llama a controlcenter para que aparezca de nuevo la pantalla
+	 * 
+	 * No recibe parametros ni devuelve nada
+	 ************************************************************************* */
 	
 	public void refresh(){
 		pantallaMain.setVisible(false);
@@ -552,4 +677,5 @@ public class PantallaPrincipal extends JFrame implements ActionListener, Setting
 		controlCenter();
 	}
 	
-} // **************** FIN DE CLASE *********
+	
+} // *************************** FIN DE CLASE *********

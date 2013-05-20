@@ -169,11 +169,11 @@ public class ContEmpresa extends JFrame implements ActionListener, Settings{
 		d9B.addActionListener(this);
 		d9C.addActionListener(this);
 		
-	} //fin del builder
+	} //fin del constructor
 	
 
 	public ContEmpresa (){
-		// builder
+		// constructor
 	}
 	
 	
